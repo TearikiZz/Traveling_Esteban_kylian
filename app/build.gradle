@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace 'com.kcorteel.travel_esteban_kylian'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.kcorteel.travel_esteban_kylian"
         minSdk 24
-        targetSdk 34
+        targetSdk 35
         versionCode 1
         versionName "1.0"
 
@@ -29,7 +29,6 @@ android {
 }
 
 dependencies {
-
     implementation libs.appcompat
     implementation libs.material
     implementation libs.activity

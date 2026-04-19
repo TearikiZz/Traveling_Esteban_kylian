@@ -12,6 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Travel_Esteban_kylian"
         tools:targetApi="31">
+        <activity android:name=".TravelPathActivity" />
+        <activity android:name=".TravelShareActivity" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
