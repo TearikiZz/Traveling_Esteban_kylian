@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,18 +26,20 @@ public class TravelShareActivity extends AppCompatActivity {
     private TravelShareRepository travelShareRepository;
     private TextView subtitleTextView;
     private Button createPhotoMetadataButton;
+    private ImageView profileShortcutImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_travel_share);
-
         travelShareRepository = TravelShareRepository.getInstance(this);
+        travelShareRepository.applyCurrentUserThemePreference();
+        setContentView(R.layout.activity_travel_share);
 
         searchEditText = findViewById(R.id.etSearchPhotoMetadata);
         photoMetadataRecyclerView = findViewById(R.id.rvPhotoMetadata);
         subtitleTextView = findViewById(R.id.tvTravelShareSubtitle);
         createPhotoMetadataButton = findViewById(R.id.btnCreatePhotoMetadata);
+        profileShortcutImageView = findViewById(R.id.ivProfileShortcut);
 
         photoMetadataAdapter = new PhotoMetadataAdapter(
                 travelShareRepository,
@@ -70,6 +73,10 @@ public class TravelShareActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        profileShortcutImageView.setOnClickListener(v ->
+                startActivity(new Intent(this, ProfileActivity.class))
+        );
+
         updateSubtitle();
     }
 
@@ -84,6 +91,7 @@ public class TravelShareActivity extends AppCompatActivity {
         if (travelShareRepository.isCurrentUserAnonymous()) {
             subtitleTextView.setText(R.string.travelshare_screen_subtitle_anonymous);
             createPhotoMetadataButton.setVisibility(View.GONE);
+            profileShortcutImageView.setVisibility(View.GONE);
             return;
         }
 
@@ -92,6 +100,11 @@ public class TravelShareActivity extends AppCompatActivity {
                 travelShareRepository.getCurrentUser().getUsername()
         ));
         createPhotoMetadataButton.setVisibility(View.VISIBLE);
+        profileShortcutImageView.setVisibility(View.VISIBLE);
+        travelShareRepository.loadUserAvatarIntoImageView(
+                profileShortcutImageView,
+                travelShareRepository.getCurrentUser()
+        );
     }
 
     private void openPhotoMetadataDetails(PhotoMetadata photoMetadata) {

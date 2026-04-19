@@ -2,11 +2,15 @@ package com.kcorteel.travel_esteban_kylian.travelshare.repository;
 
 import android.content.Context;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.widget.ImageView;
+
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.kcorteel.travel_esteban_kylian.R;
 import com.kcorteel.travel_esteban_kylian.auth.AppSessionManager;
 import com.kcorteel.travel_esteban_kylian.auth.PasswordUtils;
+import com.kcorteel.travel_esteban_kylian.travelshare.database.AppPreferencesDao;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.CommentDao;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.LocationDao;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.MediaDao;
@@ -14,6 +18,8 @@ import com.kcorteel.travel_esteban_kylian.travelshare.database.PhotoMetadataDao;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.SocialInteractionDao;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.TravelShareDatabase;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.UserDao;
+import com.kcorteel.travel_esteban_kylian.travelshare.model.AppPreferences;
+import com.kcorteel.travel_esteban_kylian.travelshare.model.AppTheme;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.Comment;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.Location;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.Media;
@@ -39,6 +45,7 @@ public class TravelShareRepository {
     private final PhotoMetadataDao photoMetadataDao;
     private final CommentDao commentDao;
     private final SocialInteractionDao socialInteractionDao;
+    private final AppPreferencesDao appPreferencesDao;
 
     private final AppSessionManager appSessionManager;
 
@@ -50,6 +57,7 @@ public class TravelShareRepository {
         photoMetadataDao = database.photoMetadataDao();
         commentDao = database.commentDao();
         socialInteractionDao = database.socialInteractionDao();
+        appPreferencesDao = database.appPreferencesDao();
         appSessionManager = new AppSessionManager(context);
 
         seedDatabaseIfNeeded();
@@ -89,6 +97,99 @@ public class TravelShareRepository {
     public boolean isCurrentUserAnonymous() {
         User currentUser = getCurrentUser();
         return currentUser == null || currentUser.isAnonymous();
+    }
+
+    public AppPreferences getCurrentUserPreferences() {
+        User currentUser = getCurrentUser();
+        if (currentUser == null || currentUser.isAnonymous()) {
+            return new AppPreferences(0L, appSessionManager.getCurrentUserId(), AppTheme.SYSTEM, "fr", false);
+        }
+        return getOrCreatePreferencesForUser(currentUser.getUserId());
+    }
+
+    public String updateCurrentUserProfile(String username, String email, String avatarUri) {
+        User currentUser = getCurrentUser();
+        if (currentUser == null || currentUser.isAnonymous()) {
+            return "Connectez-vous pour modifier votre profil.";
+        }
+
+        String normalizedUsername = username == null ? "" : username.trim();
+        String normalizedEmail = email == null ? "" : email.trim();
+        String normalizedAvatarUri = avatarUri == null
+                ? currentUser.getAvatarUri()
+                : avatarUri.trim();
+
+        if (normalizedUsername.isEmpty() || normalizedEmail.isEmpty()) {
+            return "Le nom d'utilisateur et l'email sont obligatoires.";
+        }
+
+        User existingByUsername = userDao.getByUsername(normalizedUsername);
+        if (existingByUsername != null && existingByUsername.getUserId() != currentUser.getUserId()) {
+            return "Ce nom d'utilisateur existe déjà.";
+        }
+
+        User existingByEmail = userDao.getByEmail(normalizedEmail);
+        if (existingByEmail != null && existingByEmail.getUserId() != currentUser.getUserId()) {
+            return "Cet email est déjà utilisé.";
+        }
+
+        userDao.upsert(new User(
+                currentUser.getUserId(),
+                normalizedUsername,
+                normalizedEmail,
+                currentUser.getPasswordHash(),
+                false,
+                normalizedAvatarUri
+        ));
+
+        return null;
+    }
+
+    public void updateCurrentUserPreferences(AppTheme theme, String language, boolean notificationsEnabled) {
+        User currentUser = getCurrentUser();
+        if (currentUser == null || currentUser.isAnonymous()) {
+            return;
+        }
+
+        appPreferencesDao.insert(new AppPreferences(
+                currentUser.getUserId(),
+                currentUser.getUserId(),
+                theme == null ? AppTheme.SYSTEM : theme,
+                TextUtils.isEmpty(language) ? "fr" : language,
+                notificationsEnabled
+        ));
+    }
+
+    public void applyCurrentUserThemePreference() {
+        AppTheme theme = getCurrentUserPreferences().getTheme();
+        int nightMode;
+        switch (theme) {
+            case LIGHT:
+                nightMode = AppCompatDelegate.MODE_NIGHT_NO;
+                break;
+            case DARK:
+                nightMode = AppCompatDelegate.MODE_NIGHT_YES;
+                break;
+            case SYSTEM:
+            default:
+                nightMode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+                break;
+        }
+        AppCompatDelegate.setDefaultNightMode(nightMode);
+    }
+
+    public ProfileStats getCurrentUserProfileStats() {
+        User currentUser = getCurrentUser();
+        if (currentUser == null || currentUser.isAnonymous()) {
+            return new ProfileStats(0, 0, 0);
+        }
+
+        long userId = currentUser.getUserId();
+        return new ProfileStats(
+                photoMetadataDao.countByAuthorId(userId),
+                commentDao.countByUserId(userId),
+                socialInteractionDao.countLikesReceivedByAuthor(userId)
+        );
     }
 
     public PhotoMetadata createPhotoMetadata(
@@ -249,6 +350,24 @@ public class TravelShareRepository {
         }
     }
 
+    public void loadUserAvatarIntoImageView(ImageView imageView, User user) {
+        if (user == null || user.getAvatarUri() == null || user.getAvatarUri().trim().isEmpty()) {
+            imageView.setImageResource(android.R.drawable.ic_menu_myplaces);
+            imageView.setImageTintList(android.content.res.ColorStateList.valueOf(0xFF0F172A));
+            return;
+        }
+
+        String avatarUri = user.getAvatarUri().trim();
+        if (avatarUri.startsWith("content://") || avatarUri.startsWith("file://")) {
+            imageView.setImageURI(Uri.parse(avatarUri));
+            imageView.setImageTintList(null);
+            return;
+        }
+
+        imageView.setImageResource(android.R.drawable.ic_menu_myplaces);
+        imageView.setImageTintList(android.content.res.ColorStateList.valueOf(0xFF0F172A));
+    }
+
     public String getLocationLabel(PhotoMetadata photoMetadata) {
         Location location = getLocationById(photoMetadata.getLocationId());
         if (location == null) {
@@ -275,10 +394,15 @@ public class TravelShareRepository {
 
     public String getSearchableText(PhotoMetadata photoMetadata) {
         Location location = getLocationById(photoMetadata.getLocationId());
+        User author = getUserById(photoMetadata.getAuthorId());
         StringBuilder builder = new StringBuilder();
         builder.append(photoMetadata.getTitle()).append(' ')
                 .append(photoMetadata.getDescription()).append(' ')
                 .append(photoMetadata.getPlaceType().name()).append(' ');
+
+        if (author != null) {
+            builder.append(author.getUsername()).append(' ');
+        }
 
         if (location != null) {
             builder.append(location.getAddress()).append(' ')
@@ -304,6 +428,10 @@ public class TravelShareRepository {
                 new User(3L, "maya", "maya@traveling.app", PasswordUtils.hash("maya123"), false),
                 new User(4L, "voyage_anonyme", "", "", true)
         ));
+
+        appPreferencesDao.insert(new AppPreferences(1L, 1L, AppTheme.SYSTEM, "fr", true));
+        appPreferencesDao.insert(new AppPreferences(2L, 2L, AppTheme.SYSTEM, "fr", true));
+        appPreferencesDao.insert(new AppPreferences(3L, 3L, AppTheme.SYSTEM, "fr", true));
 
         locationDao.insertAll(Arrays.asList(
                 new Location(101L, 48.8584, 2.2945, "Champ de Mars", "Paris", "France"),
@@ -380,5 +508,40 @@ public class TravelShareRepository {
                 new SocialInteraction(1003L, 1L, 304L, SocialInteractionType.LIKE),
                 new SocialInteraction(1004L, 3L, 304L, SocialInteractionType.LIKE)
         ));
+    }
+
+    private AppPreferences getOrCreatePreferencesForUser(long userId) {
+        AppPreferences preferences = appPreferencesDao.getByUserId(userId);
+        if (preferences != null) {
+            return preferences;
+        }
+
+        AppPreferences defaultPreferences = new AppPreferences(userId, userId, AppTheme.SYSTEM, "fr", true);
+        appPreferencesDao.insert(defaultPreferences);
+        return defaultPreferences;
+    }
+
+    public static class ProfileStats {
+        private final int publicationsCount;
+        private final int commentsCount;
+        private final int likesReceivedCount;
+
+        public ProfileStats(int publicationsCount, int commentsCount, int likesReceivedCount) {
+            this.publicationsCount = publicationsCount;
+            this.commentsCount = commentsCount;
+            this.likesReceivedCount = likesReceivedCount;
+        }
+
+        public int getPublicationsCount() {
+            return publicationsCount;
+        }
+
+        public int getCommentsCount() {
+            return commentsCount;
+        }
+
+        public int getLikesReceivedCount() {
+            return likesReceivedCount;
+        }
     }
 }

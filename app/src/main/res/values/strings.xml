@@ -70,6 +70,41 @@
     <string name="travelshare_post_missing">Publication introuvable</string>
     <string name="travelshare_no_map_app">Aucune application de cartographie disponible</string>
     <string name="travelshare_unknown_user">Utilisateur inconnu</string>
+    <string name="profile_open_button">Ouvrir le profil</string>
+    <string name="profile_screen_title">Mon profil</string>
+    <string name="profile_screen_subtitle">Gérez votre photo, vos informations et vos préférences TravelShare.</string>
+    <string name="profile_change_photo_button">Changer la photo</string>
+    <string name="profile_info_section">Informations du compte</string>
+    <string name="profile_username_label">Nom d\'utilisateur</string>
+    <string name="profile_email_label">Email</string>
+    <string name="profile_mode_label">Mode</string>
+    <string name="profile_mode_format">Mode : %1$s</string>
+    <string name="profile_mode_connected">Compte connecté</string>
+    <string name="profile_user_id_format">ID utilisateur : #%1$d</string>
+    <string name="profile_stats_section">Statistiques</string>
+    <string name="profile_stat_publications">Publications</string>
+    <string name="profile_stat_comments">Commentaires</string>
+    <string name="profile_stat_likes">Likes reçus</string>
+    <string name="profile_preferences_section">Préférences</string>
+    <string name="profile_theme_label">Thème</string>
+    <string name="profile_language_label">Langue préférée</string>
+    <string name="profile_notifications_label">Notifications activées</string>
+    <string name="profile_save_button">Enregistrer le profil</string>
+    <string name="profile_logout_button">Se déconnecter</string>
+    <string name="profile_saved_message">Profil mis à jour</string>
+    <string name="profile_photo_preview">Photo de profil</string>
+
+    <string-array name="profile_theme_labels">
+        <item>Suivre le système</item>
+        <item>Clair</item>
+        <item>Sombre</item>
+    </string-array>
+
+    <string-array name="profile_language_labels">
+        <item>Français</item>
+        <item>English</item>
+        <item>Español</item>
+    </string-array>
 
     <string-array name="travelshare_place_type_labels">
         <item>NATURE</item>

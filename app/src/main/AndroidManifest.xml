@@ -12,6 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Travel_Esteban_kylian"
         tools:targetApi="31">
+        <activity android:name=".ProfileActivity" />
         <activity android:name=".CreatePhotoMetadataActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".LoginActivity" />

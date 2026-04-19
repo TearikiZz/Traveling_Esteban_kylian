@@ -29,6 +29,9 @@ public interface SocialInteractionDao {
     @Query("SELECT COUNT(*) FROM social_interactions WHERE targetId = :targetId AND type = :type")
     int countByTargetAndType(long targetId, SocialInteractionType type);
 
+    @Query("SELECT COUNT(*) FROM social_interactions WHERE type = 'LIKE' AND targetId IN (SELECT photoId FROM photo_metadata WHERE authorId = :authorId)")
+    int countLikesReceivedByAuthor(long authorId);
+
     @Query("SELECT COALESCE(MAX(interactionId), 0) FROM social_interactions")
     long getMaxInteractionId();
 }

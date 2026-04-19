@@ -2,6 +2,7 @@ package com.kcorteel.travel_esteban_kylian.travelshare.database;
 
 import androidx.room.TypeConverter;
 
+import com.kcorteel.travel_esteban_kylian.travelshare.model.AppTheme;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.MediaType;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.PlaceType;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.SocialInteractionType;
@@ -56,5 +57,15 @@ public class TravelShareConverters {
     @TypeConverter
     public static SocialInteractionType toSocialInteractionType(String value) {
         return value == null ? SocialInteractionType.LIKE : SocialInteractionType.valueOf(value);
+    }
+
+    @TypeConverter
+    public static String fromAppTheme(AppTheme theme) {
+        return theme == null ? null : theme.name();
+    }
+
+    @TypeConverter
+    public static AppTheme toAppTheme(String value) {
+        return value == null ? AppTheme.SYSTEM : AppTheme.valueOf(value);
     }
 }

@@ -24,6 +24,9 @@ public interface PhotoMetadataDao {
     @Query("SELECT * FROM photo_metadata WHERE photoId = :photoId LIMIT 1")
     PhotoMetadata getById(long photoId);
 
+    @Query("SELECT COUNT(*) FROM photo_metadata WHERE authorId = :authorId")
+    int countByAuthorId(long authorId);
+
     @Query("SELECT COUNT(*) FROM photo_metadata")
     int countAll();
 

@@ -24,6 +24,9 @@ public interface CommentDao {
     @Query("SELECT COUNT(*) FROM comments WHERE photoId = :photoId")
     int countByPhotoId(long photoId);
 
+    @Query("SELECT COUNT(*) FROM comments WHERE userId = :userId")
+    int countByUserId(long userId);
+
     @Query("SELECT COALESCE(MAX(commentId), 0) FROM comments")
     long getMaxCommentId();
 }
