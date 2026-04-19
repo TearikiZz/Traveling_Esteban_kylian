@@ -2,15 +2,38 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
+    android:background="#F4F6F8"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:padding="20dp">
 
     <TextView
+        android:id="@+id/tvTravelShareTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Module TravelShare en cours de développement"
-        android:textSize="22sp"
+        android:layout_marginBottom="16dp"
+        android:text="TravelShare"
+        android:textColor="#1E293B"
+        android:textSize="28sp"
         android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/etSearchPost"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="@android:drawable/edit_text"
+        android:hint="Rechercher une publication"
+        android:imeOptions="actionDone"
+        android:inputType="text"
+        android:minHeight="48dp"
+        android:padding="12dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvPhotoPosts"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="12dp" />
 
 </LinearLayout>
