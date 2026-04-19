@@ -18,6 +18,25 @@
             android:textSize="28sp"
             android:textStyle="bold" />
 
+        <ImageView
+            android:id="@+id/ivSelectedPhotoPreview"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:layout_marginTop="20dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/bg_photo_post_card"
+            android:contentDescription="@string/travelshare_selected_photo_preview"
+            android:padding="6dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_launcher_background" />
+
+        <Button
+            android:id="@+id/btnSelectPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/travelshare_select_photo_button" />
+
         <EditText
             android:id="@+id/etCreateTitle"
             android:layout_width="match_parent"
@@ -97,14 +116,6 @@
 
         <Spinner
             android:id="@+id/spinnerCreatePlaceType"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_search_bar"
-            android:padding="8dp" />
-
-        <Spinner
-            android:id="@+id/spinnerCreateMedia"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"

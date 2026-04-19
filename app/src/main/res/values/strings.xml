@@ -35,7 +35,10 @@
     <string name="travelshare_create_longitude_hint">Longitude</string>
     <string name="travelshare_create_tags_hint">Tags séparés par des virgules</string>
     <string name="travelshare_create_publish_button">Publier</string>
+    <string name="travelshare_select_photo_button">Choisir une photo</string>
+    <string name="travelshare_selected_photo_preview">Aperçu de la photo sélectionnée</string>
     <string name="travelshare_create_missing_fields">Tous les champs principaux doivent être remplis.</string>
+    <string name="travelshare_create_missing_photo">Veuillez sélectionner une photo.</string>
     <string name="travelshare_create_invalid_coordinates">Les coordonnées doivent être valides.</string>
     <string name="travelshare_create_success">Publication créée avec succès.</string>
     <string name="travelshare_create_requires_login">Connectez-vous pour créer une publication.</string>
@@ -77,10 +80,4 @@
         <item>OTHER</item>
     </string-array>
 
-    <string-array name="travelshare_media_labels">
-        <item>Image mock Paris</item>
-        <item>Image mock Kyoto</item>
-        <item>Image mock Rome</item>
-        <item>Image mock Barcelone</item>
-    </string-array>
 </resources>

@@ -106,7 +106,7 @@ public class PhotoMetadataAdapter extends RecyclerView.Adapter<PhotoMetadataAdap
         }
 
         void bind(final PhotoMetadata photoMetadata) {
-            photoImageView.setImageResource(repository.resolveMediaResourceId(itemView.getContext(), photoMetadata));
+            repository.loadMediaIntoImageView(itemView.getContext(), photoImageView, photoMetadata);
             titleTextView.setText(photoMetadata.getTitle());
             locationTextView.setText(repository.getLocationLabel(photoMetadata));
             dateTextView.setText(dateFormat.format(new Date(photoMetadata.getTimestamp())));

@@ -1,6 +1,8 @@
 package com.kcorteel.travel_esteban_kylian.travelshare.repository;
 
 import android.content.Context;
+import android.net.Uri;
+import android.widget.ImageView;
 
 import com.kcorteel.travel_esteban_kylian.R;
 import com.kcorteel.travel_esteban_kylian.auth.AppSessionManager;
@@ -223,6 +225,28 @@ public class TravelShareRepository {
         int resourceId = context.getResources()
                 .getIdentifier(media.getUrl(), "drawable", context.getPackageName());
         return resourceId != 0 ? resourceId : R.drawable.ic_launcher_background;
+    }
+
+    public void loadMediaIntoImageView(Context context, ImageView imageView, PhotoMetadata photoMetadata) {
+        Media media = getMediaById(photoMetadata.getMediaId());
+        if (media == null || media.getUrl() == null || media.getUrl().trim().isEmpty()) {
+            imageView.setImageResource(R.drawable.ic_launcher_background);
+            return;
+        }
+
+        String mediaUrl = media.getUrl();
+        if (mediaUrl.startsWith("content://") || mediaUrl.startsWith("file://")) {
+            imageView.setImageURI(Uri.parse(mediaUrl));
+            return;
+        }
+
+        int resourceId = context.getResources()
+                .getIdentifier(mediaUrl, "drawable", context.getPackageName());
+        if (resourceId != 0) {
+            imageView.setImageResource(resourceId);
+        } else {
+            imageView.setImageResource(R.drawable.ic_launcher_background);
+        }
     }
 
     public String getLocationLabel(PhotoMetadata photoMetadata) {

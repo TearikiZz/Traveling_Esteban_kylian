@@ -108,7 +108,7 @@ public class TravelShareDetailActivity extends AppCompatActivity {
             return;
         }
 
-        mediaImageView.setImageResource(travelShareRepository.resolveMediaResourceId(this, photoMetadata));
+        travelShareRepository.loadMediaIntoImageView(this, mediaImageView, photoMetadata);
         titleTextView.setText(photoMetadata.getTitle());
         authorTextView.setText(getString(
                 R.string.travelshare_author_format,

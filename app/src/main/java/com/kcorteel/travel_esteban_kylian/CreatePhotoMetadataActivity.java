@@ -1,13 +1,17 @@
 package com.kcorteel.travel_esteban_kylian;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.kcorteel.travel_esteban_kylian.travelshare.model.PlaceType;
 import com.kcorteel.travel_esteban_kylian.travelshare.repository.TravelShareRepository;
@@ -27,9 +31,11 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
     private EditText longitudeEditText;
     private EditText tagsEditText;
     private Spinner placeTypeSpinner;
-    private Spinner mediaSpinner;
+    private ImageView selectedImagePreview;
 
     private TravelShareRepository travelShareRepository;
+    private Uri selectedImageUri;
+    private ActivityResultLauncher<String[]> openDocumentLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +50,33 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
             return;
         }
 
+        setupImagePicker();
         bindViews();
-        setupSpinners();
+        setupPlaceTypeSpinner();
+
+        Button selectImageButton = findViewById(R.id.btnSelectPhoto);
+        selectImageButton.setOnClickListener(v -> openDocumentLauncher.launch(new String[]{"image/*"}));
 
         Button publishButton = findViewById(R.id.btnPublishPhotoMetadata);
         publishButton.setOnClickListener(v -> publishPhotoMetadata());
+    }
+
+    private void setupImagePicker() {
+        openDocumentLauncher = registerForActivityResult(
+                new ActivityResultContracts.OpenDocument(),
+                uri -> {
+                    if (uri == null) {
+                        return;
+                    }
+
+                    selectedImageUri = uri;
+                    final int flags = Intent.FLAG_GRANT_READ_URI_PERMISSION;
+                    getContentResolver().takePersistableUriPermission(uri, flags);
+                    if (selectedImagePreview != null) {
+                        selectedImagePreview.setImageURI(uri);
+                    }
+                }
+        );
     }
 
     private void bindViews() {
@@ -61,25 +89,17 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         longitudeEditText = findViewById(R.id.etCreateLongitude);
         tagsEditText = findViewById(R.id.etCreateTags);
         placeTypeSpinner = findViewById(R.id.spinnerCreatePlaceType);
-        mediaSpinner = findViewById(R.id.spinnerCreateMedia);
+        selectedImagePreview = findViewById(R.id.ivSelectedPhotoPreview);
     }
 
-    private void setupSpinners() {
-        ArrayAdapter<String> placeTypeAdapter = new ArrayAdapter<>(
+    private void setupPlaceTypeSpinner() {
+        android.widget.ArrayAdapter<String> placeTypeAdapter = new android.widget.ArrayAdapter<>(
                 this,
                 android.R.layout.simple_spinner_item,
                 getResources().getStringArray(R.array.travelshare_place_type_labels)
         );
         placeTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         placeTypeSpinner.setAdapter(placeTypeAdapter);
-
-        ArrayAdapter<String> mediaAdapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_spinner_item,
-                getResources().getStringArray(R.array.travelshare_media_labels)
-        );
-        mediaAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mediaSpinner.setAdapter(mediaAdapter);
     }
 
     private void publishPhotoMetadata() {
@@ -98,6 +118,11 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
             return;
         }
 
+        if (selectedImageUri == null) {
+            Toast.makeText(this, R.string.travelshare_create_missing_photo, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         double latitude;
         double longitude;
         try {
@@ -110,7 +135,6 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
 
         List<String> tags = parseTags(tagsRaw);
         PlaceType placeType = PlaceType.values()[placeTypeSpinner.getSelectedItemPosition()];
-        String imageDrawableName = getSelectedMediaDrawableName(mediaSpinner.getSelectedItemPosition());
 
         if (travelShareRepository.createPhotoMetadata(
                 title,
@@ -122,7 +146,7 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
                 longitude,
                 tags,
                 placeType,
-                imageDrawableName
+                selectedImageUri.toString()
         ) == null) {
             Toast.makeText(this, R.string.travelshare_create_requires_login, Toast.LENGTH_SHORT).show();
             return;
@@ -145,19 +169,5 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
             }
         }
         return tags;
-    }
-
-    private String getSelectedMediaDrawableName(int selectedPosition) {
-        switch (selectedPosition) {
-            case 1:
-                return "img_mock_kyoto";
-            case 2:
-                return "img_mock_rome";
-            case 3:
-                return "img_mock_barcelona";
-            case 0:
-            default:
-                return "img_mock_paris";
-        }
     }
 }
