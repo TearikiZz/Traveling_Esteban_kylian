@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,6 +21,7 @@ public class TravelShareActivity extends AppCompatActivity {
     private RecyclerView photoMetadataRecyclerView;
     private PhotoMetadataAdapter photoMetadataAdapter;
     private TravelShareRepository travelShareRepository;
+    private TextView subtitleTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +32,7 @@ public class TravelShareActivity extends AppCompatActivity {
 
         searchEditText = findViewById(R.id.etSearchPhotoMetadata);
         photoMetadataRecyclerView = findViewById(R.id.rvPhotoMetadata);
+        subtitleTextView = findViewById(R.id.tvTravelShareSubtitle);
 
         photoMetadataAdapter = new PhotoMetadataAdapter(
                 travelShareRepository,
@@ -57,6 +60,26 @@ public class TravelShareActivity extends AppCompatActivity {
                 // No-op
             }
         });
+
+        updateSubtitle();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateSubtitle();
+    }
+
+    private void updateSubtitle() {
+        if (travelShareRepository.isCurrentUserAnonymous()) {
+            subtitleTextView.setText(R.string.travelshare_screen_subtitle_anonymous);
+            return;
+        }
+
+        subtitleTextView.setText(getString(
+                R.string.travelshare_screen_subtitle_connected,
+                travelShareRepository.getCurrentUser().getUsername()
+        ));
     }
 
     private void openPhotoMetadataDetails(PhotoMetadata photoMetadata) {

@@ -39,6 +39,7 @@ public class TravelShareDetailActivity extends AppCompatActivity {
     private Button likeButton;
     private Button reportButton;
     private Button directionsButton;
+    private Button addCommentButton;
     private EditText commentEditText;
     private RecyclerView commentsRecyclerView;
 
@@ -90,6 +91,7 @@ public class TravelShareDetailActivity extends AppCompatActivity {
         likeButton = findViewById(R.id.btnLikePhotoMetadata);
         reportButton = findViewById(R.id.btnReportPhotoMetadata);
         directionsButton = findViewById(R.id.btnOpenDirections);
+        addCommentButton = findViewById(R.id.btnAddComment);
         commentEditText = findViewById(R.id.etAddComment);
         commentsRecyclerView = findViewById(R.id.rvComments);
     }
@@ -134,6 +136,7 @@ public class TravelShareDetailActivity extends AppCompatActivity {
 
         updateLikeButton();
         updateReportButton();
+        updateCommentInputState();
     }
 
     private void setupActions() {
@@ -165,7 +168,7 @@ public class TravelShareDetailActivity extends AppCompatActivity {
 
         directionsButton.setOnClickListener(v -> openDirections());
 
-        findViewById(R.id.btnAddComment).setOnClickListener(v -> addComment());
+        addCommentButton.setOnClickListener(v -> addComment());
     }
 
     private void updateLikeButton() {
@@ -186,6 +189,11 @@ public class TravelShareDetailActivity extends AppCompatActivity {
     }
 
     private void addComment() {
+        if (travelShareRepository.isCurrentUserAnonymous()) {
+            Toast.makeText(this, R.string.auth_comment_requires_login, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         String commentText = commentEditText.getText().toString().trim();
         if (commentText.isEmpty()) {
             Toast.makeText(this, R.string.travelshare_comment_empty_error, Toast.LENGTH_SHORT).show();
@@ -196,6 +204,15 @@ public class TravelShareDetailActivity extends AppCompatActivity {
         commentEditText.setText("");
         bindPhotoMetadata();
         Toast.makeText(this, R.string.travelshare_comment_added, Toast.LENGTH_SHORT).show();
+    }
+
+    private void updateCommentInputState() {
+        boolean anonymous = travelShareRepository.isCurrentUserAnonymous();
+        commentEditText.setEnabled(!anonymous);
+        addCommentButton.setEnabled(!anonymous);
+        commentEditText.setHint(anonymous
+                ? getString(R.string.auth_comment_requires_login)
+                : getString(R.string.travelshare_comment_hint));
     }
 
     private void openDirections() {

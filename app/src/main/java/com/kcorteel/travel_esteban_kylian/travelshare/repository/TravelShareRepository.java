@@ -3,6 +3,8 @@ package com.kcorteel.travel_esteban_kylian.travelshare.repository;
 import android.content.Context;
 
 import com.kcorteel.travel_esteban_kylian.R;
+import com.kcorteel.travel_esteban_kylian.auth.AppSessionManager;
+import com.kcorteel.travel_esteban_kylian.auth.PasswordUtils;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.CommentDao;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.LocationDao;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.MediaDao;
@@ -35,7 +37,7 @@ public class TravelShareRepository {
     private final CommentDao commentDao;
     private final SocialInteractionDao socialInteractionDao;
 
-    private final long currentUserId;
+    private final AppSessionManager appSessionManager;
 
     private TravelShareRepository(Context context) {
         TravelShareDatabase database = TravelShareDatabase.getInstance(context);
@@ -45,8 +47,7 @@ public class TravelShareRepository {
         photoMetadataDao = database.photoMetadataDao();
         commentDao = database.commentDao();
         socialInteractionDao = database.socialInteractionDao();
-
-        currentUserId = 1L;
+        appSessionManager = new AppSessionManager(context);
 
         seedDatabaseIfNeeded();
     }
@@ -79,7 +80,12 @@ public class TravelShareRepository {
     }
 
     public User getCurrentUser() {
-        return userDao.getById(currentUserId);
+        return userDao.getById(appSessionManager.getCurrentUserId());
+    }
+
+    public boolean isCurrentUserAnonymous() {
+        User currentUser = getCurrentUser();
+        return currentUser == null || currentUser.isAnonymous();
     }
 
     public List<Comment> getCommentsForPhoto(long photoId) {
@@ -96,7 +102,7 @@ public class TravelShareRepository {
         Comment comment = new Comment(
                 nextCommentId,
                 photoId,
-                currentUserId,
+                appSessionManager.getCurrentUserId(),
                 normalizedText,
                 "",
                 System.currentTimeMillis()
@@ -107,7 +113,7 @@ public class TravelShareRepository {
 
     public boolean toggleLike(long photoId) {
         SocialInteraction existingLike = socialInteractionDao.findInteraction(
-                currentUserId,
+                appSessionManager.getCurrentUserId(),
                 photoId,
                 SocialInteractionType.LIKE
         );
@@ -119,7 +125,7 @@ public class TravelShareRepository {
 
         socialInteractionDao.insert(new SocialInteraction(
                 socialInteractionDao.getMaxInteractionId() + 1L,
-                currentUserId,
+                appSessionManager.getCurrentUserId(),
                 photoId,
                 SocialInteractionType.LIKE
         ));
@@ -127,7 +133,11 @@ public class TravelShareRepository {
     }
 
     public boolean isPhotoLikedByCurrentUser(long photoId) {
-        return socialInteractionDao.findInteraction(currentUserId, photoId, SocialInteractionType.LIKE) != null;
+        return socialInteractionDao.findInteraction(
+                appSessionManager.getCurrentUserId(),
+                photoId,
+                SocialInteractionType.LIKE
+        ) != null;
     }
 
     public int getLikeCount(long photoId) {
@@ -136,7 +146,7 @@ public class TravelShareRepository {
 
     public boolean reportPhoto(long photoId) {
         SocialInteraction existingReport = socialInteractionDao.findInteraction(
-                currentUserId,
+                appSessionManager.getCurrentUserId(),
                 photoId,
                 SocialInteractionType.REPORT
         );
@@ -147,7 +157,7 @@ public class TravelShareRepository {
 
         socialInteractionDao.insert(new SocialInteraction(
                 socialInteractionDao.getMaxInteractionId() + 1L,
-                currentUserId,
+                appSessionManager.getCurrentUserId(),
                 photoId,
                 SocialInteractionType.REPORT
         ));
@@ -155,7 +165,11 @@ public class TravelShareRepository {
     }
 
     public boolean isPhotoReportedByCurrentUser(long photoId) {
-        return socialInteractionDao.findInteraction(currentUserId, photoId, SocialInteractionType.REPORT) != null;
+        return socialInteractionDao.findInteraction(
+                appSessionManager.getCurrentUserId(),
+                photoId,
+                SocialInteractionType.REPORT
+        ) != null;
     }
 
     public int resolveMediaResourceId(Context context, PhotoMetadata photoMetadata) {
@@ -219,9 +233,9 @@ public class TravelShareRepository {
         }
 
         userDao.insertAll(Arrays.asList(
-                new User(1L, "kylian", "kylian@traveling.app", "hash-kylian", false),
-                new User(2L, "esteban", "esteban@traveling.app", "hash-esteban", false),
-                new User(3L, "maya", "maya@traveling.app", "hash-maya", false),
+                new User(1L, "kylian", "kylian@traveling.app", PasswordUtils.hash("kylian123"), false),
+                new User(2L, "esteban", "esteban@traveling.app", PasswordUtils.hash("esteban123"), false),
+                new User(3L, "maya", "maya@traveling.app", PasswordUtils.hash("maya123"), false),
                 new User(4L, "voyage_anonyme", "", "", true)
         ));
 
