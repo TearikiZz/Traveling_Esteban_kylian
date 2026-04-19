@@ -10,14 +10,23 @@
         android:id="@+id/tvTravelShareTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:text="TravelShare"
+        android:text="@string/travelshare_screen_title"
         android:textColor="#1E293B"
         android:textSize="28sp"
         android:textStyle="bold" />
 
+    <TextView
+        android:id="@+id/tvTravelShareSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/travelshare_screen_subtitle"
+        android:textColor="#475569"
+        android:textSize="14sp" />
+
     <EditText
-        android:id="@+id/etSearchPost"
+        android:id="@+id/etSearchPhotoMetadata"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
@@ -29,7 +38,7 @@
         android:padding="12dp" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvPhotoPosts"
+        android:id="@+id/rvPhotoMetadata"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"

@@ -2,113 +2,212 @@ package com.kcorteel.travel_esteban_kylian;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.kcorteel.travel_esteban_kylian.travelshare.model.PhotoPost;
+import com.kcorteel.travel_esteban_kylian.travelshare.adapter.CommentAdapter;
+import com.kcorteel.travel_esteban_kylian.travelshare.model.Location;
+import com.kcorteel.travel_esteban_kylian.travelshare.model.PhotoMetadata;
+import com.kcorteel.travel_esteban_kylian.travelshare.repository.TravelShareRepository;
+
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class TravelShareDetailActivity extends AppCompatActivity {
 
-    public static final String EXTRA_PHOTO_POST = "extra_photo_post";
+    public static final String EXTRA_PHOTO_ID = "extra_photo_id";
 
-    private ImageView postImageView;
+    private ImageView mediaImageView;
     private TextView titleTextView;
+    private TextView authorTextView;
     private TextView locationTextView;
     private TextView dateTextView;
     private TextView descriptionTextView;
+    private TextView tagsTextView;
     private TextView routeAdviceTextView;
+    private TextView commentsCountTextView;
     private Button likeButton;
+    private Button reportButton;
     private Button directionsButton;
+    private EditText commentEditText;
+    private RecyclerView commentsRecyclerView;
 
-    private PhotoPost photoPost;
+    private TravelShareRepository travelShareRepository;
+    private CommentAdapter commentAdapter;
+    private PhotoMetadata photoMetadata;
+    private long photoId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_travel_share_detail);
 
-        bindViews();
-        readPost();
+        travelShareRepository = TravelShareRepository.getInstance();
+        photoId = getIntent().getLongExtra(EXTRA_PHOTO_ID, -1L);
+        photoMetadata = travelShareRepository.getPhotoMetadataById(photoId);
 
-        if (photoPost == null) {
+        if (photoMetadata == null) {
             Toast.makeText(this, R.string.travelshare_post_missing, Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
-        bindPost();
+        bindViews();
+        setupCommentsRecyclerView();
+        bindPhotoMetadata();
         setupActions();
     }
 
-    private void bindViews() {
-        postImageView = findViewById(R.id.ivDetailPhoto);
-        titleTextView = findViewById(R.id.tvDetailTitle);
-        locationTextView = findViewById(R.id.tvDetailLocation);
-        dateTextView = findViewById(R.id.tvDetailDate);
-        descriptionTextView = findViewById(R.id.tvDetailDescription);
-        routeAdviceTextView = findViewById(R.id.tvDetailRouteAdvice);
-        likeButton = findViewById(R.id.btnLikePost);
-        directionsButton = findViewById(R.id.btnOpenDirections);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        photoMetadata = travelShareRepository.getPhotoMetadataById(photoId);
+        if (photoMetadata != null) {
+            bindPhotoMetadata();
+        }
     }
 
-    private void readPost() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            photoPost = getIntent().getSerializableExtra(EXTRA_PHOTO_POST, PhotoPost.class);
+    private void bindViews() {
+        mediaImageView = findViewById(R.id.ivDetailPhotoMetadataMedia);
+        titleTextView = findViewById(R.id.tvDetailPhotoMetadataTitle);
+        authorTextView = findViewById(R.id.tvDetailPhotoMetadataAuthor);
+        locationTextView = findViewById(R.id.tvDetailPhotoMetadataLocation);
+        dateTextView = findViewById(R.id.tvDetailPhotoMetadataDate);
+        descriptionTextView = findViewById(R.id.tvDetailPhotoMetadataDescription);
+        tagsTextView = findViewById(R.id.tvDetailPhotoMetadataTags);
+        routeAdviceTextView = findViewById(R.id.tvDetailPhotoMetadataRouteAdvice);
+        commentsCountTextView = findViewById(R.id.tvCommentsCount);
+        likeButton = findViewById(R.id.btnLikePhotoMetadata);
+        reportButton = findViewById(R.id.btnReportPhotoMetadata);
+        directionsButton = findViewById(R.id.btnOpenDirections);
+        commentEditText = findViewById(R.id.etAddComment);
+        commentsRecyclerView = findViewById(R.id.rvComments);
+    }
+
+    private void setupCommentsRecyclerView() {
+        commentAdapter = new CommentAdapter(travelShareRepository);
+        commentsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        commentsRecyclerView.setNestedScrollingEnabled(false);
+        commentsRecyclerView.setAdapter(commentAdapter);
+    }
+
+    private void bindPhotoMetadata() {
+        if (photoMetadata == null) {
             return;
         }
 
-        Object extra = getIntent().getSerializableExtra(EXTRA_PHOTO_POST);
-        if (extra instanceof PhotoPost) {
-            photoPost = (PhotoPost) extra;
-        }
-    }
+        mediaImageView.setImageResource(travelShareRepository.resolveMediaResourceId(this, photoMetadata));
+        titleTextView.setText(photoMetadata.getTitle());
+        authorTextView.setText(getString(
+                R.string.travelshare_author_format,
+                travelShareRepository.getAuthorLabel(photoMetadata)
+        ));
+        locationTextView.setText(getString(
+                R.string.travelshare_location_format,
+                travelShareRepository.getLocationLabel(photoMetadata)
+        ));
+        dateTextView.setText(getString(
+                R.string.travelshare_date_format,
+                DateFormat.getDateInstance(DateFormat.LONG, Locale.FRANCE)
+                        .format(new Date(photoMetadata.getTimestamp()))
+        ));
+        descriptionTextView.setText(photoMetadata.getDescription());
+        tagsTextView.setText(getString(
+                R.string.travelshare_tags_format,
+                TextUtils.join(", ", photoMetadata.getTags())
+        ));
+        routeAdviceTextView.setText(travelShareRepository.getRouteAdvice(photoMetadata));
 
-    private void bindPost() {
-        postImageView.setImageResource(photoPost.getImageResId());
-        titleTextView.setText(photoPost.getTitle());
-        locationTextView.setText(getString(R.string.travelshare_location_format, photoPost.getLocation()));
-        dateTextView.setText(getString(R.string.travelshare_date_format, photoPost.getDate()));
-        descriptionTextView.setText(photoPost.getDescription());
-        routeAdviceTextView.setText(photoPost.getRouteAdvice());
+        int commentsCount = travelShareRepository.getCommentsForPhoto(photoId).size();
+        commentsCountTextView.setText(getString(R.string.travelshare_comments_count_format, commentsCount));
+        commentAdapter.submitComments(travelShareRepository.getCommentsForPhoto(photoId));
+
         updateLikeButton();
+        updateReportButton();
     }
 
     private void setupActions() {
         likeButton.setOnClickListener(v -> {
-            photoPost.setLiked(!photoPost.isLiked());
+            boolean liked = travelShareRepository.toggleLike(photoId);
             updateLikeButton();
 
-            int messageRes = photoPost.isLiked()
+            int messageRes = liked
                     ? R.string.travelshare_liked_message
                     : R.string.travelshare_unliked_message;
 
             Toast.makeText(
                     TravelShareDetailActivity.this,
-                    getString(messageRes, photoPost.getTitle()),
+                    getString(messageRes, photoMetadata.getTitle()),
                     Toast.LENGTH_SHORT
             ).show();
         });
 
+        reportButton.setOnClickListener(v -> {
+            boolean reported = travelShareRepository.reportPhoto(photoId);
+            updateReportButton();
+
+            int messageRes = reported
+                    ? R.string.travelshare_report_success
+                    : R.string.travelshare_report_already_done;
+
+            Toast.makeText(this, messageRes, Toast.LENGTH_SHORT).show();
+        });
+
         directionsButton.setOnClickListener(v -> openDirections());
+
+        findViewById(R.id.btnAddComment).setOnClickListener(v -> addComment());
     }
 
     private void updateLikeButton() {
-        int labelRes = photoPost.isLiked()
+        boolean liked = travelShareRepository.isPhotoLikedByCurrentUser(photoId);
+        int likeCount = travelShareRepository.getLikeCount(photoId);
+        int labelRes = liked
                 ? R.string.travelshare_unlike_button
                 : R.string.travelshare_like_button;
-        likeButton.setText(labelRes);
+
+        likeButton.setText(getString(labelRes) + " (" + likeCount + ")");
+    }
+
+    private void updateReportButton() {
+        boolean reported = travelShareRepository.isPhotoReportedByCurrentUser(photoId);
+        reportButton.setText(reported
+                ? R.string.travelshare_reported_button
+                : R.string.travelshare_report_button);
+    }
+
+    private void addComment() {
+        String commentText = commentEditText.getText().toString().trim();
+        if (commentText.isEmpty()) {
+            Toast.makeText(this, R.string.travelshare_comment_empty_error, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        travelShareRepository.addComment(photoId, commentText);
+        commentEditText.setText("");
+        bindPhotoMetadata();
+        Toast.makeText(this, R.string.travelshare_comment_added, Toast.LENGTH_SHORT).show();
     }
 
     private void openDirections() {
-        String query = photoPost.getLatitude() + "," + photoPost.getLongitude()
-                + "(" + Uri.encode(photoPost.getTitle()) + ")";
-        Uri geoUri = Uri.parse("geo:" + photoPost.getLatitude() + "," + photoPost.getLongitude()
+        Location location = travelShareRepository.getLocationById(photoMetadata.getLocationId());
+        if (location == null) {
+            Toast.makeText(this, R.string.travelshare_no_map_app, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String query = location.getLatitude() + "," + location.getLongitude()
+                + "(" + Uri.encode(photoMetadata.getTitle()) + ")";
+        Uri geoUri = Uri.parse("geo:" + location.getLatitude() + "," + location.getLongitude()
                 + "?q=" + query);
 
         Intent mapIntent = new Intent(Intent.ACTION_VIEW, geoUri);
