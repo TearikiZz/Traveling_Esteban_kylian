@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:padding="16dp">
+
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Budget (€)"
+    android:textSize="18sp" />
+
+<EditText
+    android:id="@+id/budgetEditText"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:inputType="numberDecimal" />
+
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Durée (heures)"
+    android:textSize="18sp" />
+
+<EditText
+    android:id="@+id/durationEditText"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:inputType="number" />
+
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Activités"
+    android:textSize="18sp" />
+
+<CheckBox
+    android:id="@+id/cultureCheckBox"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Culture" />
+
+<CheckBox
+    android:id="@+id/leisureCheckBox"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Loisirs" />
+
+<CheckBox
+    android:id="@+id/foodCheckBox"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Nourriture" />
+
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Niveau d'effort"
+    android:textSize="18sp" />
+
+<RadioGroup
+    android:id="@+id/effortRadioGroup"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <RadioButton
+        android:id="@+id/effortLow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Faible" />
+
+    <RadioButton
+        android:id="@+id/effortMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Moyen" />
+
+    <RadioButton
+        android:id="@+id/effortHigh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Élevé" />
+</RadioGroup>
+
+<Button
+    android:id="@+id/nextButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:text="Suivant" />
+
+</LinearLayout>
