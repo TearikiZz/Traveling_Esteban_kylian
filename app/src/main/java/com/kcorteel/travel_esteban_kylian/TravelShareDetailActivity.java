@@ -52,7 +52,7 @@ public class TravelShareDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_travel_share_detail);
 
-        travelShareRepository = TravelShareRepository.getInstance();
+        travelShareRepository = TravelShareRepository.getInstance(this);
         photoId = getIntent().getLongExtra(EXTRA_PHOTO_ID, -1L);
         photoMetadata = travelShareRepository.getPhotoMetadataById(photoId);
 

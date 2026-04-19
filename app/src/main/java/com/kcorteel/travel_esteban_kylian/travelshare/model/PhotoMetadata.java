@@ -1,20 +1,25 @@
 package com.kcorteel.travel_esteban_kylian.travelshare.model;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Entity(tableName = "photo_metadata")
 public class PhotoMetadata {
 
-    private final long photoId;
-    private final long authorId;
-    private final String title;
-    private final String description;
-    private final long timestamp;
-    private final long locationId;
-    private final long mediaId;
-    private final List<String> tags;
-    private final PlaceType placeType;
+    @PrimaryKey
+    private long photoId;
+    private long authorId;
+    private String title;
+    private String description;
+    private long timestamp;
+    private long locationId;
+    private long mediaId;
+    private List<String> tags;
+    private PlaceType placeType;
 
     public PhotoMetadata(
             long photoId,

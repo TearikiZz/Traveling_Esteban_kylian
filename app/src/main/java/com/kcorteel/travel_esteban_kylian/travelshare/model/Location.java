@@ -1,13 +1,18 @@
 package com.kcorteel.travel_esteban_kylian.travelshare.model;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "locations")
 public class Location {
 
-    private final long locationId;
-    private final double latitude;
-    private final double longitude;
-    private final String address;
-    private final String city;
-    private final String country;
+    @PrimaryKey
+    private long locationId;
+    private double latitude;
+    private double longitude;
+    private String address;
+    private String city;
+    private String country;
 
     public Location(long locationId, double latitude, double longitude, String address, String city, String country) {
         this.locationId = locationId;

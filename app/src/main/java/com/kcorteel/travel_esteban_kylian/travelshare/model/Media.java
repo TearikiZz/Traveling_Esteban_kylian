@@ -1,12 +1,17 @@
 package com.kcorteel.travel_esteban_kylian.travelshare.model;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "media")
 public class Media {
 
-    private final long mediaId;
-    private final long ownerId;
-    private final String url;
-    private final MediaType type;
-    private final String thumbnailUrl;
+    @PrimaryKey
+    private long mediaId;
+    private long ownerId;
+    private String url;
+    private MediaType type;
+    private String thumbnailUrl;
 
     public Media(long mediaId, long ownerId, String url, MediaType type, String thumbnailUrl) {
         this.mediaId = mediaId;

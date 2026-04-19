@@ -1,12 +1,17 @@
 package com.kcorteel.travel_esteban_kylian.travelshare.model;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "users")
 public class User {
 
-    private final long userId;
-    private final String username;
-    private final String email;
-    private final String passwordHash;
-    private final boolean isAnonymous;
+    @PrimaryKey
+    private long userId;
+    private String username;
+    private String email;
+    private String passwordHash;
+    private boolean isAnonymous;
 
     public User(long userId, String username, String email, String passwordHash, boolean isAnonymous) {
         this.userId = userId;

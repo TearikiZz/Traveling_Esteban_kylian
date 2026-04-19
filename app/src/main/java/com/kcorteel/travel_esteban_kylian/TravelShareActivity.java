@@ -26,7 +26,7 @@ public class TravelShareActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_travel_share);
 
-        travelShareRepository = TravelShareRepository.getInstance();
+        travelShareRepository = TravelShareRepository.getInstance(this);
 
         searchEditText = findViewById(R.id.etSearchPhotoMetadata);
         photoMetadataRecyclerView = findViewById(R.id.rvPhotoMetadata);

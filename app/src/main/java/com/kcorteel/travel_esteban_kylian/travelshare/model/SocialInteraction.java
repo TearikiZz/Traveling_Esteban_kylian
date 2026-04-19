@@ -1,11 +1,16 @@
 package com.kcorteel.travel_esteban_kylian.travelshare.model;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "social_interactions")
 public class SocialInteraction {
 
-    private final long interactionId;
-    private final long userId;
-    private final long targetId;
-    private final SocialInteractionType type;
+    @PrimaryKey
+    private long interactionId;
+    private long userId;
+    private long targetId;
+    private SocialInteractionType type;
 
     public SocialInteraction(long interactionId, long userId, long targetId, SocialInteractionType type) {
         this.interactionId = interactionId;
