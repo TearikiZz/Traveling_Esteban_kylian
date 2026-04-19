@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    android:background="#FFFFFF"
+    android:background="@drawable/bg_photo_post_card"
     android:clickable="true"
     android:elevation="2dp"
     android:focusable="true"
@@ -11,10 +11,19 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <ImageView
+        android:id="@+id/ivPostPhoto"
+        android:layout_width="match_parent"
+        android:layout_height="148dp"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/travelshare_post_image_content_description"
+        android:scaleType="centerCrop" />
+
     <TextView
         android:id="@+id/tvPostTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
         android:textColor="#0F172A"
         android:textSize="18sp"
         android:textStyle="bold" />
@@ -42,6 +51,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:lineSpacingExtra="2dp"
+        android:maxLines="3"
         android:textColor="#334155"
         android:textSize="15sp" />
 

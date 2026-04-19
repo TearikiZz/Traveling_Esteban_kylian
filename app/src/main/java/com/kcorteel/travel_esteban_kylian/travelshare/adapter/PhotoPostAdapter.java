@@ -3,6 +3,7 @@ package com.kcorteel.travel_esteban_kylian.travelshare.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -71,11 +72,13 @@ public class PhotoPostAdapter extends RecyclerView.Adapter<PhotoPostAdapter.Phot
         return photoPost.getTitle().toLowerCase(Locale.getDefault()).contains(query)
                 || photoPost.getLocation().toLowerCase(Locale.getDefault()).contains(query)
                 || photoPost.getDate().toLowerCase(Locale.getDefault()).contains(query)
-                || photoPost.getDescription().toLowerCase(Locale.getDefault()).contains(query);
+                || photoPost.getDescription().toLowerCase(Locale.getDefault()).contains(query)
+                || photoPost.getRouteAdvice().toLowerCase(Locale.getDefault()).contains(query);
     }
 
     static class PhotoPostViewHolder extends RecyclerView.ViewHolder {
 
+        private final ImageView photoImageView;
         private final TextView titleTextView;
         private final TextView locationTextView;
         private final TextView dateTextView;
@@ -83,6 +86,7 @@ public class PhotoPostAdapter extends RecyclerView.Adapter<PhotoPostAdapter.Phot
 
         PhotoPostViewHolder(@NonNull View itemView) {
             super(itemView);
+            photoImageView = itemView.findViewById(R.id.ivPostPhoto);
             titleTextView = itemView.findViewById(R.id.tvPostTitle);
             locationTextView = itemView.findViewById(R.id.tvPostLocation);
             dateTextView = itemView.findViewById(R.id.tvPostDate);
@@ -90,6 +94,7 @@ public class PhotoPostAdapter extends RecyclerView.Adapter<PhotoPostAdapter.Phot
         }
 
         void bind(final PhotoPost photoPost, final OnItemClickListener onItemClickListener) {
+            photoImageView.setImageResource(photoPost.getImageResId());
             titleTextView.setText(photoPost.getTitle());
             locationTextView.setText(photoPost.getLocation());
             dateTextView.setText(photoPost.getDate());

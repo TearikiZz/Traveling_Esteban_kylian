@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">Travel_Esteban_kylian</string>
+    <string name="travelshare_search_hint">Rechercher une publication, un lieu ou un conseil</string>
+    <string name="travelshare_post_image_content_description">Illustration d\'une publication de voyage</string>
+    <string name="travelshare_description_section">Description</string>
+    <string name="travelshare_route_section">Comment y aller</string>
+    <string name="travelshare_directions_button">Ouvrir l\'itinéraire</string>
+    <string name="travelshare_like_button">Like</string>
+    <string name="travelshare_unlike_button">Retirer le like</string>
+    <string name="travelshare_location_format">Lieu : %1$s</string>
+    <string name="travelshare_date_format">Date : %1$s</string>
+    <string name="travelshare_liked_message">Vous aimez maintenant %1$s</string>
+    <string name="travelshare_unliked_message">Vous n\'aimez plus %1$s</string>
+    <string name="travelshare_post_missing">Publication introuvable</string>
+    <string name="travelshare_no_map_app">Aucune application de cartographie disponible</string>
 </resources>
