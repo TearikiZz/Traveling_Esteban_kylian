@@ -24,6 +24,21 @@
     <string name="travelshare_screen_subtitle">Flux public basé sur les modèles du rapport : PhotoMetadata, Comment, SocialInteraction.</string>
     <string name="travelshare_screen_subtitle_anonymous">Mode anonyme : consultation, likes et signalements disponibles.</string>
     <string name="travelshare_screen_subtitle_connected">Mode connecté : bienvenue %1$s, vous pouvez aussi commenter.</string>
+    <string name="travelshare_create_post_button">Créer une publication</string>
+    <string name="travelshare_create_screen_title">Nouvelle publication TravelShare</string>
+    <string name="travelshare_create_title_hint">Titre de la publication</string>
+    <string name="travelshare_create_description_hint">Description</string>
+    <string name="travelshare_create_address_hint">Adresse ou repère</string>
+    <string name="travelshare_create_city_hint">Ville</string>
+    <string name="travelshare_create_country_hint">Pays</string>
+    <string name="travelshare_create_latitude_hint">Latitude</string>
+    <string name="travelshare_create_longitude_hint">Longitude</string>
+    <string name="travelshare_create_tags_hint">Tags séparés par des virgules</string>
+    <string name="travelshare_create_publish_button">Publier</string>
+    <string name="travelshare_create_missing_fields">Tous les champs principaux doivent être remplis.</string>
+    <string name="travelshare_create_invalid_coordinates">Les coordonnées doivent être valides.</string>
+    <string name="travelshare_create_success">Publication créée avec succès.</string>
+    <string name="travelshare_create_requires_login">Connectez-vous pour créer une publication.</string>
     <string name="travelshare_search_hint">Rechercher une publication, un lieu ou un conseil</string>
     <string name="travelshare_post_image_content_description">Illustration d\'une publication de voyage</string>
     <string name="travelshare_description_section">Description</string>
@@ -52,4 +67,20 @@
     <string name="travelshare_post_missing">Publication introuvable</string>
     <string name="travelshare_no_map_app">Aucune application de cartographie disponible</string>
     <string name="travelshare_unknown_user">Utilisateur inconnu</string>
+
+    <string-array name="travelshare_place_type_labels">
+        <item>NATURE</item>
+        <item>MUSEUM</item>
+        <item>STREET</item>
+        <item>SHOP</item>
+        <item>RESTAURANT</item>
+        <item>OTHER</item>
+    </string-array>
+
+    <string-array name="travelshare_media_labels">
+        <item>Image mock Paris</item>
+        <item>Image mock Kyoto</item>
+        <item>Image mock Rome</item>
+        <item>Image mock Barcelone</item>
+    </string-array>
 </resources>

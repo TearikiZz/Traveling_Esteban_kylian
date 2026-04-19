@@ -15,6 +15,9 @@ public interface PhotoMetadataDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<PhotoMetadata> photoMetadataList);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insert(PhotoMetadata photoMetadata);
+
     @Query("SELECT * FROM photo_metadata ORDER BY timestamp DESC")
     List<PhotoMetadata> getAll();
 
@@ -23,4 +26,7 @@ public interface PhotoMetadataDao {
 
     @Query("SELECT COUNT(*) FROM photo_metadata")
     int countAll();
+
+    @Query("SELECT COALESCE(MAX(photoId), 0) FROM photo_metadata")
+    long getMaxPhotoId();
 }

@@ -78,6 +78,14 @@ public class PhotoMetadataAdapter extends RecyclerView.Adapter<PhotoMetadataAdap
         notifyDataSetChanged();
     }
 
+    public void submitPhotoMetadataList(List<PhotoMetadata> photoMetadataList) {
+        allPhotoMetadata.clear();
+        allPhotoMetadata.addAll(photoMetadataList);
+        visiblePhotoMetadata.clear();
+        visiblePhotoMetadata.addAll(photoMetadataList);
+        notifyDataSetChanged();
+    }
+
     class PhotoMetadataViewHolder extends RecyclerView.ViewHolder {
 
         private final ImageView photoImageView;

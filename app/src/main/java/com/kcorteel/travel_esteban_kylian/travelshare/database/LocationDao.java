@@ -15,6 +15,12 @@ public interface LocationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<Location> locations);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insert(Location location);
+
     @Query("SELECT * FROM locations WHERE locationId = :locationId LIMIT 1")
     Location getById(long locationId);
+
+    @Query("SELECT COALESCE(MAX(locationId), 0) FROM locations")
+    long getMaxLocationId();
 }

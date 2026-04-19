@@ -4,8 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -22,6 +24,7 @@ public class TravelShareActivity extends AppCompatActivity {
     private PhotoMetadataAdapter photoMetadataAdapter;
     private TravelShareRepository travelShareRepository;
     private TextView subtitleTextView;
+    private Button createPhotoMetadataButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +36,7 @@ public class TravelShareActivity extends AppCompatActivity {
         searchEditText = findViewById(R.id.etSearchPhotoMetadata);
         photoMetadataRecyclerView = findViewById(R.id.rvPhotoMetadata);
         subtitleTextView = findViewById(R.id.tvTravelShareSubtitle);
+        createPhotoMetadataButton = findViewById(R.id.btnCreatePhotoMetadata);
 
         photoMetadataAdapter = new PhotoMetadataAdapter(
                 travelShareRepository,
@@ -61,18 +65,25 @@ public class TravelShareActivity extends AppCompatActivity {
             }
         });
 
+        createPhotoMetadataButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, CreatePhotoMetadataActivity.class);
+            startActivity(intent);
+        });
+
         updateSubtitle();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        photoMetadataAdapter.submitPhotoMetadataList(travelShareRepository.getPhotoMetadataList());
         updateSubtitle();
     }
 
     private void updateSubtitle() {
         if (travelShareRepository.isCurrentUserAnonymous()) {
             subtitleTextView.setText(R.string.travelshare_screen_subtitle_anonymous);
+            createPhotoMetadataButton.setVisibility(View.GONE);
             return;
         }
 
@@ -80,6 +91,7 @@ public class TravelShareActivity extends AppCompatActivity {
                 R.string.travelshare_screen_subtitle_connected,
                 travelShareRepository.getCurrentUser().getUsername()
         ));
+        createPhotoMetadataButton.setVisibility(View.VISIBLE);
     }
 
     private void openPhotoMetadataDetails(PhotoMetadata photoMetadata) {

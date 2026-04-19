@@ -23,6 +23,7 @@ import com.kcorteel.travel_esteban_kylian.travelshare.model.SocialInteractionTyp
 import com.kcorteel.travel_esteban_kylian.travelshare.model.User;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -86,6 +87,47 @@ public class TravelShareRepository {
     public boolean isCurrentUserAnonymous() {
         User currentUser = getCurrentUser();
         return currentUser == null || currentUser.isAnonymous();
+    }
+
+    public PhotoMetadata createPhotoMetadata(
+            String title,
+            String description,
+            String address,
+            String city,
+            String country,
+            double latitude,
+            double longitude,
+            List<String> tags,
+            PlaceType placeType,
+            String imageDrawableName
+    ) {
+        if (isCurrentUserAnonymous()) {
+            return null;
+        }
+
+        long nextLocationId = locationDao.getMaxLocationId() + 1L;
+        long nextMediaId = mediaDao.getMaxMediaId() + 1L;
+        long nextPhotoId = photoMetadataDao.getMaxPhotoId() + 1L;
+
+        Location location = new Location(nextLocationId, latitude, longitude, address, city, country);
+        Media media = new Media(nextMediaId, appSessionManager.getCurrentUserId(), imageDrawableName, MediaType.PHOTO, imageDrawableName);
+        PhotoMetadata photoMetadata = new PhotoMetadata(
+                nextPhotoId,
+                appSessionManager.getCurrentUserId(),
+                title,
+                description,
+                System.currentTimeMillis(),
+                nextLocationId,
+                nextMediaId,
+                tags == null ? Collections.emptyList() : tags,
+                placeType
+        );
+
+        locationDao.insert(location);
+        mediaDao.insert(media);
+        photoMetadataDao.insert(photoMetadata);
+
+        return photoMetadata;
     }
 
     public List<Comment> getCommentsForPhoto(long photoId) {
