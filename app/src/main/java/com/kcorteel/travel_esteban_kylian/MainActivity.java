@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         btnTravelPath.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, TravelPathActivity.class);
+            Intent intent = new Intent(MainActivity.this, TravelPathPreferencesActivity.class);
             startActivity(intent);
         });
 

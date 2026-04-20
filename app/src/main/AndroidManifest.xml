@@ -19,6 +19,9 @@
         <activity android:name=".TravelShareDetailActivity" />
         <activity android:name=".TravelPathActivity" />
         <activity android:name=".TravelShareActivity" />
+        <activity android:name=".TravelPathPreferencesActivity" />
+        <activity android:name=".TravelPathSummaryActivity" />
+        <activity android:name=".TravelPathTypeActivity" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
