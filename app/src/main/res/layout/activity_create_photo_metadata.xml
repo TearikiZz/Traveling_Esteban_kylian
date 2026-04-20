@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F4F6F8">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/travelshare_create_screen_title"
+            android:textColor="#0F172A"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/ivSelectedPhotoPreview"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:layout_marginTop="20dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/bg_photo_post_card"
+            android:contentDescription="@string/travelshare_selected_photo_preview"
+            android:padding="6dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_launcher_background" />
+
+        <Button
+            android:id="@+id/btnSelectPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/travelshare_select_photo_button" />
+
+        <EditText
+            android:id="@+id/etCreateTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_search_bar"
+            android:hint="@string/travelshare_create_title_hint"
+            android:padding="12dp" />
+
+        <EditText
+            android:id="@+id/etCreateDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_search_bar"
+            android:gravity="top|start"
+            android:hint="@string/travelshare_create_description_hint"
+            android:inputType="textMultiLine"
+            android:minHeight="110dp"
+            android:padding="12dp" />
+
+        <EditText
+            android:id="@+id/etCreateAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_search_bar"
+            android:hint="@string/travelshare_create_address_hint"
+            android:padding="12dp" />
+
+        <EditText
+            android:id="@+id/etCreateCity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_search_bar"
+            android:hint="@string/travelshare_create_city_hint"
+            android:padding="12dp" />
+
+        <EditText
+            android:id="@+id/etCreateCountry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_search_bar"
+            android:hint="@string/travelshare_create_country_hint"
+            android:padding="12dp" />
+
+        <EditText
+            android:id="@+id/etCreateLatitude"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_search_bar"
+            android:hint="@string/travelshare_create_latitude_hint"
+            android:inputType="numberDecimal|numberSigned"
+            android:padding="12dp" />
+
+        <EditText
+            android:id="@+id/etCreateLongitude"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_search_bar"
+            android:hint="@string/travelshare_create_longitude_hint"
+            android:inputType="numberDecimal|numberSigned"
+            android:padding="12dp" />
+
+        <EditText
+            android:id="@+id/etCreateTags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_search_bar"
+            android:hint="@string/travelshare_create_tags_hint"
+            android:padding="12dp" />
+
+        <Spinner
+            android:id="@+id/spinnerCreatePlaceType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_search_bar"
+            android:padding="8dp" />
+
+        <Button
+            android:id="@+id/btnPublishPhotoMetadata"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/travelshare_create_publish_button" />
+
+    </LinearLayout>
+
+</ScrollView>

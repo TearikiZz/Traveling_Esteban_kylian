@@ -1,0 +1,62 @@
+package com.kcorteel.travel_esteban_kylian.travelshare.model;
+
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "users")
+public class User {
+
+    @PrimaryKey
+    private long userId;
+    private String username;
+    private String email;
+    private String passwordHash;
+    private boolean isAnonymous;
+    private String avatarUri;
+
+    public User(
+            long userId,
+            String username,
+            String email,
+            String passwordHash,
+            boolean isAnonymous,
+            String avatarUri
+    ) {
+        this.userId = userId;
+        this.username = username;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.isAnonymous = isAnonymous;
+        this.avatarUri = avatarUri;
+    }
+
+    @Ignore
+    public User(long userId, String username, String email, String passwordHash, boolean isAnonymous) {
+        this(userId, username, email, passwordHash, isAnonymous, "");
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public boolean isAnonymous() {
+        return isAnonymous;
+    }
+
+    public String getAvatarUri() {
+        return avatarUri;
+    }
+}

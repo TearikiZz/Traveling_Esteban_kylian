@@ -1,3 +1,118 @@
 <resources>
     <string name="app_name">Travel_Esteban_kylian</string>
+    <string name="app_home_title">Traveling</string>
+    <string name="app_home_subtitle">Choisissez votre expérience, connectez-vous ou restez anonyme.</string>
+    <string name="app_open_travelshare_button">Aller vers TravelShare</string>
+    <string name="app_open_travelpath_button">Aller vers TravelPath</string>
+    <string name="auth_login_button">Se connecter</string>
+    <string name="auth_register_button">S\'inscrire</string>
+    <string name="auth_continue_anonymous_button">Continuer en anonyme</string>
+    <string name="auth_logout_button">Se déconnecter</string>
+    <string name="auth_login_screen_title">Connexion</string>
+    <string name="auth_register_screen_title">Inscription</string>
+    <string name="auth_identifier_hint">Nom d\'utilisateur ou email</string>
+    <string name="auth_username_hint">Nom d\'utilisateur</string>
+    <string name="auth_email_hint">Email</string>
+    <string name="auth_password_hint">Mot de passe</string>
+    <string name="auth_confirm_password_hint">Confirmer le mot de passe</string>
+    <string name="auth_status_anonymous">Session actuelle : mode anonyme</string>
+    <string name="auth_status_connected_format">Session actuelle : connecté en tant que %1$s</string>
+    <string name="auth_login_success">Connexion réussie</string>
+    <string name="auth_register_success">Compte créé avec succès</string>
+    <string name="auth_comment_requires_login">Connectez-vous pour publier un commentaire</string>
+    <string name="travelshare_screen_title">TravelShare</string>
+    <string name="travelshare_screen_subtitle">Flux public basé sur les modèles du rapport : PhotoMetadata, Comment, SocialInteraction.</string>
+    <string name="travelshare_screen_subtitle_anonymous">Mode anonyme : consultation, likes et signalements disponibles.</string>
+    <string name="travelshare_screen_subtitle_connected">Mode connecté : bienvenue %1$s, vous pouvez aussi commenter.</string>
+    <string name="travelshare_create_post_button">Créer une publication</string>
+    <string name="travelshare_create_screen_title">Nouvelle publication TravelShare</string>
+    <string name="travelshare_create_title_hint">Titre de la publication</string>
+    <string name="travelshare_create_description_hint">Description</string>
+    <string name="travelshare_create_address_hint">Adresse ou repère</string>
+    <string name="travelshare_create_city_hint">Ville</string>
+    <string name="travelshare_create_country_hint">Pays</string>
+    <string name="travelshare_create_latitude_hint">Latitude</string>
+    <string name="travelshare_create_longitude_hint">Longitude</string>
+    <string name="travelshare_create_tags_hint">Tags séparés par des virgules</string>
+    <string name="travelshare_create_publish_button">Publier</string>
+    <string name="travelshare_select_photo_button">Choisir une photo</string>
+    <string name="travelshare_selected_photo_preview">Aperçu de la photo sélectionnée</string>
+    <string name="travelshare_create_missing_fields">Tous les champs principaux doivent être remplis.</string>
+    <string name="travelshare_create_missing_photo">Veuillez sélectionner une photo.</string>
+    <string name="travelshare_create_invalid_coordinates">Les coordonnées doivent être valides.</string>
+    <string name="travelshare_create_success">Publication créée avec succès.</string>
+    <string name="travelshare_create_requires_login">Connectez-vous pour créer une publication.</string>
+    <string name="travelshare_search_hint">Rechercher une publication, un lieu ou un conseil</string>
+    <string name="travelshare_post_image_content_description">Illustration d\'une publication de voyage</string>
+    <string name="travelshare_description_section">Description</string>
+    <string name="travelshare_tags_section">Tags</string>
+    <string name="travelshare_route_section">Comment y aller</string>
+    <string name="travelshare_comments_section">Commentaires</string>
+    <string name="travelshare_directions_button">Ouvrir l\'itinéraire</string>
+    <string name="travelshare_like_button">Like</string>
+    <string name="travelshare_unlike_button">Retirer le like</string>
+    <string name="travelshare_report_button">Signaler</string>
+    <string name="travelshare_reported_button">Signalé</string>
+    <string name="travelshare_location_format">Lieu : %1$s</string>
+    <string name="travelshare_date_format">Date : %1$s</string>
+    <string name="travelshare_author_format">Auteur : %1$s</string>
+    <string name="travelshare_tags_format">Tags : %1$s</string>
+    <string name="travelshare_feed_info_format">Type : %1$s  •  Likes : %2$d</string>
+    <string name="travelshare_comments_count_format">%1$d commentaire(s)</string>
+    <string name="travelshare_add_comment_button">Publier le commentaire</string>
+    <string name="travelshare_comment_hint">Ajouter un commentaire</string>
+    <string name="travelshare_liked_message">Vous aimez maintenant %1$s</string>
+    <string name="travelshare_unliked_message">Vous n\'aimez plus %1$s</string>
+    <string name="travelshare_comment_added">Commentaire ajouté</string>
+    <string name="travelshare_comment_empty_error">Le commentaire ne peut pas être vide</string>
+    <string name="travelshare_report_success">Le contenu a été signalé</string>
+    <string name="travelshare_report_already_done">Vous avez déjà signalé ce contenu</string>
+    <string name="travelshare_post_missing">Publication introuvable</string>
+    <string name="travelshare_no_map_app">Aucune application de cartographie disponible</string>
+    <string name="travelshare_unknown_user">Utilisateur inconnu</string>
+    <string name="profile_open_button">Ouvrir le profil</string>
+    <string name="profile_screen_title">Mon profil</string>
+    <string name="profile_screen_subtitle">Gérez votre photo, vos informations et vos préférences TravelShare.</string>
+    <string name="profile_change_photo_button">Changer la photo</string>
+    <string name="profile_info_section">Informations du compte</string>
+    <string name="profile_username_label">Nom d\'utilisateur</string>
+    <string name="profile_email_label">Email</string>
+    <string name="profile_mode_label">Mode</string>
+    <string name="profile_mode_format">Mode : %1$s</string>
+    <string name="profile_mode_connected">Compte connecté</string>
+    <string name="profile_user_id_format">ID utilisateur : #%1$d</string>
+    <string name="profile_stats_section">Statistiques</string>
+    <string name="profile_stat_publications">Publications</string>
+    <string name="profile_stat_comments">Commentaires</string>
+    <string name="profile_stat_likes">Likes reçus</string>
+    <string name="profile_preferences_section">Préférences</string>
+    <string name="profile_theme_label">Thème</string>
+    <string name="profile_language_label">Langue préférée</string>
+    <string name="profile_notifications_label">Notifications activées</string>
+    <string name="profile_save_button">Enregistrer le profil</string>
+    <string name="profile_logout_button">Se déconnecter</string>
+    <string name="profile_saved_message">Profil mis à jour</string>
+    <string name="profile_photo_preview">Photo de profil</string>
+
+    <string-array name="profile_theme_labels">
+        <item>Suivre le système</item>
+        <item>Clair</item>
+        <item>Sombre</item>
+    </string-array>
+
+    <string-array name="profile_language_labels">
+        <item>Français</item>
+        <item>English</item>
+        <item>Español</item>
+    </string-array>
+
+    <string-array name="travelshare_place_type_labels">
+        <item>NATURE</item>
+        <item>MUSEUM</item>
+        <item>STREET</item>
+        <item>SHOP</item>
+        <item>RESTAURANT</item>
+        <item>OTHER</item>
+    </string-array>
+
 </resources>
