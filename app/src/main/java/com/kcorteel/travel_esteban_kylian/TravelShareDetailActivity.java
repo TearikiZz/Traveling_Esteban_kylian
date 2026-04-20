@@ -1,5 +1,6 @@
 package com.kcorteel.travel_esteban_kylian;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -222,24 +223,48 @@ public class TravelShareDetailActivity extends AppCompatActivity {
             return;
         }
 
-        String query = location.getLatitude() + "," + location.getLongitude()
-                + "(" + Uri.encode(photoMetadata.getTitle()) + ")";
-        Uri geoUri = Uri.parse("geo:" + location.getLatitude() + "," + location.getLongitude()
-                + "?q=" + query);
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+        String destination = latitude + "," + longitude;
+        String encodedTitle = Uri.encode(photoMetadata.getTitle());
 
-        Intent mapIntent = new Intent(Intent.ACTION_VIEW, geoUri);
-        mapIntent.setPackage("com.google.android.apps.maps");
+        Intent googleMapsIntent = new Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("google.navigation:q=" + destination + "&mode=w")
+        );
+        googleMapsIntent.setPackage("com.google.android.apps.maps");
 
-        if (mapIntent.resolveActivity(getPackageManager()) != null) {
-            startActivity(mapIntent);
+        Intent geoFallbackIntent = new Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("geo:" + destination + "?q=" + destination + "(" + encodedTitle + ")")
+        );
+
+        Intent webFallbackIntent = new Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://www.google.com/maps/dir/?api=1&destination="
+                        + destination
+                        + "&travelmode=walking")
+        );
+
+        if (tryStartIntent(googleMapsIntent)) {
             return;
         }
 
-        Intent fallbackIntent = new Intent(Intent.ACTION_VIEW, geoUri);
-        if (fallbackIntent.resolveActivity(getPackageManager()) != null) {
-            startActivity(fallbackIntent);
-        } else {
+        if (tryStartIntent(geoFallbackIntent)) {
+            return;
+        }
+
+        if (!tryStartIntent(webFallbackIntent)) {
             Toast.makeText(this, R.string.travelshare_no_map_app, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private boolean tryStartIntent(Intent intent) {
+        try {
+            startActivity(intent);
+            return true;
+        } catch (ActivityNotFoundException exception) {
+            return false;
         }
     }
 }
