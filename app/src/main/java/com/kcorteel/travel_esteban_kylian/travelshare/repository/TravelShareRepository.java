@@ -437,14 +437,22 @@ public class TravelShareRepository {
                 new Location(101L, 48.8584, 2.2945, "Champ de Mars", "Paris", "France"),
                 new Location(102L, 35.0116, 135.7681, "Quartier de Gion", "Kyoto", "Japon"),
                 new Location(103L, 41.8902, 12.4922, "Piazza del Colosseo", "Rome", "Italie"),
-                new Location(104L, 41.3851, 2.1734, "Barri Gotic", "Barcelone", "Espagne")
+                new Location(104L, 41.3851, 2.1734, "Barri Gotic", "Barcelone", "Espagne"),
+                new Location(105L, 48.8867, 2.3431, "Montmartre", "Paris", "France"),
+                new Location(106L, 34.9671, 135.7727, "Fushimi Inari", "Kyoto", "Japon"),
+                new Location(107L, 41.8894, 12.4709, "Trastevere", "Rome", "Italie"),
+                new Location(108L, 41.3765, 2.1921, "Barceloneta", "Barcelone", "Espagne")
         ));
 
         mediaDao.insertAll(Arrays.asList(
-                new Media(201L, 2L, "img_mock_paris", MediaType.PHOTO, "img_mock_paris"),
-                new Media(202L, 3L, "img_mock_kyoto", MediaType.PHOTO, "img_mock_kyoto"),
-                new Media(203L, 2L, "img_mock_rome", MediaType.PHOTO, "img_mock_rome"),
-                new Media(204L, 1L, "img_mock_barcelona", MediaType.PHOTO, "img_mock_barcelona")
+                new Media(201L, 2L, "travel_paris", MediaType.PHOTO, "travel_paris"),
+                new Media(202L, 3L, "travel_japon", MediaType.PHOTO, "travel_japon"),
+                new Media(203L, 2L, "travel_colosseum", MediaType.PHOTO, "travel_colosseum"),
+                new Media(204L, 1L, "travel_barcelone", MediaType.PHOTO, "travel_barcelone"),
+                new Media(205L, 1L, "travel_paris", MediaType.PHOTO, "travel_paris"),
+                new Media(206L, 2L, "travel_japon", MediaType.PHOTO, "travel_japon"),
+                new Media(207L, 3L, "travel_colosseum", MediaType.PHOTO, "travel_colosseum"),
+                new Media(208L, 1L, "travel_barcelone", MediaType.PHOTO, "travel_barcelone")
         ));
 
         photoMetadataDao.insertAll(Arrays.asList(
@@ -491,6 +499,50 @@ public class TravelShareRepository {
                         204L,
                         Arrays.asList("mediterranean", "sea", "tapas"),
                         PlaceType.RESTAURANT
+                ),
+                new PhotoMetadata(
+                        305L,
+                        1L,
+                        "Pause café à Montmartre",
+                        "Une matinée tranquille entre ruelles pavées, terrasses discrètes et vue dégagée sur les toits de Paris.",
+                        1776719400000L,
+                        105L,
+                        205L,
+                        Arrays.asList("paris", "montmartre", "coffee"),
+                        PlaceType.STREET
+                ),
+                new PhotoMetadata(
+                        306L,
+                        2L,
+                        "Escalier rouge à Kyoto",
+                        "Un passage marquant au milieu des torii, avec une atmosphère calme et un rythme plus lent que dans le centre-ville.",
+                        1773282600000L,
+                        106L,
+                        206L,
+                        Arrays.asList("kyoto", "torii", "japan"),
+                        PlaceType.NATURE
+                ),
+                new PhotoMetadata(
+                        307L,
+                        3L,
+                        "Fin d'après-midi à Rome",
+                        "Une halte à Trastevere après la visite des monuments, entre façades chaudes, petites places et lumière dorée.",
+                        1771738200000L,
+                        107L,
+                        207L,
+                        Arrays.asList("rome", "trastevere", "sunset"),
+                        PlaceType.STREET
+                ),
+                new PhotoMetadata(
+                        308L,
+                        1L,
+                        "Week-end à Barceloneta",
+                        "Un moment simple entre promenade en bord de mer, restaurants ouverts tard et ambiance détendue de fin de journée.",
+                        1770170400000L,
+                        108L,
+                        208L,
+                        Arrays.asList("barcelona", "beach", "weekend"),
+                        PlaceType.RESTAURANT
                 )
         ));
 
@@ -498,7 +550,12 @@ public class TravelShareRepository {
                 new Comment(1000L, 301L, 1L, "La lumière est incroyable, on sent vraiment l'ambiance du matin.", "", 1775948400000L),
                 new Comment(1001L, 301L, 3L, "Super point de vue, je vais l'ajouter à mon prochain city trip.", "", 1775950200000L),
                 new Comment(1002L, 302L, 2L, "Le contraste entre les ruelles et les arbres en fleurs marche vraiment bien.", "", 1772589900000L),
-                new Comment(1003L, 304L, 2L, "On imagine déjà la fin de journée au bord de l'eau.", "", 1769505300000L)
+                new Comment(1003L, 304L, 2L, "On imagine déjà la fin de journée au bord de l'eau.", "", 1769505300000L),
+                new Comment(1004L, 305L, 2L, "Le cadre donne vraiment envie de prendre son temps.", "", 1776722400000L),
+                new Comment(1005L, 305L, 3L, "Très belle série, le lieu colle bien à l'esprit du post.", "", 1776723900000L),
+                new Comment(1006L, 306L, 1L, "Le rouge ressort super bien, ça donne beaucoup de présence à la photo.", "", 1773285000000L),
+                new Comment(1007L, 307L, 2L, "J'aime bien l'ambiance plus locale que touristique.", "", 1771740900000L),
+                new Comment(1008L, 308L, 3L, "On sent vraiment le week-end détente.", "", 1770172800000L)
         ));
 
         socialInteractionDao.insertAll(Arrays.asList(
@@ -506,7 +563,15 @@ public class TravelShareRepository {
                 new SocialInteraction(1001L, 2L, 301L, SocialInteractionType.LIKE),
                 new SocialInteraction(1002L, 3L, 301L, SocialInteractionType.LIKE),
                 new SocialInteraction(1003L, 1L, 304L, SocialInteractionType.LIKE),
-                new SocialInteraction(1004L, 3L, 304L, SocialInteractionType.LIKE)
+                new SocialInteraction(1004L, 3L, 304L, SocialInteractionType.LIKE),
+                new SocialInteraction(1005L, 2L, 305L, SocialInteractionType.LIKE),
+                new SocialInteraction(1006L, 3L, 305L, SocialInteractionType.LIKE),
+                new SocialInteraction(1007L, 1L, 306L, SocialInteractionType.LIKE),
+                new SocialInteraction(1008L, 3L, 306L, SocialInteractionType.LIKE),
+                new SocialInteraction(1009L, 1L, 307L, SocialInteractionType.LIKE),
+                new SocialInteraction(1010L, 2L, 307L, SocialInteractionType.LIKE),
+                new SocialInteraction(1011L, 2L, 308L, SocialInteractionType.LIKE),
+                new SocialInteraction(1012L, 3L, 308L, SocialInteractionType.LIKE)
         ));
     }
 
