@@ -74,7 +74,18 @@
             android:background="@drawable/bg_search_bar"
             android:padding="12dp"
             android:text="@string/travelshare_place_not_selected"
+            android:textStyle="bold"
             android:textColor="#475569" />
+
+        <TextView
+            android:id="@+id/tvSelectedPlaceDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_photo_post_card"
+            android:padding="12dp"
+            android:text="@string/travelshare_place_details_empty"
+            android:textColor="#64748B" />
 
         <AutoCompleteTextView
             android:id="@+id/actvCreatePlaceSearch"
@@ -84,51 +95,8 @@
             android:background="@drawable/bg_search_bar"
             android:completionThreshold="2"
             android:hint="@string/travelshare_place_search_hint"
-            android:padding="12dp" />
-
-        <EditText
-            android:id="@+id/etCreateAddress"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_search_bar"
-            android:hint="@string/travelshare_create_address_hint"
-            android:padding="12dp" />
-
-        <EditText
-            android:id="@+id/etCreateCity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_search_bar"
-            android:hint="@string/travelshare_create_city_hint"
-            android:padding="12dp" />
-
-        <EditText
-            android:id="@+id/etCreateCountry"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_search_bar"
-            android:hint="@string/travelshare_create_country_hint"
-            android:padding="12dp" />
-
-        <EditText
-            android:id="@+id/etCreateLatitude"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_search_bar"
-            android:hint="@string/travelshare_create_latitude_hint"
-            android:padding="12dp" />
-
-        <EditText
-            android:id="@+id/etCreateLongitude"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_search_bar"
-            android:hint="@string/travelshare_create_longitude_hint"
+            android:imeOptions="actionDone"
+            android:inputType="text"
             android:padding="12dp" />
 
         <EditText

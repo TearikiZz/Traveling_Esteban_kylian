@@ -35,10 +35,13 @@
     <string name="travelshare_create_longitude_hint">Longitude</string>
     <string name="travelshare_place_section">Lieu</string>
     <string name="travelshare_place_not_selected">Aucun lieu sélectionné</string>
+    <string name="travelshare_place_details_empty">Sélectionnez un lieu dans la liste pour remplir automatiquement les informations utiles.</string>
     <string name="travelshare_select_place_button">Choisir un lieu</string>
     <string name="travelshare_place_search_hint">Commencez à taper un lieu</string>
     <string name="travelshare_place_api_missing">Ajoutez une clé Places API dans local.properties pour activer la recherche de lieu.</string>
     <string name="travelshare_place_autocomplete_error">Impossible de récupérer ce lieu pour le moment.</string>
+    <string name="travelshare_place_required">Veuillez choisir un lieu dans la liste proposée.</string>
+    <string name="travelshare_place_fetch_incomplete">Le lieu sélectionné ne contient pas assez d\'informations pour être enregistré.</string>
     <string name="travelshare_create_tags_hint">Tags séparés par des virgules</string>
     <string name="travelshare_create_publish_button">Publier</string>
     <string name="travelshare_select_photo_button">Choisir une photo</string>
