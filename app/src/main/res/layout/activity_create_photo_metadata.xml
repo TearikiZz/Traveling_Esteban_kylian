@@ -163,6 +163,88 @@
             android:inputType="text"
             android:padding="12dp" />
 
+        <TextView
+            android:id="@+id/tvManualPlaceFallback"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_photo_post_card"
+            android:padding="12dp"
+            android:textColor="#64748B"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnShowManualPlaceForm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/travelshare_place_manual_button"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/layoutManualPlaceContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/etManualPlaceName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_search_bar"
+                android:hint="@string/travelshare_create_place_name_hint"
+                android:padding="12dp" />
+
+            <EditText
+                android:id="@+id/etManualPlaceAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_search_bar"
+                android:hint="@string/travelshare_create_address_hint"
+                android:padding="12dp" />
+
+            <EditText
+                android:id="@+id/etManualPlaceCity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_search_bar"
+                android:hint="@string/travelshare_create_city_hint"
+                android:padding="12dp" />
+
+            <EditText
+                android:id="@+id/etManualPlaceCountry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_search_bar"
+                android:hint="@string/travelshare_create_country_hint"
+                android:padding="12dp" />
+
+            <EditText
+                android:id="@+id/etManualPlaceLatitude"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_search_bar"
+                android:hint="@string/travelshare_create_latitude_hint"
+                android:inputType="numberDecimal|numberSigned"
+                android:padding="12dp" />
+
+            <EditText
+                android:id="@+id/etManualPlaceLongitude"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_search_bar"
+                android:hint="@string/travelshare_create_longitude_hint"
+                android:inputType="numberDecimal|numberSigned"
+                android:padding="12dp" />
+        </LinearLayout>
+
         <EditText
             android:id="@+id/etCreateTags"
             android:layout_width="match_parent"

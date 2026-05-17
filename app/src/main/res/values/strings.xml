@@ -32,6 +32,7 @@
     <string name="travelshare_create_screen_title">Nouvelle publication TravelShare</string>
     <string name="travelshare_create_title_hint">Titre de la publication</string>
     <string name="travelshare_create_description_hint">Description</string>
+    <string name="travelshare_create_place_name_hint">Nom du lieu ou repère</string>
     <string name="travelshare_create_address_hint">Adresse ou repère</string>
     <string name="travelshare_create_city_hint">Ville</string>
     <string name="travelshare_create_country_hint">Pays</string>
@@ -45,6 +46,9 @@
     <string name="travelshare_place_api_missing">Ajoutez une clé Places API dans local.properties pour activer la recherche de lieu.</string>
     <string name="travelshare_place_autocomplete_error">Impossible de récupérer ce lieu pour le moment.</string>
     <string name="travelshare_place_required">Veuillez choisir un lieu dans la liste proposée.</string>
+    <string name="travelshare_place_manual_button">Saisir le lieu manuellement</string>
+    <string name="travelshare_place_manual_unavailable">L’autocomplétion n’est pas disponible pour le moment. Vous pouvez saisir le lieu manuellement.</string>
+    <string name="travelshare_place_manual_required">Renseignez au moins le nom du lieu, la ville et le pays.</string>
     <string name="travelshare_place_fetch_incomplete">Le lieu sélectionné ne contient pas assez d\'informations pour être enregistré.</string>
     <string name="travelshare_create_tags_hint">Tags séparés par des virgules</string>
     <string name="travelshare_group_picker_label">Publier dans un groupe</string>
@@ -122,6 +126,7 @@
     <string name="travelshare_route_section">Comment y aller</string>
     <string name="travelshare_comments_section">Commentaires</string>
     <string name="travelshare_directions_button">Ouvrir l\'itinéraire</string>
+    <string name="travelshare_directions_missing_coordinates">Itinéraire indisponible : ce lieu a été saisi sans coordonnées.</string>
     <string name="travelshare_like_button">Like</string>
     <string name="travelshare_unlike_button">Retirer le like</string>
     <string name="travelshare_report_button">Signaler</string>

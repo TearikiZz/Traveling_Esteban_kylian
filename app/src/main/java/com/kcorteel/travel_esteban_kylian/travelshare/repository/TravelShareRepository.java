@@ -586,6 +586,10 @@ public class TravelShareRepository {
             return "";
         }
 
+        if (Double.isNaN(location.getLatitude()) || Double.isNaN(location.getLongitude())) {
+            return "Lieu saisi manuellement sans coordonnees precises. Ajoutez une latitude et une longitude pour activer l'itineraire.";
+        }
+
         return "Rejoindre " + location.getAddress()
                 + ", " + location.getCity()
                 + ". Ouvrez l'itinéraire pour un guidage détaillé jusqu'au point photo.";

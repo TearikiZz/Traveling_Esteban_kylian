@@ -70,20 +70,29 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
     private EditText descriptionEditText;
     private EditText tagsEditText;
     private AutoCompleteTextView placeSearchAutoCompleteTextView;
+    private EditText manualPlaceNameEditText;
+    private EditText manualPlaceAddressEditText;
+    private EditText manualPlaceCityEditText;
+    private EditText manualPlaceCountryEditText;
+    private EditText manualPlaceLatitudeEditText;
+    private EditText manualPlaceLongitudeEditText;
     private Spinner groupSpinner;
     private Spinner placeTypeSpinner;
     private ImageView selectedImagePreview;
     private TextView selectedPlaceLabelTextView;
     private TextView selectedPlaceDetailsTextView;
+    private TextView manualPlaceFallbackTextView;
     private TextView annotationStatusTextView;
     private TextView annotationSummaryTextView;
     private TextView annotationTagsTextView;
     private TextView voiceNoteStatusTextView;
     private ProgressBar annotationProgressBar;
     private Button applyAnnotationButton;
+    private Button showManualPlaceFormButton;
     private Button recordVoiceNoteButton;
     private Button playVoiceNoteButton;
     private Button deleteVoiceNoteButton;
+    private View manualPlaceContainer;
 
     private TravelShareRepository travelShareRepository;
     private TravelShareAnnotationProvider annotationProvider;
@@ -101,6 +110,9 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
     private Runnable annotationDebounceRunnable;
     private AutocompleteSessionToken autocompleteSessionToken;
     private boolean updatingPlaceSearchText;
+    private boolean placeAutocompleteUnavailable;
+    private boolean manualPlaceFormExpanded;
+    private String placeAutocompleteUnavailableMessage = "";
     private String selectedPlaceName = "";
     private String selectedPlaceAddress = "";
     private String selectedPlaceCity = "";
@@ -169,14 +181,20 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
     private void setupPlaceAutocomplete() {
         if (TextUtils.isEmpty(BuildConfig.PLACES_API_KEY)) {
             Log.w(TAG, "Places API key is missing; autocomplete is disabled.");
+            markPlaceAutocompleteUnavailable(getString(R.string.travelshare_place_manual_unavailable));
             return;
         }
 
-        if (!Places.isInitialized()) {
-            Places.initializeWithNewPlacesApiEnabled(getApplicationContext(), BuildConfig.PLACES_API_KEY);
+        try {
+            if (!Places.isInitialized()) {
+                Places.initializeWithNewPlacesApiEnabled(getApplicationContext(), BuildConfig.PLACES_API_KEY);
+            }
+            placesClient = Places.createClient(this);
+            Log.d(TAG, "Places client initialized successfully.");
+        } catch (Exception exception) {
+            Log.e(TAG, "Places initialization failed: " + exception.getMessage(), exception);
+            markPlaceAutocompleteUnavailable(getString(R.string.travelshare_place_manual_unavailable));
         }
-        placesClient = Places.createClient(this);
-        Log.d(TAG, "Places client initialized successfully.");
     }
 
     private void bindViews() {
@@ -184,31 +202,140 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         descriptionEditText = findViewById(R.id.etCreateDescription);
         tagsEditText = findViewById(R.id.etCreateTags);
         placeSearchAutoCompleteTextView = findViewById(R.id.actvCreatePlaceSearch);
+        manualPlaceNameEditText = findViewById(R.id.etManualPlaceName);
+        manualPlaceAddressEditText = findViewById(R.id.etManualPlaceAddress);
+        manualPlaceCityEditText = findViewById(R.id.etManualPlaceCity);
+        manualPlaceCountryEditText = findViewById(R.id.etManualPlaceCountry);
+        manualPlaceLatitudeEditText = findViewById(R.id.etManualPlaceLatitude);
+        manualPlaceLongitudeEditText = findViewById(R.id.etManualPlaceLongitude);
         groupSpinner = findViewById(R.id.spinnerCreateGroup);
         placeTypeSpinner = findViewById(R.id.spinnerCreatePlaceType);
         selectedImagePreview = findViewById(R.id.ivSelectedPhotoPreview);
         selectedPlaceLabelTextView = findViewById(R.id.tvSelectedPlaceValue);
         selectedPlaceDetailsTextView = findViewById(R.id.tvSelectedPlaceDetails);
+        manualPlaceFallbackTextView = findViewById(R.id.tvManualPlaceFallback);
         annotationStatusTextView = findViewById(R.id.tvAnnotationStatus);
         annotationSummaryTextView = findViewById(R.id.tvAnnotationSummary);
         annotationTagsTextView = findViewById(R.id.tvAnnotationTags);
         voiceNoteStatusTextView = findViewById(R.id.tvVoiceNoteStatus);
         annotationProgressBar = findViewById(R.id.progressAnnotation);
         applyAnnotationButton = findViewById(R.id.btnApplyAnnotation);
+        showManualPlaceFormButton = findViewById(R.id.btnShowManualPlaceForm);
         recordVoiceNoteButton = findViewById(R.id.btnRecordVoiceNote);
         playVoiceNoteButton = findViewById(R.id.btnPlayVoiceNote);
         deleteVoiceNoteButton = findViewById(R.id.btnDeleteVoiceNote);
+        manualPlaceContainer = findViewById(R.id.layoutManualPlaceContainer);
 
-        boolean placesConfigured = !TextUtils.isEmpty(BuildConfig.PLACES_API_KEY);
-        placeSearchAutoCompleteTextView.setEnabled(placesConfigured);
-        if (!placesConfigured) {
-            selectedPlaceLabelTextView.setText(R.string.travelshare_place_api_missing);
-            selectedPlaceDetailsTextView.setText(R.string.travelshare_place_api_missing);
-            placeSearchAutoCompleteTextView.setVisibility(View.GONE);
-        }
+        showManualPlaceFormButton.setOnClickListener(v -> {
+            manualPlaceFormExpanded = true;
+            renderManualPlaceFallbackState();
+            manualPlaceNameEditText.requestFocus();
+        });
+
+        bindManualPlaceWatchers();
+        renderManualPlaceFallbackState();
 
         renderAnnotationSuggestion(null);
         updateVoiceNoteUi();
+    }
+
+    private void bindManualPlaceWatchers() {
+        SimpleTextWatcher watcher = new SimpleTextWatcher(() -> {
+            updateSelectedPlacePreviewFromManualInputs();
+            scheduleAnnotationSuggestion();
+        });
+        manualPlaceNameEditText.addTextChangedListener(watcher);
+        manualPlaceAddressEditText.addTextChangedListener(watcher);
+        manualPlaceCityEditText.addTextChangedListener(watcher);
+        manualPlaceCountryEditText.addTextChangedListener(watcher);
+        manualPlaceLatitudeEditText.addTextChangedListener(watcher);
+        manualPlaceLongitudeEditText.addTextChangedListener(watcher);
+    }
+
+    private void markPlaceAutocompleteUnavailable(String fallbackMessage) {
+        placeAutocompleteUnavailable = true;
+        placeAutocompleteUnavailableMessage = TextUtils.isEmpty(fallbackMessage)
+                ? getString(R.string.travelshare_place_manual_unavailable)
+                : fallbackMessage;
+        if (placeSearchAutoCompleteTextView != null) {
+            renderManualPlaceFallbackState();
+        }
+    }
+
+    private void renderManualPlaceFallbackState() {
+        if (placeSearchAutoCompleteTextView == null) {
+            return;
+        }
+
+        placeSearchAutoCompleteTextView.setEnabled(!placeAutocompleteUnavailable);
+        placeSearchAutoCompleteTextView.setVisibility(placeAutocompleteUnavailable ? View.GONE : View.VISIBLE);
+
+        int fallbackVisibility = placeAutocompleteUnavailable ? View.VISIBLE : View.GONE;
+        manualPlaceFallbackTextView.setVisibility(fallbackVisibility);
+        manualPlaceFallbackTextView.setText(
+                TextUtils.isEmpty(placeAutocompleteUnavailableMessage)
+                        ? getString(R.string.travelshare_place_manual_unavailable)
+                        : placeAutocompleteUnavailableMessage
+        );
+
+        showManualPlaceFormButton.setVisibility(
+                placeAutocompleteUnavailable && !manualPlaceFormExpanded ? View.VISIBLE : View.GONE
+        );
+        manualPlaceContainer.setVisibility(
+                placeAutocompleteUnavailable && manualPlaceFormExpanded ? View.VISIBLE : View.GONE
+        );
+
+        if (placeAutocompleteUnavailable) {
+            updateSelectedPlacePreviewFromManualInputs();
+        }
+    }
+
+    private void updateSelectedPlacePreviewFromManualInputs() {
+        if (!placeAutocompleteUnavailable || hasSelectedPlace) {
+            return;
+        }
+
+        PlaceDraft placeDraft = resolvePlaceDraft();
+        if (placeDraft.name.isEmpty() && placeDraft.city.isEmpty() && placeDraft.country.isEmpty()) {
+            selectedPlaceLabelTextView.setText(R.string.travelshare_place_not_selected);
+            selectedPlaceDetailsTextView.setText(R.string.travelshare_place_details_empty);
+            return;
+        }
+
+        selectedPlaceLabelTextView.setText(
+                placeDraft.name.isEmpty()
+                        ? getString(R.string.travelshare_place_not_selected)
+                        : placeDraft.name
+        );
+
+        List<String> lines = new ArrayList<>();
+        if (!placeDraft.address.isEmpty() && !placeDraft.address.equals(placeDraft.name)) {
+            lines.add(placeDraft.address);
+        }
+
+        StringBuilder localityBuilder = new StringBuilder();
+        if (!placeDraft.city.isEmpty()) {
+            localityBuilder.append(placeDraft.city);
+        }
+        if (!placeDraft.country.isEmpty()) {
+            if (localityBuilder.length() > 0) {
+                localityBuilder.append(", ");
+            }
+            localityBuilder.append(placeDraft.country);
+        }
+        if (localityBuilder.length() > 0) {
+            lines.add(localityBuilder.toString());
+        }
+
+        if (!placeDraft.areCoordinatesUsable()) {
+            lines.add(getString(R.string.travelshare_create_invalid_coordinates));
+        }
+
+        selectedPlaceDetailsTextView.setText(
+                lines.isEmpty()
+                        ? getString(R.string.travelshare_place_details_empty)
+                        : TextUtils.join("\n", lines)
+        );
     }
 
     private void setupGroupSpinner() {
@@ -422,6 +549,7 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
 
     private void fetchSelectedPlace(String placeId, String displayLabel) {
         if (placesClient == null || TextUtils.isEmpty(placeId)) {
+            markPlaceAutocompleteUnavailable(getString(R.string.travelshare_place_manual_unavailable));
             Toast.makeText(this, R.string.travelshare_place_autocomplete_error, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -573,6 +701,9 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
             Log.e(TAG, "Places error during " + step + " without exception details.");
         }
 
+        clearPredictions();
+        markPlaceAutocompleteUnavailable(getString(R.string.travelshare_place_manual_unavailable));
+
         Toast.makeText(
                 this,
                 TextUtils.isEmpty(statusMessage)
@@ -628,9 +759,7 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         final Uri imageUri = selectedImageUri;
         final String title = titleEditText.getText().toString();
         final String description = descriptionEditText.getText().toString();
-        final String placeName = selectedPlaceName;
-        final String city = selectedPlaceCity;
-        final String country = selectedPlaceCountry;
+        final PlaceDraft placeDraft = resolvePlaceDraft();
         final PlaceType placeType = PlaceType.values()[placeTypeSpinner.getSelectedItemPosition()];
 
         annotationProgressBar.setVisibility(View.VISIBLE);
@@ -642,9 +771,9 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
                         imageUri,
                         title,
                         description,
-                        placeName,
-                        city,
-                        country,
+                        placeDraft.name,
+                        placeDraft.city,
+                        placeDraft.country,
                         placeType
                 );
                 runOnUiThread(() -> {
@@ -696,14 +825,32 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         String title = titleEditText.getText().toString().trim();
         String description = descriptionEditText.getText().toString().trim();
         String tagsRaw = tagsEditText.getText().toString().trim();
+        PlaceDraft placeDraft = resolvePlaceDraft();
 
         if (title.isEmpty() || description.isEmpty()) {
             Toast.makeText(this, R.string.travelshare_create_missing_fields, Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (!hasSelectedPlace) {
-            Toast.makeText(this, R.string.travelshare_place_required, Toast.LENGTH_SHORT).show();
+        if (hasSelectedPlace) {
+            placeDraft = PlaceDraft.fromAutocomplete(
+                    selectedPlaceName,
+                    selectedPlaceAddress,
+                    selectedPlaceCity,
+                    selectedPlaceCountry,
+                    selectedPlaceLatitude,
+                    selectedPlaceLongitude
+            );
+        } else if (!placeDraft.isComplete()) {
+            int messageRes = placeAutocompleteUnavailable
+                    ? R.string.travelshare_place_manual_required
+                    : R.string.travelshare_place_required;
+            Toast.makeText(this, messageRes, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!placeDraft.areCoordinatesUsable()) {
+            Toast.makeText(this, R.string.travelshare_create_invalid_coordinates, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -718,11 +865,11 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         if (travelShareRepository.createPhotoMetadata(
                 title,
                 description,
-                selectedPlaceAddress,
-                TextUtils.isEmpty(selectedPlaceCity) ? selectedPlaceName : selectedPlaceCity,
-                selectedPlaceCountry,
-                selectedPlaceLatitude,
-                selectedPlaceLongitude,
+                placeDraft.address,
+                placeDraft.city,
+                placeDraft.country,
+                placeDraft.latitude,
+                placeDraft.longitude,
                 tags,
                 placeType,
                 selectedGroupId,
@@ -763,12 +910,70 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
     }
 
     private boolean hasAnnotationInput() {
+        PlaceDraft placeDraft = resolvePlaceDraft();
         return selectedImageUri != null
                 || !titleEditText.getText().toString().trim().isEmpty()
                 || !descriptionEditText.getText().toString().trim().isEmpty()
-                || !selectedPlaceName.trim().isEmpty()
-                || !selectedPlaceCity.trim().isEmpty()
-                || !selectedPlaceCountry.trim().isEmpty();
+                || !placeDraft.name.isEmpty()
+                || !placeDraft.city.isEmpty()
+                || !placeDraft.country.isEmpty();
+    }
+
+    private PlaceDraft resolvePlaceDraft() {
+        if (hasSelectedPlace) {
+            return PlaceDraft.fromAutocomplete(
+                    selectedPlaceName,
+                    selectedPlaceAddress,
+                    selectedPlaceCity,
+                    selectedPlaceCountry,
+                    selectedPlaceLatitude,
+                    selectedPlaceLongitude
+            );
+        }
+
+        String name = manualPlaceNameEditText.getText().toString().trim();
+        String address = manualPlaceAddressEditText.getText().toString().trim();
+        String city = manualPlaceCityEditText.getText().toString().trim();
+        String country = manualPlaceCountryEditText.getText().toString().trim();
+        String latitudeRaw = manualPlaceLatitudeEditText.getText().toString().trim();
+        String longitudeRaw = manualPlaceLongitudeEditText.getText().toString().trim();
+
+        boolean hasCoordinateInput = !latitudeRaw.isEmpty() || !longitudeRaw.isEmpty();
+        boolean coordinatesUsable = true;
+        double latitude = Double.NaN;
+        double longitude = Double.NaN;
+
+        if (hasCoordinateInput) {
+            coordinatesUsable = false;
+            if (!latitudeRaw.isEmpty() && !longitudeRaw.isEmpty()) {
+                try {
+                    latitude = Double.parseDouble(latitudeRaw);
+                    longitude = Double.parseDouble(longitudeRaw);
+                    coordinatesUsable = latitude >= -90d
+                            && latitude <= 90d
+                            && longitude >= -180d
+                            && longitude <= 180d;
+                    if (!coordinatesUsable) {
+                        latitude = Double.NaN;
+                        longitude = Double.NaN;
+                    }
+                } catch (NumberFormatException exception) {
+                    latitude = Double.NaN;
+                    longitude = Double.NaN;
+                }
+            }
+        }
+
+        return new PlaceDraft(
+                name,
+                address.isEmpty() ? name : address,
+                city,
+                country,
+                latitude,
+                longitude,
+                coordinatesUsable,
+                hasCoordinateInput
+        );
     }
 
     private String buildAnnotationErrorMessage(Exception exception) {
@@ -985,6 +1190,56 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         if (mediaRecorder != null) {
             mediaRecorder.release();
             mediaRecorder = null;
+        }
+    }
+
+    private static class PlaceDraft {
+        private final String name;
+        private final String address;
+        private final String city;
+        private final String country;
+        private final double latitude;
+        private final double longitude;
+        private final boolean coordinatesUsable;
+        private final boolean hasCoordinateInput;
+
+        private PlaceDraft(
+                String name,
+                String address,
+                String city,
+                String country,
+                double latitude,
+                double longitude,
+                boolean coordinatesUsable,
+                boolean hasCoordinateInput
+        ) {
+            this.name = name == null ? "" : name.trim();
+            this.address = address == null ? "" : address.trim();
+            this.city = city == null ? "" : city.trim();
+            this.country = country == null ? "" : country.trim();
+            this.latitude = latitude;
+            this.longitude = longitude;
+            this.coordinatesUsable = coordinatesUsable;
+            this.hasCoordinateInput = hasCoordinateInput;
+        }
+
+        private static PlaceDraft fromAutocomplete(
+                String name,
+                String address,
+                String city,
+                String country,
+                double latitude,
+                double longitude
+        ) {
+            return new PlaceDraft(name, address, city, country, latitude, longitude, true, true);
+        }
+
+        private boolean isComplete() {
+            return !name.isEmpty() && !city.isEmpty() && !country.isEmpty();
+        }
+
+        private boolean areCoordinatesUsable() {
+            return !hasCoordinateInput || coordinatesUsable;
         }
     }
 

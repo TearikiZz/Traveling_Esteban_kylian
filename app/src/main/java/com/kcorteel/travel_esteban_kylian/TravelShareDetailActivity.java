@@ -242,6 +242,11 @@ public class TravelShareDetailActivity extends AppCompatActivity {
             return;
         }
 
+        if (Double.isNaN(location.getLatitude()) || Double.isNaN(location.getLongitude())) {
+            Toast.makeText(this, R.string.travelshare_directions_missing_coordinates, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
         String destination = latitude + "," + longitude;
