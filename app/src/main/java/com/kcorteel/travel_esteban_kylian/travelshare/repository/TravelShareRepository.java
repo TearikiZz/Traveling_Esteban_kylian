@@ -14,6 +14,7 @@ import com.kcorteel.travel_esteban_kylian.travelshare.database.AppPreferencesDao
 import com.kcorteel.travel_esteban_kylian.travelshare.database.CommentDao;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.LocationDao;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.MediaDao;
+import com.kcorteel.travel_esteban_kylian.travelshare.database.NotificationDao;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.PhotoMetadataDao;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.SocialInteractionDao;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.TravelShareDatabase;
@@ -24,6 +25,8 @@ import com.kcorteel.travel_esteban_kylian.travelshare.model.Comment;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.Location;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.Media;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.MediaType;
+import com.kcorteel.travel_esteban_kylian.travelshare.model.Notification;
+import com.kcorteel.travel_esteban_kylian.travelshare.model.NotificationTriggerType;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.PhotoMetadata;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.PlaceType;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.SocialInteraction;
@@ -46,6 +49,7 @@ public class TravelShareRepository {
     private final CommentDao commentDao;
     private final SocialInteractionDao socialInteractionDao;
     private final AppPreferencesDao appPreferencesDao;
+    private final NotificationDao notificationDao;
 
     private final AppSessionManager appSessionManager;
 
@@ -58,6 +62,7 @@ public class TravelShareRepository {
         commentDao = database.commentDao();
         socialInteractionDao = database.socialInteractionDao();
         appPreferencesDao = database.appPreferencesDao();
+        notificationDao = database.notificationDao();
         appSessionManager = new AppSessionManager(context);
 
         seedDatabaseIfNeeded();
@@ -229,6 +234,7 @@ public class TravelShareRepository {
         locationDao.insert(location);
         mediaDao.insert(media);
         photoMetadataDao.insert(photoMetadata);
+        notifyUsersAboutNewPost(photoMetadata);
 
         return photoMetadata;
     }
@@ -253,6 +259,7 @@ public class TravelShareRepository {
                 System.currentTimeMillis()
         );
         commentDao.insert(comment);
+        notifyPhotoAuthorAboutComment(photoId, normalizedText);
         return comment;
     }
 
@@ -274,6 +281,7 @@ public class TravelShareRepository {
                 photoId,
                 SocialInteractionType.LIKE
         ));
+        notifyPhotoAuthorAboutLike(photoId);
         return true;
     }
 
@@ -315,6 +323,18 @@ public class TravelShareRepository {
                 photoId,
                 SocialInteractionType.REPORT
         ) != null;
+    }
+
+    public List<Notification> getNotificationsForCurrentUser() {
+        return notificationDao.getByTargetUserId(appSessionManager.getCurrentUserId());
+    }
+
+    public int getUnreadNotificationsCountForCurrentUser() {
+        return notificationDao.countUnreadByTargetUserId(appSessionManager.getCurrentUserId());
+    }
+
+    public void markCurrentUserNotificationsAsRead() {
+        notificationDao.markAllAsRead(appSessionManager.getCurrentUserId());
     }
 
     public int resolveMediaResourceId(Context context, PhotoMetadata photoMetadata) {
@@ -415,6 +435,107 @@ public class TravelShareRepository {
         }
 
         return builder.toString().toLowerCase(Locale.getDefault());
+    }
+
+    public String getNotificationTypeLabel(Notification notification) {
+        if (notification == null) {
+            return "";
+        }
+
+        switch (notification.getTriggerType()) {
+            case LIKE_ON_PHOTO:
+                return "Like reçu";
+            case COMMENT_ON_PHOTO:
+                return "Commentaire reçu";
+            case NEW_POST_BY_USER:
+            case NEW_POST_IN_GROUP:
+            case NEW_POST_IN_LOCATION:
+            case NEW_TAG_MATCH:
+            default:
+                return "Nouvelle publication";
+        }
+    }
+
+    private void notifyUsersAboutNewPost(PhotoMetadata photoMetadata) {
+        User author = getUserById(photoMetadata.getAuthorId());
+        if (author == null) {
+            return;
+        }
+
+        for (User user : userDao.getAllRegisteredUsers()) {
+            if (user.getUserId() == photoMetadata.getAuthorId()) {
+                continue;
+            }
+            if (!getOrCreatePreferencesForUser(user.getUserId()).isNotificationsEnabled()) {
+                continue;
+            }
+
+            createNotification(
+                    user.getUserId(),
+                    photoMetadata.getPhotoId(),
+                    author.getUsername() + " a publié \"" + photoMetadata.getTitle() + "\".",
+                    NotificationTriggerType.NEW_POST_BY_USER
+            );
+        }
+    }
+
+    private void notifyPhotoAuthorAboutComment(long photoId, String commentText) {
+        PhotoMetadata photoMetadata = getPhotoMetadataById(photoId);
+        User actor = getCurrentUser();
+        if (photoMetadata == null || actor == null || actor.isAnonymous()) {
+            return;
+        }
+        if (photoMetadata.getAuthorId() == actor.getUserId()) {
+            return;
+        }
+        if (!getOrCreatePreferencesForUser(photoMetadata.getAuthorId()).isNotificationsEnabled()) {
+            return;
+        }
+
+        createNotification(
+                photoMetadata.getAuthorId(),
+                photoId,
+                actor.getUsername() + " a commenté votre publication : \"" + commentText + "\".",
+                NotificationTriggerType.COMMENT_ON_PHOTO
+        );
+    }
+
+    private void notifyPhotoAuthorAboutLike(long photoId) {
+        PhotoMetadata photoMetadata = getPhotoMetadataById(photoId);
+        User actor = getCurrentUser();
+        if (photoMetadata == null || actor == null || actor.isAnonymous()) {
+            return;
+        }
+        if (photoMetadata.getAuthorId() == actor.getUserId()) {
+            return;
+        }
+        if (!getOrCreatePreferencesForUser(photoMetadata.getAuthorId()).isNotificationsEnabled()) {
+            return;
+        }
+
+        createNotification(
+                photoMetadata.getAuthorId(),
+                photoId,
+                actor.getUsername() + " aime votre publication \"" + photoMetadata.getTitle() + "\".",
+                NotificationTriggerType.LIKE_ON_PHOTO
+        );
+    }
+
+    private void createNotification(
+            long targetUserId,
+            long relatedPhotoId,
+            String message,
+            NotificationTriggerType triggerType
+    ) {
+        notificationDao.insert(new Notification(
+                notificationDao.getMaxNotificationId() + 1L,
+                targetUserId,
+                relatedPhotoId,
+                message,
+                triggerType,
+                false,
+                System.currentTimeMillis()
+        ));
     }
 
     private void seedDatabaseIfNeeded() {

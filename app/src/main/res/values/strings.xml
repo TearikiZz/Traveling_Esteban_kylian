@@ -106,10 +106,21 @@
     <string name="profile_theme_label">Thème</string>
     <string name="profile_language_label">Langue préférée</string>
     <string name="profile_notifications_label">Notifications activées</string>
+    <string name="profile_notifications_button">Voir mes notifications</string>
+    <string name="profile_notifications_unread_format">%1$d notification(s) non lue(s)</string>
+    <string name="profile_notifications_none">Aucune notification en attente</string>
     <string name="profile_save_button">Enregistrer le profil</string>
     <string name="profile_logout_button">Se déconnecter</string>
     <string name="profile_saved_message">Profil mis à jour</string>
     <string name="profile_photo_preview">Photo de profil</string>
+    <string name="notifications_screen_title">Notifications TravelShare</string>
+    <string name="notifications_screen_subtitle">Retrouvez les dernières activités liées à vos publications et au flux TravelShare.</string>
+    <string name="notifications_empty_state">Aucune notification pour le moment.</string>
+    <string name="notifications_type_new_post">Nouvelle publication</string>
+    <string name="notifications_type_like">Like reçu</string>
+    <string name="notifications_type_comment">Commentaire reçu</string>
+    <string name="notifications_open_post">Ouvrir la publication</string>
+    <string name="notifications_marked_read">Notifications marquées comme lues</string>
 
     <string-array name="profile_theme_labels">
         <item>Suivre le système</item>

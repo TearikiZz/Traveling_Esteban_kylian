@@ -33,6 +33,9 @@ public interface UserDao {
     @Query("SELECT * FROM users WHERE username = :identifier OR email = :identifier LIMIT 1")
     User getByUsernameOrEmail(String identifier);
 
+    @Query("SELECT * FROM users WHERE isAnonymous = 0")
+    List<User> getAllRegisteredUsers();
+
     @Query("SELECT COALESCE(MAX(userId), 0) FROM users")
     long getMaxUserId();
 }

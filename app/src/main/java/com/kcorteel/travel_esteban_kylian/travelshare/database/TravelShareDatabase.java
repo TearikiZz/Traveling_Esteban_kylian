@@ -11,6 +11,7 @@ import com.kcorteel.travel_esteban_kylian.travelshare.model.AppPreferences;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.Comment;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.Location;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.Media;
+import com.kcorteel.travel_esteban_kylian.travelshare.model.Notification;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.PhotoMetadata;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.SocialInteraction;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.User;
@@ -23,9 +24,10 @@ import com.kcorteel.travel_esteban_kylian.travelshare.model.User;
                 PhotoMetadata.class,
                 Comment.class,
                 SocialInteraction.class,
-                AppPreferences.class
+                AppPreferences.class,
+                Notification.class
         },
-        version = 3,
+        version = 4,
         exportSchema = false
 )
 @TypeConverters(TravelShareConverters.class)
@@ -46,6 +48,8 @@ public abstract class TravelShareDatabase extends RoomDatabase {
     public abstract SocialInteractionDao socialInteractionDao();
 
     public abstract AppPreferencesDao appPreferencesDao();
+
+    public abstract NotificationDao notificationDao();
 
     public static TravelShareDatabase getInstance(Context context) {
         if (instance == null) {
