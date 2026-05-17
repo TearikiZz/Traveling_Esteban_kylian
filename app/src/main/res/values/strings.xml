@@ -43,6 +43,17 @@
     <string name="travelshare_place_required">Veuillez choisir un lieu dans la liste proposée.</string>
     <string name="travelshare_place_fetch_incomplete">Le lieu sélectionné ne contient pas assez d\'informations pour être enregistré.</string>
     <string name="travelshare_create_tags_hint">Tags séparés par des virgules</string>
+    <string name="travelshare_annotation_section">Annotation assistée</string>
+    <string name="travelshare_annotation_subtitle">Suggestions générées automatiquement à partir de la photo, du texte et du lieu.</string>
+    <string name="travelshare_annotation_apply_button">Appliquer</string>
+    <string name="travelshare_annotation_summary_label">Résumé suggéré</string>
+    <string name="travelshare_annotation_tags_label">Tags suggérés</string>
+    <string name="travelshare_annotation_empty_state">Ajoutez un titre, une description ou un lieu pour obtenir une annotation assistée.</string>
+    <string name="travelshare_annotation_loading">Analyse IA en cours…</string>
+    <string name="travelshare_annotation_missing_key">Ajoutez GEMINI_API_KEY dans local.properties pour activer l’annotation IA.</string>
+    <string name="travelshare_annotation_error">Impossible de générer une annotation IA pour le moment.</string>
+    <string name="travelshare_annotation_error_with_reason">Impossible de générer une annotation IA : %1$s</string>
+    <string name="travelshare_annotation_applied">Suggestions appliquées à la publication</string>
     <string name="travelshare_create_publish_button">Publier</string>
     <string name="travelshare_select_photo_button">Choisir une photo</string>
     <string name="travelshare_selected_photo_preview">Aperçu de la photo sélectionnée</string>

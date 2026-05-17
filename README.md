@@ -26,7 +26,9 @@ git clone https://github.com/TearikiZz/Traveling_Esteban_kylian.git
 - `targetSdk` : 35
 - Wrapper Gradle inclus dans le dépôt
 
-## Clé Google Places
+## Clés API
+
+### Google Places
 
 La fonctionnalité d'autocomplétion de lieu utilise Google Places.
 
@@ -38,6 +40,32 @@ Pour activer cette fonctionnalité, ajouter dans `local.properties` :
 ```properties
 PLACES_API_KEY=VOTRE_CLE_API
 ```
+
+### Gemini API
+
+La suggestion IA du résumé et des tags utilise Gemini.
+
+- Le site officiel pour créer une clé est [Google AI Studio](https://aistudio.google.com/apikey).
+- La documentation officielle explique que les clés Gemini se créent et se gèrent depuis la page API Keys de Google AI Studio : [Using Gemini API keys](https://ai.google.dev/gemini-api/docs/api-key).
+- La documentation officielle indique aussi qu'il existe un `Free tier` pour les utilisateurs éligibles, avec des limites par modèle et par jour : [Gemini API rate limits](https://ai.google.dev/gemini-api/docs/rate-limits).
+
+Pour activer l'annotation IA, ajouter dans `local.properties` :
+
+```properties
+GEMINI_API_KEY=VOTRE_CLE_GEMINI
+GEMINI_MODEL=gemini-2.5-flash
+```
+
+Étapes rapides :
+1. Ouvrir [Google AI Studio](https://aistudio.google.com/apikey).
+2. Se connecter avec un compte Google.
+3. Ouvrir la page `API Keys`.
+4. Créer une clé Gemini ou utiliser la clé du projet par défaut si elle est proposée.
+5. Copier la clé dans `local.properties`.
+
+Attention :
+- ne committez jamais `local.properties`
+- pour une vraie application de production, il ne faut pas exposer la clé directement dans l'application mobile
 
 ## Comptes de démonstration
 

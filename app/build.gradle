@@ -4,10 +4,16 @@ plugins {
 
 def localPropertiesFile = rootProject.file("local.properties")
 def placesApiKey = ""
+def geminiApiKey = ""
+def geminiModel = "gemini-2.5-flash"
 if (localPropertiesFile.exists()) {
     localPropertiesFile.eachLine { line ->
         if (line.startsWith("PLACES_API_KEY=")) {
             placesApiKey = line.substring("PLACES_API_KEY=".length()).trim()
+        } else if (line.startsWith("GEMINI_API_KEY=")) {
+            geminiApiKey = line.substring("GEMINI_API_KEY=".length()).trim()
+        } else if (line.startsWith("GEMINI_MODEL=")) {
+            geminiModel = line.substring("GEMINI_MODEL=".length()).trim()
         }
     }
 }
@@ -25,6 +31,8 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField "String", "PLACES_API_KEY", "\"${placesApiKey}\""
+        buildConfigField "String", "GEMINI_API_KEY", "\"${geminiApiKey}\""
+        buildConfigField "String", "GEMINI_MODEL", "\"${geminiModel}\""
     }
 
     buildTypes {

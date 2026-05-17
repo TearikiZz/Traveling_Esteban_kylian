@@ -116,6 +116,98 @@
             android:background="@drawable/bg_search_bar"
             android:padding="8dp" />
 
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardAnnotationAssistant"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#D8E1EA"
+            app:strokeWidth="1dp"
+            xmlns:app="http://schemas.android.com/apk/res-auto">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/travelshare_annotation_section"
+                    android:textColor="#0F172A"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvAnnotationStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="@string/travelshare_annotation_subtitle"
+                    android:textColor="#64748B"
+                    android:textSize="13sp" />
+
+                <ProgressBar
+                    android:id="@+id/progressAnnotation"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tvAnnotationSummaryLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/travelshare_annotation_summary_label"
+                    android:textColor="#334155"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvAnnotationSummary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_photo_post_card"
+                    android:padding="12dp"
+                    android:text="@string/travelshare_annotation_empty_state"
+                    android:textColor="#475569" />
+
+                <TextView
+                    android:id="@+id/tvAnnotationTagsLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/travelshare_annotation_tags_label"
+                    android:textColor="#334155"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvAnnotationTags"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_photo_post_card"
+                    android:padding="12dp"
+                    android:text="@string/travelshare_annotation_empty_state"
+                    android:textColor="#475569" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnApplyAnnotation"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/travelshare_annotation_apply_button" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <Button
             android:id="@+id/btnPublishPhotoMetadata"
             android:layout_width="match_parent"

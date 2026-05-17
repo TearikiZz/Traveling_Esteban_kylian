@@ -16,6 +16,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +38,9 @@ import com.google.android.libraries.places.api.net.FetchPlaceResponse;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.kcorteel.travel_esteban_kylian.travelshare.annotation.AnnotationSuggestion;
+import com.kcorteel.travel_esteban_kylian.travelshare.annotation.GeminiTravelShareAnnotationProvider;
+import com.kcorteel.travel_esteban_kylian.travelshare.annotation.TravelShareAnnotationProvider;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.PlaceType;
 import com.kcorteel.travel_esteban_kylian.travelshare.repository.TravelShareRepository;
 
@@ -44,11 +48,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CreatePhotoMetadataActivity extends AppCompatActivity {
 
     private static final String TAG = "CreatePhotoMetadata";
     private static final long PLACE_SEARCH_DEBOUNCE_MS = 300L;
+    private static final long AI_ANNOTATION_DEBOUNCE_MS = 900L;
 
     private EditText titleEditText;
     private EditText descriptionEditText;
@@ -58,15 +65,24 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
     private ImageView selectedImagePreview;
     private TextView selectedPlaceLabelTextView;
     private TextView selectedPlaceDetailsTextView;
+    private TextView annotationStatusTextView;
+    private TextView annotationSummaryTextView;
+    private TextView annotationTagsTextView;
+    private ProgressBar annotationProgressBar;
+    private Button applyAnnotationButton;
 
     private TravelShareRepository travelShareRepository;
+    private TravelShareAnnotationProvider annotationProvider;
     private Uri selectedImageUri;
     private ActivityResultLauncher<String[]> openDocumentLauncher;
     private PlacesClient placesClient;
     private ArrayAdapter<String> placeSuggestionsAdapter;
     private final List<AutocompletePrediction> currentPredictions = new ArrayList<>();
     private final Handler placeSearchHandler = new Handler(Looper.getMainLooper());
+    private final Handler annotationHandler = new Handler(Looper.getMainLooper());
+    private final ExecutorService annotationExecutor = Executors.newSingleThreadExecutor();
     private Runnable placeSearchRunnable;
+    private Runnable annotationDebounceRunnable;
     private AutocompleteSessionToken autocompleteSessionToken;
     private boolean updatingPlaceSearchText;
     private String selectedPlaceName = "";
@@ -76,6 +92,8 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
     private double selectedPlaceLatitude;
     private double selectedPlaceLongitude;
     private boolean hasSelectedPlace;
+    private AnnotationSuggestion latestAnnotationSuggestion;
+    private int latestAnnotationRequestId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +101,7 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_photo_metadata);
 
         travelShareRepository = TravelShareRepository.getInstance(this);
+        annotationProvider = new GeminiTravelShareAnnotationProvider(this);
 
         if (travelShareRepository.isCurrentUserAnonymous()) {
             Toast.makeText(this, R.string.travelshare_create_requires_login, Toast.LENGTH_SHORT).show();
@@ -95,6 +114,7 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         bindViews();
         setupPlaceTypeSpinner();
         setupPlaceSearchField();
+        setupAnnotationAssistant();
 
         Button selectImageButton = findViewById(R.id.btnSelectPhoto);
         selectImageButton.setOnClickListener(v -> openDocumentLauncher.launch(new String[]{"image/*"}));
@@ -117,6 +137,7 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
                     if (selectedImagePreview != null) {
                         selectedImagePreview.setImageURI(uri);
                     }
+                    scheduleAnnotationSuggestion();
                 }
         );
     }
@@ -143,6 +164,11 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         selectedImagePreview = findViewById(R.id.ivSelectedPhotoPreview);
         selectedPlaceLabelTextView = findViewById(R.id.tvSelectedPlaceValue);
         selectedPlaceDetailsTextView = findViewById(R.id.tvSelectedPlaceDetails);
+        annotationStatusTextView = findViewById(R.id.tvAnnotationStatus);
+        annotationSummaryTextView = findViewById(R.id.tvAnnotationSummary);
+        annotationTagsTextView = findViewById(R.id.tvAnnotationTags);
+        annotationProgressBar = findViewById(R.id.progressAnnotation);
+        applyAnnotationButton = findViewById(R.id.btnApplyAnnotation);
 
         boolean placesConfigured = !TextUtils.isEmpty(BuildConfig.PLACES_API_KEY);
         placeSearchAutoCompleteTextView.setEnabled(placesConfigured);
@@ -151,6 +177,8 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
             selectedPlaceDetailsTextView.setText(R.string.travelshare_place_api_missing);
             placeSearchAutoCompleteTextView.setVisibility(View.GONE);
         }
+
+        renderAnnotationSuggestion(null);
     }
 
     private void setupPlaceTypeSpinner() {
@@ -161,6 +189,17 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         );
         placeTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         placeTypeSpinner.setAdapter(placeTypeAdapter);
+        placeTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                scheduleAnnotationSuggestion();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // No-op
+            }
+        });
     }
 
     private void setupPlaceSearchField() {
@@ -188,9 +227,11 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
                 String query = s == null ? "" : s.toString().trim();
                 if (query.length() < 2) {
                     clearPredictions();
+                    scheduleAnnotationSuggestion();
                     return;
                 }
                 requestPlacePredictions(query);
+                scheduleAnnotationSuggestion();
             }
 
             @Override
@@ -198,6 +239,21 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
                 // No-op
             }
         });
+    }
+
+    private void setupAnnotationAssistant() {
+        titleEditText.addTextChangedListener(new SimpleTextWatcher(this::scheduleAnnotationSuggestion));
+        descriptionEditText.addTextChangedListener(new SimpleTextWatcher(this::scheduleAnnotationSuggestion));
+        applyAnnotationButton.setOnClickListener(v -> applyAnnotationSuggestion());
+
+        if (!annotationProvider.isConfigured()) {
+            annotationStatusTextView.setText(R.string.travelshare_annotation_missing_key);
+            applyAnnotationButton.setEnabled(false);
+            return;
+        }
+
+        annotationStatusTextView.setText(R.string.travelshare_annotation_subtitle);
+        applyAnnotationButton.setEnabled(false);
     }
 
     private void onPlaceSuggestionSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -330,6 +386,8 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         if (!hasSelectedPlace) {
             Toast.makeText(this, R.string.travelshare_place_fetch_incomplete, Toast.LENGTH_LONG).show();
         }
+
+        scheduleAnnotationSuggestion();
     }
 
     private String extractAddressComponent(AddressComponents addressComponents, String... expectedTypes) {
@@ -426,6 +484,114 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         ).show();
     }
 
+    private void scheduleAnnotationSuggestion() {
+        if (!annotationProvider.isConfigured()) {
+            return;
+        }
+
+        annotationHandler.removeCallbacksAndMessages(null);
+        annotationDebounceRunnable = () -> {
+            if (!hasAnnotationInput()) {
+                latestAnnotationSuggestion = null;
+                annotationProgressBar.setVisibility(View.GONE);
+                annotationStatusTextView.setText(R.string.travelshare_annotation_empty_state);
+                renderAnnotationSuggestion(null);
+                return;
+            }
+            requestAnnotationSuggestion();
+        };
+        annotationHandler.postDelayed(annotationDebounceRunnable, AI_ANNOTATION_DEBOUNCE_MS);
+    }
+
+    private void applyAnnotationSuggestion() {
+        if (latestAnnotationSuggestion == null || latestAnnotationSuggestion.isEmpty()) {
+            return;
+        }
+
+        if (descriptionEditText.getText().toString().trim().isEmpty()
+                && !latestAnnotationSuggestion.getSummary().isEmpty()) {
+            descriptionEditText.setText(latestAnnotationSuggestion.getSummary());
+        }
+
+        List<String> mergedTags = parseTags(tagsEditText.getText().toString().trim());
+        for (String tag : latestAnnotationSuggestion.getTags()) {
+            if (!containsIgnoreCase(mergedTags, tag)) {
+                mergedTags.add(tag);
+            }
+        }
+        tagsEditText.setText(TextUtils.join(", ", mergedTags));
+        Toast.makeText(this, R.string.travelshare_annotation_applied, Toast.LENGTH_SHORT).show();
+    }
+
+    private void requestAnnotationSuggestion() {
+        final int requestId = ++latestAnnotationRequestId;
+        final Uri imageUri = selectedImageUri;
+        final String title = titleEditText.getText().toString();
+        final String description = descriptionEditText.getText().toString();
+        final String placeName = selectedPlaceName;
+        final String city = selectedPlaceCity;
+        final String country = selectedPlaceCountry;
+        final PlaceType placeType = PlaceType.values()[placeTypeSpinner.getSelectedItemPosition()];
+
+        annotationProgressBar.setVisibility(View.VISIBLE);
+        annotationStatusTextView.setText(R.string.travelshare_annotation_loading);
+
+        annotationExecutor.execute(() -> {
+            try {
+                AnnotationSuggestion suggestion = annotationProvider.generateSuggestion(
+                        imageUri,
+                        title,
+                        description,
+                        placeName,
+                        city,
+                        country,
+                        placeType
+                );
+                runOnUiThread(() -> {
+                    if (requestId != latestAnnotationRequestId) {
+                        return;
+                    }
+                    annotationProgressBar.setVisibility(View.GONE);
+                    latestAnnotationSuggestion = suggestion;
+                    annotationStatusTextView.setText(R.string.travelshare_annotation_subtitle);
+                    renderAnnotationSuggestion(suggestion);
+                });
+            } catch (Exception exception) {
+                Log.e(TAG, "Annotation IA error: " + exception.getMessage(), exception);
+                runOnUiThread(() -> {
+                    if (requestId != latestAnnotationRequestId) {
+                        return;
+                    }
+                    annotationProgressBar.setVisibility(View.GONE);
+                    latestAnnotationSuggestion = null;
+                    annotationStatusTextView.setText(buildAnnotationErrorMessage(exception));
+                    renderAnnotationSuggestion(null);
+                });
+            }
+        });
+    }
+
+    private void renderAnnotationSuggestion(AnnotationSuggestion suggestion) {
+        if (suggestion == null || suggestion.isEmpty()) {
+            annotationSummaryTextView.setText(R.string.travelshare_annotation_empty_state);
+            annotationTagsTextView.setText(R.string.travelshare_annotation_empty_state);
+            applyAnnotationButton.setEnabled(false);
+            return;
+        }
+
+        annotationSummaryTextView.setText(
+                suggestion.getSummary().isEmpty()
+                        ? getString(R.string.travelshare_annotation_empty_state)
+                        : suggestion.getSummary()
+        );
+        annotationTagsTextView.setText(
+                suggestion.getTags().isEmpty()
+                        ? getString(R.string.travelshare_annotation_empty_state)
+                        : TextUtils.join(", ", suggestion.getTags())
+        );
+        applyAnnotationButton.setEnabled(true);
+    }
+
     private void publishPhotoMetadata() {
         String title = titleEditText.getText().toString().trim();
         String description = descriptionEditText.getText().toString().trim();
@@ -482,5 +648,69 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
             }
         }
         return tags;
+    }
+
+    private boolean containsIgnoreCase(List<String> values, String candidate) {
+        String normalizedCandidate = candidate == null ? "" : candidate.trim().toLowerCase(Locale.getDefault());
+        for (String value : values) {
+            if (value != null && value.trim().toLowerCase(Locale.getDefault()).equals(normalizedCandidate)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasAnnotationInput() {
+        return selectedImageUri != null
+                || !titleEditText.getText().toString().trim().isEmpty()
+                || !descriptionEditText.getText().toString().trim().isEmpty()
+                || !selectedPlaceName.trim().isEmpty()
+                || !selectedPlaceCity.trim().isEmpty()
+                || !selectedPlaceCountry.trim().isEmpty();
+    }
+
+    private String buildAnnotationErrorMessage(Exception exception) {
+        String message = exception == null ? "" : exception.getMessage();
+        if (TextUtils.isEmpty(message)) {
+            return getString(R.string.travelshare_annotation_error);
+        }
+
+        message = message.trim();
+        if (message.startsWith("Gemini API error:")) {
+            message = message.substring("Gemini API error:".length()).trim();
+        }
+
+        return getString(R.string.travelshare_annotation_error_with_reason, message);
+    }
+
+    @Override
+    protected void onDestroy() {
+        annotationHandler.removeCallbacksAndMessages(null);
+        placeSearchHandler.removeCallbacksAndMessages(null);
+        annotationExecutor.shutdownNow();
+        super.onDestroy();
+    }
+
+    private static class SimpleTextWatcher implements TextWatcher {
+        private final Runnable onChanged;
+
+        SimpleTextWatcher(Runnable onChanged) {
+            this.onChanged = onChanged;
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            // No-op
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            onChanged.run();
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            // No-op
+        }
     }
 }
