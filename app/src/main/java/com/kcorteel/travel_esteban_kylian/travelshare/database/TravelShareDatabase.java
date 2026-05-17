@@ -25,7 +25,7 @@ import com.kcorteel.travel_esteban_kylian.travelshare.model.User;
                 SocialInteraction.class,
                 AppPreferences.class
         },
-        version = 3,
+        version = 5,
         exportSchema = false
 )
 @TypeConverters(TravelShareConverters.class)

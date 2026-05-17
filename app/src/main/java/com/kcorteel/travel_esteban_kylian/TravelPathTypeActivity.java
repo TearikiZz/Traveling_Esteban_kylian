@@ -4,11 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class TravelPathTypeActivity extends AppCompatActivity {
-
-    private Button economicButton, balancedButton, comfortButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,9 +15,9 @@ public class TravelPathTypeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_travelpath_type);
 
         // Initialisation des vues
-        economicButton = findViewById(R.id.economicButton);
-        balancedButton = findViewById(R.id.balancedButton);
-        comfortButton = findViewById(R.id.comfortButton);
+        Button economicButton = findViewById(R.id.economicButton);
+        Button balancedButton = findViewById(R.id.balancedButton);
+        Button comfortButton = findViewById(R.id.comfortButton);
 
         // Récupération des préférences de l'écran précédent
         Bundle extras = getIntent().getExtras();
@@ -40,6 +39,11 @@ public class TravelPathTypeActivity extends AppCompatActivity {
                     pathType = "Équilibré";
                 } else if (v.getId() == R.id.comfortButton) {
                     pathType = "Confort";
+                }
+
+                if (pathType.isEmpty()) {
+                    Toast.makeText(TravelPathTypeActivity.this, "Veuillez choisir un type de parcours.", Toast.LENGTH_SHORT).show();
+                    return;
                 }
 
                 // Passage à l'écran de récapitulatif du parcours

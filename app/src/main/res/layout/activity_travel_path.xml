@@ -9,7 +9,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Module TravelPath en cours de développement"
+        android:text="@string/module_travelpath_en_cours_de_d_veloppement"
+        android:textColor="#000000"
         android:textSize="22sp"
         android:textStyle="bold" />
 
