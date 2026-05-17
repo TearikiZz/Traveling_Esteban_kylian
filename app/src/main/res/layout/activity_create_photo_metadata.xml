@@ -62,6 +62,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:text="@string/travelshare_group_picker_label"
+            android:textColor="#0F172A"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/spinnerCreateGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_search_bar"
+            android:padding="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:text="@string/travelshare_place_section"
             android:textColor="#0F172A"
             android:textStyle="bold" />

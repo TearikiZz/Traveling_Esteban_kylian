@@ -9,11 +9,13 @@ import androidx.room.TypeConverters;
 
 import com.kcorteel.travel_esteban_kylian.travelshare.model.AppPreferences;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.Comment;
+import com.kcorteel.travel_esteban_kylian.travelshare.model.GroupMembership;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.Location;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.Media;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.Notification;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.PhotoMetadata;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.SocialInteraction;
+import com.kcorteel.travel_esteban_kylian.travelshare.model.TravelGroup;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.User;
 
 @Database(
@@ -25,9 +27,11 @@ import com.kcorteel.travel_esteban_kylian.travelshare.model.User;
                 Comment.class,
                 SocialInteraction.class,
                 AppPreferences.class,
-                Notification.class
+                Notification.class,
+                TravelGroup.class,
+                GroupMembership.class
         },
-        version = 5,
+        version = 6,
         exportSchema = false
 )
 @TypeConverters(TravelShareConverters.class)
@@ -50,6 +54,10 @@ public abstract class TravelShareDatabase extends RoomDatabase {
     public abstract AppPreferencesDao appPreferencesDao();
 
     public abstract NotificationDao notificationDao();
+
+    public abstract TravelGroupDao travelGroupDao();
+
+    public abstract GroupMembershipDao groupMembershipDao();
 
     public static TravelShareDatabase getInstance(Context context) {
         if (instance == null) {

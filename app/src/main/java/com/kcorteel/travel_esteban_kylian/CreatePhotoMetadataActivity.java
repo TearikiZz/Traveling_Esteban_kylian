@@ -40,6 +40,7 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.kcorteel.travel_esteban_kylian.travelshare.annotation.AnnotationSuggestion;
 import com.kcorteel.travel_esteban_kylian.travelshare.annotation.GeminiTravelShareAnnotationProvider;
+import com.kcorteel.travel_esteban_kylian.travelshare.model.TravelGroup;
 import com.kcorteel.travel_esteban_kylian.travelshare.annotation.TravelShareAnnotationProvider;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.PlaceType;
 import com.kcorteel.travel_esteban_kylian.travelshare.repository.TravelShareRepository;
@@ -53,6 +54,8 @@ import java.util.concurrent.Executors;
 
 public class CreatePhotoMetadataActivity extends AppCompatActivity {
 
+    public static final String EXTRA_PRESELECT_GROUP_ID = "extra_preselect_group_id";
+
     private static final String TAG = "CreatePhotoMetadata";
     private static final long PLACE_SEARCH_DEBOUNCE_MS = 300L;
     private static final long AI_ANNOTATION_DEBOUNCE_MS = 900L;
@@ -61,6 +64,7 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
     private EditText descriptionEditText;
     private EditText tagsEditText;
     private AutoCompleteTextView placeSearchAutoCompleteTextView;
+    private Spinner groupSpinner;
     private Spinner placeTypeSpinner;
     private ImageView selectedImagePreview;
     private TextView selectedPlaceLabelTextView;
@@ -92,6 +96,8 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
     private double selectedPlaceLatitude;
     private double selectedPlaceLongitude;
     private boolean hasSelectedPlace;
+    private Long selectedGroupId;
+    private final List<TravelGroup> availableGroups = new ArrayList<>();
     private AnnotationSuggestion latestAnnotationSuggestion;
     private int latestAnnotationRequestId;
 
@@ -112,6 +118,7 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         setupImagePicker();
         setupPlaceAutocomplete();
         bindViews();
+        setupGroupSpinner();
         setupPlaceTypeSpinner();
         setupPlaceSearchField();
         setupAnnotationAssistant();
@@ -160,6 +167,7 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         descriptionEditText = findViewById(R.id.etCreateDescription);
         tagsEditText = findViewById(R.id.etCreateTags);
         placeSearchAutoCompleteTextView = findViewById(R.id.actvCreatePlaceSearch);
+        groupSpinner = findViewById(R.id.spinnerCreateGroup);
         placeTypeSpinner = findViewById(R.id.spinnerCreatePlaceType);
         selectedImagePreview = findViewById(R.id.ivSelectedPhotoPreview);
         selectedPlaceLabelTextView = findViewById(R.id.tvSelectedPlaceValue);
@@ -179,6 +187,47 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         }
 
         renderAnnotationSuggestion(null);
+    }
+
+    private void setupGroupSpinner() {
+        availableGroups.clear();
+        availableGroups.addAll(travelShareRepository.getGroupsForCurrentUser());
+
+        List<String> groupLabels = new ArrayList<>();
+        groupLabels.add(getString(R.string.travelshare_group_none_option));
+        for (TravelGroup group : availableGroups) {
+            groupLabels.add(group.getGroupName());
+        }
+
+        ArrayAdapter<String> groupAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                groupLabels
+        );
+        groupAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        groupSpinner.setAdapter(groupAdapter);
+        groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedGroupId = position == 0 ? null : availableGroups.get(position - 1).getGroupId();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                selectedGroupId = null;
+            }
+        });
+
+        long preselectedGroupId = getIntent().getLongExtra(EXTRA_PRESELECT_GROUP_ID, -1L);
+        if (preselectedGroupId > 0L) {
+            for (int i = 0; i < availableGroups.size(); i++) {
+                if (availableGroups.get(i).getGroupId() == preselectedGroupId) {
+                    groupSpinner.setSelection(i + 1, false);
+                    selectedGroupId = preselectedGroupId;
+                    break;
+                }
+            }
+        }
     }
 
     private void setupPlaceTypeSpinner() {
@@ -625,6 +674,7 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
                 selectedPlaceLongitude,
                 tags,
                 placeType,
+                selectedGroupId,
                 selectedImageUri.toString()
         ) == null) {
             Toast.makeText(this, R.string.travelshare_create_requires_login, Toast.LENGTH_SHORT).show();

@@ -29,6 +29,21 @@
         android:textStyle="bold" />
 
     <TextView
+        android:id="@+id/tvPhotoMetadataGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_search_bar"
+        android:paddingLeft="10dp"
+        android:paddingTop="6dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="6dp"
+        android:textColor="#0F766E"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <TextView
         android:id="@+id/tvPhotoMetadataLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

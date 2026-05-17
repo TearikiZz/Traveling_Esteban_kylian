@@ -1,5 +1,8 @@
 package com.kcorteel.travel_esteban_kylian.travelshare.model;
 
+import androidx.room.Entity;
+
+@Entity(tableName = "group_memberships", primaryKeys = {"groupId", "userId"})
 public class GroupMembership {
 
     private final long groupId;

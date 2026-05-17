@@ -18,6 +18,7 @@ public class PhotoMetadata {
     private long timestamp;
     private long locationId;
     private long mediaId;
+    private Long groupId;
     private List<String> tags;
     private PlaceType placeType;
 
@@ -29,6 +30,7 @@ public class PhotoMetadata {
             long timestamp,
             long locationId,
             long mediaId,
+            Long groupId,
             List<String> tags,
             PlaceType placeType
     ) {
@@ -39,6 +41,7 @@ public class PhotoMetadata {
         this.timestamp = timestamp;
         this.locationId = locationId;
         this.mediaId = mediaId;
+        this.groupId = groupId;
         this.tags = new ArrayList<>(tags);
         this.placeType = placeType;
     }
@@ -69,6 +72,10 @@ public class PhotoMetadata {
 
     public long getMediaId() {
         return mediaId;
+    }
+
+    public Long getGroupId() {
+        return groupId;
     }
 
     public List<String> getTags() {

@@ -37,6 +37,14 @@
             android:textColor="#475569"
             android:textSize="14sp" />
 
+        <Button
+            android:id="@+id/btnOpenPhotoGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/travelshare_group_open_from_post"
+            android:visibility="gone" />
+
         <TextView
             android:id="@+id/tvDetailPhotoMetadataLocation"
             android:layout_width="wrap_content"

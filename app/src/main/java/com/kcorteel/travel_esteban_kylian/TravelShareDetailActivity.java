@@ -37,6 +37,7 @@ public class TravelShareDetailActivity extends AppCompatActivity {
     private TextView tagsTextView;
     private TextView routeAdviceTextView;
     private TextView commentsCountTextView;
+    private Button openGroupButton;
     private Button likeButton;
     private Button reportButton;
     private Button directionsButton;
@@ -89,6 +90,7 @@ public class TravelShareDetailActivity extends AppCompatActivity {
         tagsTextView = findViewById(R.id.tvDetailPhotoMetadataTags);
         routeAdviceTextView = findViewById(R.id.tvDetailPhotoMetadataRouteAdvice);
         commentsCountTextView = findViewById(R.id.tvCommentsCount);
+        openGroupButton = findViewById(R.id.btnOpenPhotoGroup);
         likeButton = findViewById(R.id.btnLikePhotoMetadata);
         reportButton = findViewById(R.id.btnReportPhotoMetadata);
         directionsButton = findViewById(R.id.btnOpenDirections);
@@ -115,6 +117,13 @@ public class TravelShareDetailActivity extends AppCompatActivity {
                 R.string.travelshare_author_format,
                 travelShareRepository.getAuthorLabel(photoMetadata)
         ));
+        String groupLabel = travelShareRepository.getGroupLabel(photoMetadata);
+        if (groupLabel.isEmpty()) {
+            openGroupButton.setVisibility(android.view.View.GONE);
+        } else {
+            openGroupButton.setVisibility(android.view.View.VISIBLE);
+            openGroupButton.setText(getString(R.string.travelshare_post_group_format, groupLabel));
+        }
         locationTextView.setText(getString(
                 R.string.travelshare_location_format,
                 travelShareRepository.getLocationLabel(photoMetadata)
@@ -166,6 +175,8 @@ public class TravelShareDetailActivity extends AppCompatActivity {
 
             Toast.makeText(this, messageRes, Toast.LENGTH_SHORT).show();
         });
+
+        openGroupButton.setOnClickListener(v -> openPhotoGroup());
 
         directionsButton.setOnClickListener(v -> openDirections());
 
@@ -266,5 +277,15 @@ public class TravelShareDetailActivity extends AppCompatActivity {
         } catch (ActivityNotFoundException exception) {
             return false;
         }
+    }
+
+    private void openPhotoGroup() {
+        if (photoMetadata == null || photoMetadata.getGroupId() == null) {
+            return;
+        }
+
+        Intent intent = new Intent(this, TravelShareGroupDetailActivity.class);
+        intent.putExtra(TravelShareGroupDetailActivity.EXTRA_GROUP_ID, photoMetadata.getGroupId());
+        startActivity(intent);
     }
 }

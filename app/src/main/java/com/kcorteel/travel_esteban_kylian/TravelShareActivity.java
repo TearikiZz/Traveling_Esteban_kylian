@@ -35,6 +35,7 @@ public class TravelShareActivity extends AppCompatActivity {
     private TravelShareRepository travelShareRepository;
     private TextView subtitleTextView;
     private Button createPhotoMetadataButton;
+    private Button openGroupsButton;
     private Button resetFiltersButton;
     private ImageView profileShortcutImageView;
     private Spinner placeTypeSpinner;
@@ -56,6 +57,7 @@ public class TravelShareActivity extends AppCompatActivity {
         photoMetadataRecyclerView = findViewById(R.id.rvPhotoMetadata);
         subtitleTextView = findViewById(R.id.tvTravelShareSubtitle);
         createPhotoMetadataButton = findViewById(R.id.btnCreatePhotoMetadata);
+        openGroupsButton = findViewById(R.id.btnOpenGroups);
         resetFiltersButton = findViewById(R.id.btnResetFilters);
         profileShortcutImageView = findViewById(R.id.ivProfileShortcut);
         placeTypeSpinner = findViewById(R.id.spinnerFilterPlaceType);
@@ -95,6 +97,10 @@ public class TravelShareActivity extends AppCompatActivity {
             Intent intent = new Intent(this, CreatePhotoMetadataActivity.class);
             startActivity(intent);
         });
+
+        openGroupsButton.setOnClickListener(v ->
+                startActivity(new Intent(this, TravelShareGroupsActivity.class))
+        );
 
         resetFiltersButton.setOnClickListener(v -> resetAllFilters());
 

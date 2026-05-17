@@ -175,6 +175,7 @@ public class PhotoMetadataAdapter extends RecyclerView.Adapter<PhotoMetadataAdap
 
         private final ImageView photoImageView;
         private final TextView titleTextView;
+        private final TextView groupTextView;
         private final TextView locationTextView;
         private final TextView dateTextView;
         private final TextView descriptionTextView;
@@ -184,6 +185,7 @@ public class PhotoMetadataAdapter extends RecyclerView.Adapter<PhotoMetadataAdap
             super(itemView);
             photoImageView = itemView.findViewById(R.id.ivPhotoMetadataMedia);
             titleTextView = itemView.findViewById(R.id.tvPhotoMetadataTitle);
+            groupTextView = itemView.findViewById(R.id.tvPhotoMetadataGroup);
             locationTextView = itemView.findViewById(R.id.tvPhotoMetadataLocation);
             dateTextView = itemView.findViewById(R.id.tvPhotoMetadataDate);
             descriptionTextView = itemView.findViewById(R.id.tvPhotoMetadataDescription);
@@ -193,6 +195,16 @@ public class PhotoMetadataAdapter extends RecyclerView.Adapter<PhotoMetadataAdap
         void bind(final PhotoMetadata photoMetadata) {
             repository.loadMediaIntoImageView(itemView.getContext(), photoImageView, photoMetadata);
             titleTextView.setText(photoMetadata.getTitle());
+            String groupLabel = repository.getGroupLabel(photoMetadata);
+            if (groupLabel.isEmpty()) {
+                groupTextView.setVisibility(View.GONE);
+            } else {
+                groupTextView.setVisibility(View.VISIBLE);
+                groupTextView.setText(itemView.getContext().getString(
+                        R.string.travelshare_post_group_format,
+                        groupLabel
+                ));
+            }
             locationTextView.setText(repository.getLocationLabel(photoMetadata));
             dateTextView.setText(dateFormat.format(new Date(photoMetadata.getTimestamp())));
             descriptionTextView.setText(photoMetadata.getDescription());
