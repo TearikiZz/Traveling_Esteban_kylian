@@ -62,6 +62,54 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:text="@string/travelshare_voice_note_section"
+            android:textColor="#0F172A"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvVoiceNoteStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_photo_post_card"
+            android:padding="12dp"
+            android:text="@string/travelshare_voice_note_empty"
+            android:textColor="#64748B" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnRecordVoiceNote"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/travelshare_voice_note_record_button" />
+
+            <Button
+                android:id="@+id/btnPlayVoiceNote"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:text="@string/travelshare_voice_note_play_button" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnDeleteVoiceNote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/travelshare_voice_note_delete_button" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:text="@string/travelshare_group_picker_label"
             android:textColor="#0F172A"
             android:textStyle="bold" />

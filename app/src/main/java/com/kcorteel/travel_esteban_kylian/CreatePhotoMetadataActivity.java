@@ -1,10 +1,14 @@
 package com.kcorteel.travel_esteban_kylian;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -21,8 +25,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.common.api.Status;
@@ -72,13 +78,19 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
     private TextView annotationStatusTextView;
     private TextView annotationSummaryTextView;
     private TextView annotationTagsTextView;
+    private TextView voiceNoteStatusTextView;
     private ProgressBar annotationProgressBar;
     private Button applyAnnotationButton;
+    private Button recordVoiceNoteButton;
+    private Button playVoiceNoteButton;
+    private Button deleteVoiceNoteButton;
 
     private TravelShareRepository travelShareRepository;
     private TravelShareAnnotationProvider annotationProvider;
     private Uri selectedImageUri;
     private ActivityResultLauncher<String[]> openDocumentLauncher;
+    private ActivityResultLauncher<String> recordAudioPermissionLauncher;
+    private ActivityResultLauncher<Intent> descriptionSpeechLauncher;
     private PlacesClient placesClient;
     private ArrayAdapter<String> placeSuggestionsAdapter;
     private final List<AutocompletePrediction> currentPredictions = new ArrayList<>();
@@ -98,6 +110,10 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
     private boolean hasSelectedPlace;
     private Long selectedGroupId;
     private final List<TravelGroup> availableGroups = new ArrayList<>();
+    private MediaRecorder mediaRecorder;
+    private MediaPlayer audioPreviewPlayer;
+    private String voiceNotePath = "";
+    private boolean isRecordingVoiceNote;
     private AnnotationSuggestion latestAnnotationSuggestion;
     private int latestAnnotationRequestId;
 
@@ -116,6 +132,7 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         }
 
         setupImagePicker();
+        setupVoiceInputHelpers();
         setupPlaceAutocomplete();
         bindViews();
         setupGroupSpinner();
@@ -175,8 +192,12 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         annotationStatusTextView = findViewById(R.id.tvAnnotationStatus);
         annotationSummaryTextView = findViewById(R.id.tvAnnotationSummary);
         annotationTagsTextView = findViewById(R.id.tvAnnotationTags);
+        voiceNoteStatusTextView = findViewById(R.id.tvVoiceNoteStatus);
         annotationProgressBar = findViewById(R.id.progressAnnotation);
         applyAnnotationButton = findViewById(R.id.btnApplyAnnotation);
+        recordVoiceNoteButton = findViewById(R.id.btnRecordVoiceNote);
+        playVoiceNoteButton = findViewById(R.id.btnPlayVoiceNote);
+        deleteVoiceNoteButton = findViewById(R.id.btnDeleteVoiceNote);
 
         boolean placesConfigured = !TextUtils.isEmpty(BuildConfig.PLACES_API_KEY);
         placeSearchAutoCompleteTextView.setEnabled(placesConfigured);
@@ -187,6 +208,7 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         }
 
         renderAnnotationSuggestion(null);
+        updateVoiceNoteUi();
     }
 
     private void setupGroupSpinner() {
@@ -294,6 +316,13 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         titleEditText.addTextChangedListener(new SimpleTextWatcher(this::scheduleAnnotationSuggestion));
         descriptionEditText.addTextChangedListener(new SimpleTextWatcher(this::scheduleAnnotationSuggestion));
         applyAnnotationButton.setOnClickListener(v -> applyAnnotationSuggestion());
+        descriptionEditText.setOnLongClickListener(v -> {
+            startDescriptionSpeechInput();
+            return true;
+        });
+        recordVoiceNoteButton.setOnClickListener(v -> toggleVoiceRecording());
+        playVoiceNoteButton.setOnClickListener(v -> toggleVoicePlayback());
+        deleteVoiceNoteButton.setOnClickListener(v -> deleteVoiceNote());
 
         if (!annotationProvider.isConfigured()) {
             annotationStatusTextView.setText(R.string.travelshare_annotation_missing_key);
@@ -303,6 +332,28 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
 
         annotationStatusTextView.setText(R.string.travelshare_annotation_subtitle);
         applyAnnotationButton.setEnabled(false);
+    }
+
+    private void setupVoiceInputHelpers() {
+        recordAudioPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        startVoiceRecording();
+                    } else {
+                        Toast.makeText(
+                                this,
+                                R.string.travelshare_voice_note_permission_required,
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                }
+        );
+
+        descriptionSpeechLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                this::handleDescriptionSpeechResult
+        );
     }
 
     private void onPlaceSuggestionSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -675,6 +726,7 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
                 tags,
                 placeType,
                 selectedGroupId,
+                normalizeVoiceNotePath(),
                 selectedImageUri.toString()
         ) == null) {
             Toast.makeText(this, R.string.travelshare_create_requires_login, Toast.LENGTH_SHORT).show();
@@ -733,8 +785,221 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         return getString(R.string.travelshare_annotation_error_with_reason, message);
     }
 
+    private void startDescriptionSpeechInput() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.FRANCE.toLanguageTag());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.travelshare_create_description_hint));
+
+        try {
+            descriptionSpeechLauncher.launch(intent);
+        } catch (Exception exception) {
+            Toast.makeText(this, R.string.travelshare_voice_search_unavailable, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void handleDescriptionSpeechResult(ActivityResult result) {
+        if (result.getResultCode() != RESULT_OK || result.getData() == null) {
+            return;
+        }
+
+        ArrayList<String> matches = result.getData().getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+        if (matches == null || matches.isEmpty()) {
+            return;
+        }
+
+        String recognizedText = matches.get(0).trim();
+        if (recognizedText.isEmpty()) {
+            return;
+        }
+
+        String current = descriptionEditText.getText().toString().trim();
+        if (current.isEmpty()) {
+            descriptionEditText.setText(recognizedText);
+        } else {
+            descriptionEditText.setText(current + " " + recognizedText);
+        }
+        descriptionEditText.setSelection(descriptionEditText.getText().length());
+    }
+
+    private void toggleVoiceRecording() {
+        if (isRecordingVoiceNote) {
+            stopVoiceRecording();
+            return;
+        }
+
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO)
+                == PackageManager.PERMISSION_GRANTED) {
+            startVoiceRecording();
+        } else {
+            recordAudioPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO);
+        }
+    }
+
+    private void startVoiceRecording() {
+        stopVoicePlayback();
+        deleteVoiceFileSilently();
+        voiceNotePath = buildVoiceNotePath();
+
+        try {
+            mediaRecorder = new MediaRecorder();
+            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+            mediaRecorder.setOutputFile(voiceNotePath);
+            mediaRecorder.prepare();
+            mediaRecorder.start();
+            isRecordingVoiceNote = true;
+            updateVoiceNoteUi();
+        } catch (Exception exception) {
+            Log.e(TAG, "Voice note recording error: " + exception.getMessage(), exception);
+            releaseRecorder();
+            voiceNotePath = "";
+            isRecordingVoiceNote = false;
+            updateVoiceNoteUi();
+            Toast.makeText(this, R.string.travelshare_voice_note_error, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void stopVoiceRecording() {
+        try {
+            if (mediaRecorder != null) {
+                mediaRecorder.stop();
+            }
+            Toast.makeText(this, R.string.travelshare_voice_note_saved, Toast.LENGTH_SHORT).show();
+        } catch (Exception exception) {
+            Log.e(TAG, "Voice note stop error: " + exception.getMessage(), exception);
+            deleteVoiceFileSilently();
+            voiceNotePath = "";
+            Toast.makeText(this, R.string.travelshare_voice_note_error, Toast.LENGTH_SHORT).show();
+        } finally {
+            releaseRecorder();
+            isRecordingVoiceNote = false;
+            updateVoiceNoteUi();
+        }
+    }
+
+    private void toggleVoicePlayback() {
+        if (audioPreviewPlayer != null && audioPreviewPlayer.isPlaying()) {
+            stopVoicePlayback();
+            updateVoiceNoteUi();
+            return;
+        }
+
+        if (normalizeVoiceNotePath() == null) {
+            return;
+        }
+
+        try {
+            audioPreviewPlayer = new MediaPlayer();
+            audioPreviewPlayer.setDataSource(voiceNotePath);
+            audioPreviewPlayer.setOnCompletionListener(mp -> {
+                stopVoicePlayback();
+                updateVoiceNoteUi();
+            });
+            audioPreviewPlayer.prepare();
+            audioPreviewPlayer.start();
+            updateVoiceNoteUi();
+        } catch (Exception exception) {
+            Log.e(TAG, "Voice note playback error: " + exception.getMessage(), exception);
+            stopVoicePlayback();
+            updateVoiceNoteUi();
+            Toast.makeText(this, R.string.travelshare_voice_note_error, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void stopVoicePlayback() {
+        if (audioPreviewPlayer != null) {
+            try {
+                if (audioPreviewPlayer.isPlaying()) {
+                    audioPreviewPlayer.stop();
+                }
+            } catch (Exception ignored) {
+                // No-op
+            }
+            audioPreviewPlayer.release();
+            audioPreviewPlayer = null;
+        }
+    }
+
+    private void deleteVoiceNote() {
+        stopVoicePlayback();
+        if (isRecordingVoiceNote) {
+            stopVoiceRecording();
+        }
+        deleteVoiceFileSilently();
+        voiceNotePath = "";
+        updateVoiceNoteUi();
+        Toast.makeText(this, R.string.travelshare_voice_note_deleted, Toast.LENGTH_SHORT).show();
+    }
+
+    private void updateVoiceNoteUi() {
+        boolean hasVoiceNote = normalizeVoiceNotePath() != null;
+        boolean isPlaying = audioPreviewPlayer != null && audioPreviewPlayer.isPlaying();
+
+        if (isRecordingVoiceNote) {
+            voiceNoteStatusTextView.setText(R.string.travelshare_voice_note_recording);
+            recordVoiceNoteButton.setText(R.string.travelshare_voice_note_stop_button);
+        } else if (hasVoiceNote) {
+            voiceNoteStatusTextView.setText(R.string.travelshare_voice_note_ready);
+            recordVoiceNoteButton.setText(R.string.travelshare_voice_note_record_button);
+        } else {
+            voiceNoteStatusTextView.setText(R.string.travelshare_voice_note_empty);
+            recordVoiceNoteButton.setText(R.string.travelshare_voice_note_record_button);
+        }
+
+        playVoiceNoteButton.setEnabled(hasVoiceNote && !isRecordingVoiceNote);
+        playVoiceNoteButton.setText(isPlaying
+                ? R.string.travelshare_voice_note_stop_playback_button
+                : R.string.travelshare_voice_note_play_button);
+        deleteVoiceNoteButton.setEnabled(hasVoiceNote || isRecordingVoiceNote);
+    }
+
+    private String buildVoiceNotePath() {
+        return new java.io.File(
+                getFilesDir(),
+                "voice_note_" + System.currentTimeMillis() + ".m4a"
+        ).getAbsolutePath();
+    }
+
+    private void deleteVoiceFileSilently() {
+        String path = normalizeVoiceNotePath();
+        if (path == null) {
+            return;
+        }
+        try {
+            new java.io.File(path).delete();
+        } catch (Exception ignored) {
+            // No-op
+        }
+    }
+
+    private String normalizeVoiceNotePath() {
+        if (voiceNotePath == null || voiceNotePath.trim().isEmpty()) {
+            return null;
+        }
+        return voiceNotePath.trim();
+    }
+
+    private void releaseRecorder() {
+        if (mediaRecorder != null) {
+            mediaRecorder.release();
+            mediaRecorder = null;
+        }
+    }
+
     @Override
     protected void onDestroy() {
+        if (isRecordingVoiceNote) {
+            try {
+                stopVoiceRecording();
+            } catch (Exception ignored) {
+                releaseRecorder();
+            }
+        } else {
+            releaseRecorder();
+        }
+        stopVoicePlayback();
         annotationHandler.removeCallbacksAndMessages(null);
         placeSearchHandler.removeCallbacksAndMessages(null);
         annotationExecutor.shutdownNow();

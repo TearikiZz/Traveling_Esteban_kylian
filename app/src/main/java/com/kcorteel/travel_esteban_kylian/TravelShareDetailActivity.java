@@ -2,6 +2,7 @@ package com.kcorteel.travel_esteban_kylian;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -34,10 +35,12 @@ public class TravelShareDetailActivity extends AppCompatActivity {
     private TextView locationTextView;
     private TextView dateTextView;
     private TextView descriptionTextView;
+    private TextView voiceNoteLabelTextView;
     private TextView tagsTextView;
     private TextView routeAdviceTextView;
     private TextView commentsCountTextView;
     private Button openGroupButton;
+    private Button playVoiceNoteButton;
     private Button likeButton;
     private Button reportButton;
     private Button directionsButton;
@@ -49,6 +52,7 @@ public class TravelShareDetailActivity extends AppCompatActivity {
     private CommentAdapter commentAdapter;
     private PhotoMetadata photoMetadata;
     private long photoId;
+    private MediaPlayer voiceNotePlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +91,8 @@ public class TravelShareDetailActivity extends AppCompatActivity {
         locationTextView = findViewById(R.id.tvDetailPhotoMetadataLocation);
         dateTextView = findViewById(R.id.tvDetailPhotoMetadataDate);
         descriptionTextView = findViewById(R.id.tvDetailPhotoMetadataDescription);
+        voiceNoteLabelTextView = findViewById(R.id.tvVoiceNoteLabel);
+        playVoiceNoteButton = findViewById(R.id.btnPlayVoiceNote);
         tagsTextView = findViewById(R.id.tvDetailPhotoMetadataTags);
         routeAdviceTextView = findViewById(R.id.tvDetailPhotoMetadataRouteAdvice);
         commentsCountTextView = findViewById(R.id.tvCommentsCount);
@@ -134,6 +140,7 @@ public class TravelShareDetailActivity extends AppCompatActivity {
                         .format(new Date(photoMetadata.getTimestamp()))
         ));
         descriptionTextView.setText(photoMetadata.getDescription());
+        bindVoiceNote();
         tagsTextView.setText(getString(
                 R.string.travelshare_tags_format,
                 TextUtils.join(", ", photoMetadata.getTags())
@@ -177,6 +184,7 @@ public class TravelShareDetailActivity extends AppCompatActivity {
         });
 
         openGroupButton.setOnClickListener(v -> openPhotoGroup());
+        playVoiceNoteButton.setOnClickListener(v -> toggleVoiceNotePlayback());
 
         directionsButton.setOnClickListener(v -> openDirections());
 
@@ -279,6 +287,55 @@ public class TravelShareDetailActivity extends AppCompatActivity {
         }
     }
 
+    private void bindVoiceNote() {
+        String voiceNotePath = photoMetadata == null ? null : photoMetadata.getAudioNoteUrl();
+        boolean hasVoiceNote = voiceNotePath != null && !voiceNotePath.trim().isEmpty();
+        voiceNoteLabelTextView.setVisibility(hasVoiceNote ? android.view.View.VISIBLE : android.view.View.GONE);
+        playVoiceNoteButton.setVisibility(hasVoiceNote ? android.view.View.VISIBLE : android.view.View.GONE);
+        playVoiceNoteButton.setText(R.string.travelshare_voice_note_play_button);
+    }
+
+    private void toggleVoiceNotePlayback() {
+        if (photoMetadata == null || TextUtils.isEmpty(photoMetadata.getAudioNoteUrl())) {
+            return;
+        }
+
+        if (voiceNotePlayer != null && voiceNotePlayer.isPlaying()) {
+            stopVoiceNotePlayback();
+            playVoiceNoteButton.setText(R.string.travelshare_voice_note_play_button);
+            return;
+        }
+
+        try {
+            voiceNotePlayer = new MediaPlayer();
+            voiceNotePlayer.setDataSource(photoMetadata.getAudioNoteUrl());
+            voiceNotePlayer.setOnCompletionListener(mp -> {
+                stopVoiceNotePlayback();
+                playVoiceNoteButton.setText(R.string.travelshare_voice_note_play_button);
+            });
+            voiceNotePlayer.prepare();
+            voiceNotePlayer.start();
+            playVoiceNoteButton.setText(R.string.travelshare_voice_note_stop_playback_button);
+        } catch (Exception exception) {
+            stopVoiceNotePlayback();
+            Toast.makeText(this, R.string.travelshare_voice_note_error, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void stopVoiceNotePlayback() {
+        if (voiceNotePlayer != null) {
+            try {
+                if (voiceNotePlayer.isPlaying()) {
+                    voiceNotePlayer.stop();
+                }
+            } catch (Exception ignored) {
+                // No-op
+            }
+            voiceNotePlayer.release();
+            voiceNotePlayer = null;
+        }
+    }
+
     private void openPhotoGroup() {
         if (photoMetadata == null || photoMetadata.getGroupId() == null) {
             return;
@@ -287,5 +344,11 @@ public class TravelShareDetailActivity extends AppCompatActivity {
         Intent intent = new Intent(this, TravelShareGroupDetailActivity.class);
         intent.putExtra(TravelShareGroupDetailActivity.EXTRA_GROUP_ID, photoMetadata.getGroupId());
         startActivity(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopVoiceNotePlayback();
+        super.onDestroy();
     }
 }

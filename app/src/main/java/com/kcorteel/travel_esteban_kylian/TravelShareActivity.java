@@ -1,7 +1,9 @@
 package com.kcorteel.travel_esteban_kylian;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -13,6 +15,8 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -38,6 +42,7 @@ public class TravelShareActivity extends AppCompatActivity {
     private Button createPhotoMetadataButton;
     private Button openGroupsButton;
     private Button toggleFeedLayoutButton;
+    private Button voiceSearchButton;
     private Button resetFiltersButton;
     private ImageView profileShortcutImageView;
     private Spinner placeTypeSpinner;
@@ -48,6 +53,7 @@ public class TravelShareActivity extends AppCompatActivity {
     private String selectedAuthor = "";
     private PhotoMetadataAdapter.PeriodFilter selectedPeriod = PhotoMetadataAdapter.PeriodFilter.ALL;
     private PhotoMetadataAdapter.DisplayMode currentDisplayMode = PhotoMetadataAdapter.DisplayMode.LIST;
+    private ActivityResultLauncher<Intent> voiceSearchLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +61,7 @@ public class TravelShareActivity extends AppCompatActivity {
         travelShareRepository = TravelShareRepository.getInstance(this);
         travelShareRepository.applyCurrentUserThemePreference();
         setContentView(R.layout.activity_travel_share);
+        setupVoiceSearch();
 
         searchEditText = findViewById(R.id.etSearchPhotoMetadata);
         photoMetadataRecyclerView = findViewById(R.id.rvPhotoMetadata);
@@ -62,6 +69,7 @@ public class TravelShareActivity extends AppCompatActivity {
         createPhotoMetadataButton = findViewById(R.id.btnCreatePhotoMetadata);
         openGroupsButton = findViewById(R.id.btnOpenGroups);
         toggleFeedLayoutButton = findViewById(R.id.btnToggleFeedLayout);
+        voiceSearchButton = findViewById(R.id.btnVoiceSearch);
         resetFiltersButton = findViewById(R.id.btnResetFilters);
         profileShortcutImageView = findViewById(R.id.ivProfileShortcut);
         placeTypeSpinner = findViewById(R.id.spinnerFilterPlaceType);
@@ -113,6 +121,8 @@ public class TravelShareActivity extends AppCompatActivity {
                     : PhotoMetadataAdapter.DisplayMode.LIST;
             updateFeedDisplayMode();
         });
+
+        voiceSearchButton.setOnClickListener(v -> startVoiceSearch());
 
         resetFiltersButton.setOnClickListener(v -> resetAllFilters());
 
@@ -309,6 +319,43 @@ public class TravelShareActivity extends AppCompatActivity {
         } else {
             photoMetadataRecyclerView.setLayoutManager(new LinearLayoutManager(this));
             toggleFeedLayoutButton.setText(R.string.travelshare_feed_grid_button);
+        }
+    }
+
+    private void setupVoiceSearch() {
+        voiceSearchLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() != RESULT_OK || result.getData() == null) {
+                        return;
+                    }
+
+                    ArrayList<String> matches = result.getData()
+                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    if (matches == null || matches.isEmpty()) {
+                        return;
+                    }
+
+                    searchEditText.setText(matches.get(0));
+                    searchEditText.setSelection(searchEditText.getText().length());
+                }
+        );
+    }
+
+    private void startVoiceSearch() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.FRANCE.toLanguageTag());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.travelshare_search_hint));
+
+        try {
+            voiceSearchLauncher.launch(intent);
+        } catch (ActivityNotFoundException exception) {
+            android.widget.Toast.makeText(
+                    this,
+                    R.string.travelshare_voice_search_unavailable,
+                    android.widget.Toast.LENGTH_SHORT
+            ).show();
         }
     }
 

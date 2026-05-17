@@ -227,6 +227,7 @@ public class TravelShareRepository {
             List<String> tags,
             PlaceType placeType,
             Long groupId,
+            String audioNoteUrl,
             String imageDrawableName
     ) {
         if (isCurrentUserAnonymous()) {
@@ -252,6 +253,7 @@ public class TravelShareRepository {
                 nextLocationId,
                 nextMediaId,
                 groupId,
+                audioNoteUrl,
                 tags == null ? Collections.emptyList() : tags,
                 placeType
         );
@@ -826,6 +828,7 @@ public class TravelShareRepository {
                         101L,
                         201L,
                         401L,
+                        null,
                         Arrays.asList("sunrise", "eiffel", "seine"),
                         PlaceType.STREET
                 ),
@@ -838,6 +841,7 @@ public class TravelShareRepository {
                         102L,
                         202L,
                         402L,
+                        null,
                         Arrays.asList("sakura", "temple", "gion"),
                         PlaceType.MUSEUM
                 ),
@@ -850,6 +854,7 @@ public class TravelShareRepository {
                         103L,
                         203L,
                         403L,
+                        null,
                         Arrays.asList("rome", "colosseum", "history"),
                         PlaceType.MUSEUM
                 ),
@@ -861,6 +866,7 @@ public class TravelShareRepository {
                         1769500800000L,
                         104L,
                         204L,
+                        null,
                         null,
                         Arrays.asList("mediterranean", "sea", "tapas"),
                         PlaceType.RESTAURANT
@@ -874,6 +880,7 @@ public class TravelShareRepository {
                         105L,
                         205L,
                         401L,
+                        null,
                         Arrays.asList("paris", "montmartre", "coffee"),
                         PlaceType.STREET
                 ),
@@ -886,6 +893,7 @@ public class TravelShareRepository {
                         106L,
                         206L,
                         402L,
+                        null,
                         Arrays.asList("kyoto", "torii", "japan"),
                         PlaceType.NATURE
                 ),
@@ -897,6 +905,7 @@ public class TravelShareRepository {
                         1771738200000L,
                         107L,
                         207L,
+                        null,
                         null,
                         Arrays.asList("rome", "trastevere", "sunset"),
                         PlaceType.STREET
@@ -910,6 +919,7 @@ public class TravelShareRepository {
                         108L,
                         208L,
                         403L,
+                        null,
                         Arrays.asList("barcelona", "beach", "weekend"),
                         PlaceType.RESTAURANT
                 )

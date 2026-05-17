@@ -19,6 +19,7 @@ public class PhotoMetadata {
     private long locationId;
     private long mediaId;
     private Long groupId;
+    private String audioNoteUrl;
     private List<String> tags;
     private PlaceType placeType;
 
@@ -31,6 +32,7 @@ public class PhotoMetadata {
             long locationId,
             long mediaId,
             Long groupId,
+            String audioNoteUrl,
             List<String> tags,
             PlaceType placeType
     ) {
@@ -42,6 +44,7 @@ public class PhotoMetadata {
         this.locationId = locationId;
         this.mediaId = mediaId;
         this.groupId = groupId;
+        this.audioNoteUrl = audioNoteUrl;
         this.tags = new ArrayList<>(tags);
         this.placeType = placeType;
     }
@@ -76,6 +79,10 @@ public class PhotoMetadata {
 
     public Long getGroupId() {
         return groupId;
+    }
+
+    public String getAudioNoteUrl() {
+        return audioNoteUrl;
     }
 
     public List<String> getTags() {

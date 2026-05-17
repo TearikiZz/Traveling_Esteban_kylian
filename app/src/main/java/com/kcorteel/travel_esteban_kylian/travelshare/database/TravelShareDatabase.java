@@ -31,7 +31,7 @@ import com.kcorteel.travel_esteban_kylian.travelshare.model.User;
                 TravelGroup.class,
                 GroupMembership.class
         },
-        version = 6,
+        version = 7,
         exportSchema = false
 )
 @TypeConverters(TravelShareConverters.class)
