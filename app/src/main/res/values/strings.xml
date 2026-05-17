@@ -52,6 +52,14 @@
     <string name="travelshare_create_success">Publication créée avec succès.</string>
     <string name="travelshare_create_requires_login">Connectez-vous pour créer une publication.</string>
     <string name="travelshare_search_hint">Rechercher une publication, un lieu ou un conseil</string>
+    <string name="travelshare_filters_section">Filtres du flux</string>
+    <string name="travelshare_filter_all_types">Tous les types</string>
+    <string name="travelshare_filter_all_authors">Tous les auteurs</string>
+    <string name="travelshare_filter_all_periods">Toutes les périodes</string>
+    <string name="travelshare_filter_period_30_days">30 derniers jours</string>
+    <string name="travelshare_filter_period_6_months">6 derniers mois</string>
+    <string name="travelshare_filter_period_older">Plus ancien</string>
+    <string name="travelshare_filter_reset_button">Réinitialiser les filtres</string>
     <string name="travelshare_post_image_content_description">Illustration d\'une publication de voyage</string>
     <string name="travelshare_description_section">Description</string>
     <string name="travelshare_tags_section">Tags</string>
@@ -122,6 +130,13 @@
         <item>SHOP</item>
         <item>RESTAURANT</item>
         <item>OTHER</item>
+    </string-array>
+
+    <string-array name="travelshare_period_filter_labels">
+        <item>Toutes les périodes</item>
+        <item>30 derniers jours</item>
+        <item>6 derniers mois</item>
+        <item>Plus ancien</item>
     </string-array>
 
 </resources>
