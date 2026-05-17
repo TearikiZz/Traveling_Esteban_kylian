@@ -18,6 +18,10 @@ public class PhotoMetadata {
     private long timestamp;
     private long locationId;
     private long mediaId;
+    private double price;
+    private String openingTime;
+    private String closingTime;
+    private ActivityType activityType;
     private List<String> tags;
     private PlaceType placeType;
 
@@ -29,6 +33,10 @@ public class PhotoMetadata {
             long timestamp,
             long locationId,
             long mediaId,
+            double price,
+            String openingTime,
+            String closingTime,
+            ActivityType activityType,
             List<String> tags,
             PlaceType placeType
     ) {
@@ -39,6 +47,10 @@ public class PhotoMetadata {
         this.timestamp = timestamp;
         this.locationId = locationId;
         this.mediaId = mediaId;
+        this.price = price;
+        this.openingTime = openingTime;
+        this.closingTime = closingTime;
+        this.activityType = activityType;
         this.tags = new ArrayList<>(tags);
         this.placeType = placeType;
     }
@@ -69,6 +81,22 @@ public class PhotoMetadata {
 
     public long getMediaId() {
         return mediaId;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public String getOpeningTime() {
+        return openingTime;
+    }
+
+    public String getClosingTime() {
+        return closingTime;
+    }
+
+    public ActivityType getActivityType() {
+        return activityType;
     }
 
     public List<String> getTags() {

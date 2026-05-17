@@ -1,132 +1,217 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:layout_marginTop="70sp"
-    android:background="#F4F6F8">
+    android:background="#FFFFFF"
+    android:fillViewport="true">
 
     <LinearLayout
-        android:layout_width="300sp"
-        android:layout_height="100sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="15sp"
-        android:background="#3a7bff">
+        android:padding="20dp">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Créez votre parcours"
+            android:layout_marginTop="12dp"
+            android:background="#7C3AED"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/cr_ez_votre_parcours"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/entrez_vos_pr_ferences_de_parcours"
+                android:textColor="#F5EEFF"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:background="@drawable/bg_save_name_input"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/budget"
+                android:textColor="#111111"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/budgetEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_save_name_input"
+                android:hint="Ex: 50"
+                android:inputType="numberDecimal"
+                android:padding="12dp"
+                android:textColor="#111111"
+                android:textColorHint="#7A7A7A" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/dur_e_heures"
+                android:textColor="#111111"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/durationEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_save_name_input"
+                android:hint="Ex: 6"
+                android:inputType="number"
+                android:padding="12dp"
+                android:textColor="#111111"
+                android:textColorHint="#7A7A7A" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/bg_save_name_input"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/activit_s"
+                android:textColor="#111111"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <CheckBox
+                android:id="@+id/cultureCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:buttonTint="#7C3AED"
+                android:text="@string/culture"
+                android:textColor="#111111"
+                android:textSize="15sp" />
+
+            <CheckBox
+                android:id="@+id/leisureCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:buttonTint="#7C3AED"
+                android:text="@string/loisirs"
+                android:textColor="#111111"
+                android:textSize="15sp" />
+
+            <CheckBox
+                android:id="@+id/foodCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:buttonTint="#7C3AED"
+                android:text="@string/nourriture"
+                android:textColor="#111111"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/bg_save_name_input"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/niveau_d_effort"
+                android:textColor="#111111"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <RadioGroup
+                android:id="@+id/effortRadioGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/effortLow"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:buttonTint="#7C3AED"
+                    android:text="@string/faible"
+                    android:textColor="#111111" />
+
+                <RadioButton
+                    android:id="@+id/effortMedium"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:buttonTint="#7C3AED"
+                    android:text="@string/moyen"
+                    android:textColor="#111111" />
+
+                <RadioButton
+                    android:id="@+id/effortHigh"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:buttonTint="#7C3AED"
+                    android:text="@string/lev"
+                    android:textColor="#111111" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/nextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:backgroundTint="#7C3AED"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:text="@string/suivant"
+            android:textAllCaps="false"
             android:textColor="#FFFFFF"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/loadButton"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Entrez vos préferences de parcours"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="18dp"
+            android:backgroundTint="#7C3AED"
+            android:background="@drawable/bg_save_name_input"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:text="@string/charger_un_parcours"
+            android:textAllCaps="false"
             android:textColor="#FFFFFF"
-            android:textSize="12sp"
-            android:layout_marginTop="15sp"
+            android:textSize="15sp"
             android:textStyle="bold" />
-
 
     </LinearLayout>
-
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Budget (€)"
-    android:layout_marginTop="10sp"
-    android:textColor="#0F172A"
-    android:textSize="18sp"
-    android:textStyle="bold" />
-
-<EditText
-    android:id="@+id/budgetEditText"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:inputType="numberDecimal" />
-
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Durée (heures)"
-    android:textColor="#0F172A"
-    android:textSize="18sp"
-    android:textStyle="bold"/>
-
-<EditText
-    android:id="@+id/durationEditText"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:inputType="number" />
-
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Activités"
-    android:textColor="#0F172A"
-    android:textSize="18sp"
-    android:textStyle="bold" />
-
-<CheckBox
-    android:id="@+id/cultureCheckBox"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Culture" />
-
-<CheckBox
-    android:id="@+id/leisureCheckBox"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Loisirs" />
-
-<CheckBox
-    android:id="@+id/foodCheckBox"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Nourriture" />
-
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Niveau d'effort"
-    android:textColor="#0F172A"
-    android:textSize="18sp"
-    android:textStyle="bold"/>
-
-<RadioGroup
-    android:id="@+id/effortRadioGroup"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
-
-    <RadioButton
-        android:id="@+id/effortLow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Faible" />
-
-    <RadioButton
-        android:id="@+id/effortMedium"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Moyen" />
-
-    <RadioButton
-        android:id="@+id/effortHigh"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Élevé" />
-</RadioGroup>
-
-    <Button
-        android:id="@+id/nextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Suivant" />
-
-</LinearLayout>
+</ScrollView>

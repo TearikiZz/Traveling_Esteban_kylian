@@ -10,8 +10,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Choisissez le type de parcours"
-        android:textColor="#0F172A"
+        android:text="@string/choisissez_le_type_de_parcours"
+        android:textColor="#000000"
         android:textSize="18sp"
         android:textStyle="bold"
         android:layout_gravity="center_horizontal"
@@ -21,20 +21,20 @@
         android:id="@+id/economicButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Économique"
+        android:text="@string/conomique"
         android:layout_marginBottom="10dp"/>
 
     <Button
         android:id="@+id/balancedButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Équilibré"
+        android:text="@string/quilibr"
         android:layout_marginBottom="10dp"/>
 
     <Button
         android:id="@+id/comfortButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Confort"/>
+        android:text="@string/confort"/>
 
 </LinearLayout>
