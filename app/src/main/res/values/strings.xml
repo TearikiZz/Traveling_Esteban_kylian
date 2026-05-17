@@ -26,6 +26,8 @@
     <string name="travelshare_screen_subtitle_connected">Mode connecté : bienvenue %1$s, vous pouvez aussi commenter.</string>
     <string name="travelshare_create_post_button">Créer une publication</string>
     <string name="travelshare_groups_button">Voir les groupes</string>
+    <string name="travelshare_feed_grid_button">Passer en grille</string>
+    <string name="travelshare_feed_list_button">Passer en liste</string>
     <string name="travelshare_create_screen_title">Nouvelle publication TravelShare</string>
     <string name="travelshare_create_title_hint">Titre de la publication</string>
     <string name="travelshare_create_description_hint">Description</string>

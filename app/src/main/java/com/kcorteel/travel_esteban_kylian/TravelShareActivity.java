@@ -14,6 +14,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,6 +37,7 @@ public class TravelShareActivity extends AppCompatActivity {
     private TextView subtitleTextView;
     private Button createPhotoMetadataButton;
     private Button openGroupsButton;
+    private Button toggleFeedLayoutButton;
     private Button resetFiltersButton;
     private ImageView profileShortcutImageView;
     private Spinner placeTypeSpinner;
@@ -45,6 +47,7 @@ public class TravelShareActivity extends AppCompatActivity {
     private PlaceType selectedPlaceType;
     private String selectedAuthor = "";
     private PhotoMetadataAdapter.PeriodFilter selectedPeriod = PhotoMetadataAdapter.PeriodFilter.ALL;
+    private PhotoMetadataAdapter.DisplayMode currentDisplayMode = PhotoMetadataAdapter.DisplayMode.LIST;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +61,7 @@ public class TravelShareActivity extends AppCompatActivity {
         subtitleTextView = findViewById(R.id.tvTravelShareSubtitle);
         createPhotoMetadataButton = findViewById(R.id.btnCreatePhotoMetadata);
         openGroupsButton = findViewById(R.id.btnOpenGroups);
+        toggleFeedLayoutButton = findViewById(R.id.btnToggleFeedLayout);
         resetFiltersButton = findViewById(R.id.btnResetFilters);
         profileShortcutImageView = findViewById(R.id.ivProfileShortcut);
         placeTypeSpinner = findViewById(R.id.spinnerFilterPlaceType);
@@ -73,6 +77,7 @@ public class TravelShareActivity extends AppCompatActivity {
         photoMetadataRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         photoMetadataRecyclerView.setHasFixedSize(true);
         photoMetadataRecyclerView.setAdapter(photoMetadataAdapter);
+        updateFeedDisplayMode();
 
         setupFilterControls();
 
@@ -101,6 +106,13 @@ public class TravelShareActivity extends AppCompatActivity {
         openGroupsButton.setOnClickListener(v ->
                 startActivity(new Intent(this, TravelShareGroupsActivity.class))
         );
+
+        toggleFeedLayoutButton.setOnClickListener(v -> {
+            currentDisplayMode = currentDisplayMode == PhotoMetadataAdapter.DisplayMode.LIST
+                    ? PhotoMetadataAdapter.DisplayMode.GRID
+                    : PhotoMetadataAdapter.DisplayMode.LIST;
+            updateFeedDisplayMode();
+        });
 
         resetFiltersButton.setOnClickListener(v -> resetAllFilters());
 
@@ -287,6 +299,17 @@ public class TravelShareActivity extends AppCompatActivity {
         periodSpinner.setSelection(0, false);
 
         photoMetadataAdapter.resetFilters();
+    }
+
+    private void updateFeedDisplayMode() {
+        photoMetadataAdapter.setDisplayMode(currentDisplayMode);
+        if (currentDisplayMode == PhotoMetadataAdapter.DisplayMode.GRID) {
+            photoMetadataRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+            toggleFeedLayoutButton.setText(R.string.travelshare_feed_list_button);
+        } else {
+            photoMetadataRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            toggleFeedLayoutButton.setText(R.string.travelshare_feed_grid_button);
+        }
     }
 
     private boolean containsIgnoreCase(List<String> values, String candidate) {

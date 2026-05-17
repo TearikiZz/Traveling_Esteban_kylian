@@ -70,6 +70,13 @@
         android:layout_marginBottom="12dp"
         android:text="@string/travelshare_groups_button" />
 
+    <Button
+        android:id="@+id/btnToggleFeedLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:text="@string/travelshare_feed_grid_button" />
+
     <EditText
         android:id="@+id/etSearchPhotoMetadata"
         android:layout_width="match_parent"

@@ -23,6 +23,11 @@ import java.util.concurrent.TimeUnit;
 
 public class PhotoMetadataAdapter extends RecyclerView.Adapter<PhotoMetadataAdapter.PhotoMetadataViewHolder> {
 
+    public enum DisplayMode {
+        LIST,
+        GRID
+    }
+
     public enum PeriodFilter {
         ALL,
         LAST_30_DAYS,
@@ -43,6 +48,7 @@ public class PhotoMetadataAdapter extends RecyclerView.Adapter<PhotoMetadataAdap
     private String currentAuthor = "";
     private PlaceType currentPlaceType;
     private PeriodFilter currentPeriodFilter = PeriodFilter.ALL;
+    private DisplayMode displayMode = DisplayMode.LIST;
 
     public PhotoMetadataAdapter(
             TravelShareRepository repository,
@@ -60,7 +66,9 @@ public class PhotoMetadataAdapter extends RecyclerView.Adapter<PhotoMetadataAdap
     @Override
     public PhotoMetadataViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_photo_metadata, parent, false);
+                .inflate(viewType == DisplayMode.GRID.ordinal()
+                        ? R.layout.item_photo_metadata_grid
+                        : R.layout.item_photo_metadata, parent, false);
         return new PhotoMetadataViewHolder(view);
     }
 
@@ -72,6 +80,11 @@ public class PhotoMetadataAdapter extends RecyclerView.Adapter<PhotoMetadataAdap
     @Override
     public int getItemCount() {
         return visiblePhotoMetadata.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return displayMode.ordinal();
     }
 
     public void filter(String query) {
@@ -106,6 +119,15 @@ public class PhotoMetadataAdapter extends RecyclerView.Adapter<PhotoMetadataAdap
         allPhotoMetadata.clear();
         allPhotoMetadata.addAll(photoMetadataList);
         applyFilters();
+    }
+
+    public void setDisplayMode(DisplayMode displayMode) {
+        DisplayMode resolvedMode = displayMode == null ? DisplayMode.LIST : displayMode;
+        if (this.displayMode == resolvedMode) {
+            return;
+        }
+        this.displayMode = resolvedMode;
+        notifyDataSetChanged();
     }
 
     private void applyFilters() {
