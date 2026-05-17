@@ -18,11 +18,17 @@ public interface NotificationDao {
     @Query("SELECT * FROM notifications WHERE targetUserId = :userId ORDER BY createdAt DESC")
     List<Notification> getByTargetUserId(long userId);
 
+    @Query("SELECT * FROM notifications WHERE targetUserId = :userId AND isDelivered = 0 ORDER BY createdAt DESC")
+    List<Notification> getUndeliveredByTargetUserId(long userId);
+
     @Query("SELECT COUNT(*) FROM notifications WHERE targetUserId = :userId AND isRead = 0")
     int countUnreadByTargetUserId(long userId);
 
     @Query("UPDATE notifications SET isRead = 1 WHERE targetUserId = :userId AND isRead = 0")
     void markAllAsRead(long userId);
+
+    @Query("UPDATE notifications SET isDelivered = 1 WHERE notifId = :notificationId")
+    void markAsDelivered(long notificationId);
 
     @Query("SELECT COALESCE(MAX(notifId), 0) FROM notifications")
     long getMaxNotificationId();

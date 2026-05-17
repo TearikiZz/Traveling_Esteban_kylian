@@ -116,6 +116,8 @@
     <string name="notifications_screen_title">Notifications TravelShare</string>
     <string name="notifications_screen_subtitle">Retrouvez les dernières activités liées à vos publications et au flux TravelShare.</string>
     <string name="notifications_empty_state">Aucune notification pour le moment.</string>
+    <string name="notifications_channel_name">Activité TravelShare</string>
+    <string name="notifications_channel_description">Alertes liées aux publications, likes et commentaires TravelShare.</string>
     <string name="notifications_type_new_post">Nouvelle publication</string>
     <string name="notifications_type_like">Like reçu</string>
     <string name="notifications_type_comment">Commentaire reçu</string>

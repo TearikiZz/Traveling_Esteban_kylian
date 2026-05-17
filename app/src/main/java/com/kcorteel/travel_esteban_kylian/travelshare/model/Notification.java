@@ -13,6 +13,7 @@ public class Notification {
     private final String message;
     private final NotificationTriggerType triggerType;
     private final boolean isRead;
+    private final boolean isDelivered;
     private final long createdAt;
 
     public Notification(
@@ -22,6 +23,7 @@ public class Notification {
             String message,
             NotificationTriggerType triggerType,
             boolean isRead,
+            boolean isDelivered,
             long createdAt
     ) {
         this.notifId = notifId;
@@ -30,6 +32,7 @@ public class Notification {
         this.message = message;
         this.triggerType = triggerType;
         this.isRead = isRead;
+        this.isDelivered = isDelivered;
         this.createdAt = createdAt;
     }
 
@@ -55,6 +58,10 @@ public class Notification {
 
     public boolean isRead() {
         return isRead;
+    }
+
+    public boolean isDelivered() {
+        return isDelivered;
     }
 
     public long getCreatedAt() {

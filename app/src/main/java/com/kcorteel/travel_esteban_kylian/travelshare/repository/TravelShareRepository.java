@@ -32,6 +32,7 @@ import com.kcorteel.travel_esteban_kylian.travelshare.model.PlaceType;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.SocialInteraction;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.SocialInteractionType;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.User;
+import com.kcorteel.travel_esteban_kylian.travelshare.notifications.TravelShareSystemNotifier;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -52,8 +53,10 @@ public class TravelShareRepository {
     private final NotificationDao notificationDao;
 
     private final AppSessionManager appSessionManager;
+    private final Context appContext;
 
     private TravelShareRepository(Context context) {
+        appContext = context.getApplicationContext();
         TravelShareDatabase database = TravelShareDatabase.getInstance(context);
         userDao = database.userDao();
         locationDao = database.locationDao();
@@ -337,6 +340,27 @@ public class TravelShareRepository {
         notificationDao.markAllAsRead(appSessionManager.getCurrentUserId());
     }
 
+    public void dispatchPendingSystemNotifications() {
+        if (isCurrentUserAnonymous()) {
+            return;
+        }
+
+        for (Notification notification : notificationDao.getUndeliveredByTargetUserId(appSessionManager.getCurrentUserId())) {
+            if (!getCurrentUserPreferences().isNotificationsEnabled()) {
+                return;
+            }
+
+            boolean shown = TravelShareSystemNotifier.showNotification(
+                    appContext,
+                    notification,
+                    getNotificationTypeLabel(notification)
+            );
+            if (shown) {
+                notificationDao.markAsDelivered(notification.getNotifId());
+            }
+        }
+    }
+
     public int resolveMediaResourceId(Context context, PhotoMetadata photoMetadata) {
         Media media = getMediaById(photoMetadata.getMediaId());
         if (media == null) {
@@ -534,8 +558,13 @@ public class TravelShareRepository {
                 message,
                 triggerType,
                 false,
+                false,
                 System.currentTimeMillis()
         ));
+
+        if (targetUserId == appSessionManager.getCurrentUserId()) {
+            dispatchPendingSystemNotifications();
+        }
     }
 
     private void seedDatabaseIfNeeded() {
