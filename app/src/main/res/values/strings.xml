@@ -2,6 +2,8 @@
     <string name="app_name">Travel_Esteban_kylian</string>
     <string name="app_home_title">Traveling</string>
     <string name="app_home_subtitle">Choisissez votre expérience, connectez-vous ou restez anonyme.</string>
+    <string name="app_home_account_section">Compte</string>
+    <string name="app_home_explore_section">Explorer l\'application</string>
     <string name="app_open_travelshare_button">Aller vers TravelShare</string>
     <string name="app_open_travelpath_button">Aller vers TravelPath</string>
     <string name="auth_login_button">Se connecter</string>
@@ -26,8 +28,12 @@
     <string name="travelshare_screen_subtitle_connected">Mode connecté : bienvenue %1$s, vous pouvez aussi commenter.</string>
     <string name="travelshare_create_post_button">Créer une publication</string>
     <string name="travelshare_groups_button">Voir les groupes</string>
+    <string name="travelshare_groups_button_short">Groupes</string>
+    <string name="travelshare_notifications_button_short">Notifs</string>
     <string name="travelshare_feed_grid_button">Passer en grille</string>
     <string name="travelshare_feed_list_button">Passer en liste</string>
+    <string name="travelshare_feed_grid_compact">Grille</string>
+    <string name="travelshare_feed_list_compact">Liste</string>
     <string name="travelshare_voice_search_button">Recherche vocale</string>
     <string name="travelshare_create_screen_title">Nouvelle publication TravelShare</string>
     <string name="travelshare_create_title_hint">Titre de la publication</string>

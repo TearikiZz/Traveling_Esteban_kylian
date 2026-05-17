@@ -9,7 +9,6 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -39,11 +38,14 @@ public class TravelShareActivity extends AppCompatActivity {
     private PhotoMetadataAdapter photoMetadataAdapter;
     private TravelShareRepository travelShareRepository;
     private TextView subtitleTextView;
-    private Button createPhotoMetadataButton;
-    private Button openGroupsButton;
-    private Button toggleFeedLayoutButton;
-    private Button voiceSearchButton;
-    private Button resetFiltersButton;
+    private View createPhotoMetadataButton;
+    private View openGroupsButton;
+    private android.widget.Button toggleFeedLayoutButton;
+    private View voiceSearchButton;
+    private View resetFiltersButton;
+    private View openNotificationsButton;
+    private View toggleFiltersButton;
+    private View filtersContainer;
     private ImageView profileShortcutImageView;
     private Spinner placeTypeSpinner;
     private Spinner authorSpinner;
@@ -53,6 +55,7 @@ public class TravelShareActivity extends AppCompatActivity {
     private String selectedAuthor = "";
     private PhotoMetadataAdapter.PeriodFilter selectedPeriod = PhotoMetadataAdapter.PeriodFilter.ALL;
     private PhotoMetadataAdapter.DisplayMode currentDisplayMode = PhotoMetadataAdapter.DisplayMode.LIST;
+    private boolean filtersVisible;
     private ActivityResultLauncher<Intent> voiceSearchLauncher;
 
     @Override
@@ -71,6 +74,9 @@ public class TravelShareActivity extends AppCompatActivity {
         toggleFeedLayoutButton = findViewById(R.id.btnToggleFeedLayout);
         voiceSearchButton = findViewById(R.id.btnVoiceSearch);
         resetFiltersButton = findViewById(R.id.btnResetFilters);
+        openNotificationsButton = findViewById(R.id.btnOpenNotifications);
+        toggleFiltersButton = findViewById(R.id.btnToggleFilters);
+        filtersContainer = findViewById(R.id.layoutFiltersContainer);
         profileShortcutImageView = findViewById(R.id.ivProfileShortcut);
         placeTypeSpinner = findViewById(R.id.spinnerFilterPlaceType);
         authorSpinner = findViewById(R.id.spinnerFilterAuthor);
@@ -88,6 +94,7 @@ public class TravelShareActivity extends AppCompatActivity {
         updateFeedDisplayMode();
 
         setupFilterControls();
+        setFiltersVisible(false);
 
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -115,6 +122,10 @@ public class TravelShareActivity extends AppCompatActivity {
                 startActivity(new Intent(this, TravelShareGroupsActivity.class))
         );
 
+        openNotificationsButton.setOnClickListener(v ->
+                startActivity(new Intent(this, NotificationsActivity.class))
+        );
+
         toggleFeedLayoutButton.setOnClickListener(v -> {
             currentDisplayMode = currentDisplayMode == PhotoMetadataAdapter.DisplayMode.LIST
                     ? PhotoMetadataAdapter.DisplayMode.GRID
@@ -123,6 +134,7 @@ public class TravelShareActivity extends AppCompatActivity {
         });
 
         voiceSearchButton.setOnClickListener(v -> startVoiceSearch());
+        toggleFiltersButton.setOnClickListener(v -> setFiltersVisible(!filtersVisible));
 
         resetFiltersButton.setOnClickListener(v -> resetAllFilters());
 
@@ -146,6 +158,7 @@ public class TravelShareActivity extends AppCompatActivity {
         if (travelShareRepository.isCurrentUserAnonymous()) {
             subtitleTextView.setText(R.string.travelshare_screen_subtitle_anonymous);
             createPhotoMetadataButton.setVisibility(View.GONE);
+            openNotificationsButton.setVisibility(View.GONE);
             profileShortcutImageView.setVisibility(View.GONE);
             return;
         }
@@ -155,6 +168,7 @@ public class TravelShareActivity extends AppCompatActivity {
                 travelShareRepository.getCurrentUser().getUsername()
         ));
         createPhotoMetadataButton.setVisibility(View.VISIBLE);
+        openNotificationsButton.setVisibility(View.VISIBLE);
         profileShortcutImageView.setVisibility(View.VISIBLE);
         travelShareRepository.loadUserAvatarIntoImageView(
                 profileShortcutImageView,
@@ -309,17 +323,24 @@ public class TravelShareActivity extends AppCompatActivity {
         periodSpinner.setSelection(0, false);
 
         photoMetadataAdapter.resetFilters();
+        setFiltersVisible(false);
     }
 
     private void updateFeedDisplayMode() {
         photoMetadataAdapter.setDisplayMode(currentDisplayMode);
         if (currentDisplayMode == PhotoMetadataAdapter.DisplayMode.GRID) {
             photoMetadataRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-            toggleFeedLayoutButton.setText(R.string.travelshare_feed_list_button);
+            toggleFeedLayoutButton.setText(R.string.travelshare_feed_list_compact);
         } else {
             photoMetadataRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-            toggleFeedLayoutButton.setText(R.string.travelshare_feed_grid_button);
+            toggleFeedLayoutButton.setText(R.string.travelshare_feed_grid_compact);
         }
+    }
+
+    private void setFiltersVisible(boolean visible) {
+        filtersVisible = visible;
+        filtersContainer.setVisibility(visible ? View.VISIBLE : View.GONE);
+        toggleFiltersButton.setSelected(visible);
     }
 
     private void setupVoiceSearch() {

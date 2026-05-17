@@ -96,9 +96,9 @@ public class MainActivity extends AppCompatActivity {
             tvSessionStatus.setText(getString(R.string.auth_status_connected_format, currentUser.getUsername()));
         }
 
-        btnLogin.setEnabled(anonymous);
-        btnRegister.setEnabled(anonymous);
-        btnAnonymous.setEnabled(!anonymous);
-        btnLogout.setEnabled(!anonymous);
+        btnLogin.setVisibility(anonymous ? android.view.View.VISIBLE : android.view.View.GONE);
+        btnRegister.setVisibility(anonymous ? android.view.View.VISIBLE : android.view.View.GONE);
+        btnAnonymous.setVisibility(android.view.View.GONE);
+        btnLogout.setVisibility(anonymous ? android.view.View.GONE : android.view.View.VISIBLE);
     }
 }

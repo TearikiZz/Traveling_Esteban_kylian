@@ -2,14 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F6F8"
+    android:background="@color/app_bg"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:paddingLeft="18dp"
+    android:paddingTop="18dp"
+    android:paddingRight="18dp"
+    android:paddingBottom="14dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
+        android:gravity="top"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -23,143 +26,255 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/travelshare_screen_title"
-                android:textColor="#1E293B"
-                android:textSize="28sp"
+                android:textColor="@color/app_text_primary"
+                android:textSize="30sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvTravelShareSubtitle"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:layout_marginBottom="12dp"
+                android:layout_marginTop="8dp"
                 android:text="@string/travelshare_screen_subtitle"
-                android:textColor="#475569"
+                android:textColor="@color/app_text_secondary"
                 android:textSize="14sp" />
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/ivProfileShortcut"
-            android:layout_width="46dp"
-            android:layout_height="46dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:background="@drawable/bg_profile_avatar"
-            android:clickable="true"
-            android:clipToOutline="true"
-            android:contentDescription="@string/profile_open_button"
-            android:focusable="true"
-            android:padding="8dp"
-            android:scaleType="centerCrop"
-            android:src="@android:drawable/ic_menu_myplaces"
-            android:tint="#0F172A"
-            android:visibility="gone" />
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btnToggleFeedLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_soft_icon_button"
+                android:paddingLeft="12dp"
+                android:paddingTop="8dp"
+                android:paddingRight="12dp"
+                android:paddingBottom="8dp"
+                android:text="@string/travelshare_feed_grid_compact"
+                android:textAllCaps="false"
+                android:textColor="@color/app_text_primary"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/ivProfileShortcut"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_profile_avatar"
+                android:clickable="true"
+                android:clipToOutline="true"
+                android:contentDescription="@string/profile_open_button"
+                android:focusable="true"
+                android:padding="8dp"
+                android:scaleType="centerCrop"
+                android:src="@android:drawable/ic_menu_myplaces"
+                android:tint="@color/app_text_primary"
+                android:visibility="gone" />
+        </LinearLayout>
     </LinearLayout>
-
-    <Button
-        android:id="@+id/btnCreatePhotoMetadata"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:text="@string/travelshare_create_post_button"
-        android:visibility="gone" />
-
-    <Button
-        android:id="@+id/btnOpenGroups"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:text="@string/travelshare_groups_button" />
-
-    <Button
-        android:id="@+id/btnToggleFeedLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:text="@string/travelshare_feed_grid_button" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
+        android:layout_marginTop="18dp"
+        android:background="@drawable/bg_surface_panel"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="10dp"
+            android:src="@android:drawable/ic_menu_search"
+            android:tint="@color/app_text_secondary" />
 
         <EditText
             android:id="@+id/etSearchPhotoMetadata"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/bg_search_bar"
+            android:background="@android:color/transparent"
             android:hint="@string/travelshare_search_hint"
             android:imeOptions="actionDone"
             android:inputType="text"
-            android:minHeight="48dp"
-            android:padding="12dp" />
+            android:minHeight="44dp"
+            android:paddingLeft="0dp"
+            android:paddingTop="8dp"
+            android:paddingRight="0dp"
+            android:paddingBottom="8dp"
+            android:textColor="@color/app_text_primary"
+            android:textColorHint="@color/app_text_secondary" />
 
-        <Button
+        <ImageButton
+            android:id="@+id/btnToggleFilters"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_soft_icon_button"
+            android:contentDescription="@string/travelshare_filters_section"
+            android:padding="10dp"
+            android:src="@android:drawable/ic_menu_manage"
+            android:tint="@color/app_text_primary" />
+
+        <ImageButton
             android:id="@+id/btnVoiceSearch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="@string/travelshare_voice_search_button" />
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_soft_icon_button"
+            android:contentDescription="@string/travelshare_voice_search_button"
+            android:padding="10dp"
+            android:src="@android:drawable/ic_btn_speak_now"
+            android:tint="@color/app_blue" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/tvTravelShareFilters"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="@string/travelshare_filters_section"
-        android:textColor="#334155"
-        android:textStyle="bold" />
-
-    <HorizontalScrollView
+    <LinearLayout
+        android:id="@+id/layoutFiltersContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:scrollbars="none">
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_surface_panel"
+        android:orientation="vertical"
+        android:padding="14dp"
+        android:visibility="gone">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/tvTravelShareFilters"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:text="@string/travelshare_filters_section"
+            android:textColor="@color/app_text_primary"
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
-            <Spinner
-                android:id="@+id/spinnerFilterPlaceType"
-                android:layout_width="170dp"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp" />
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:scrollbars="none">
 
-            <Spinner
-                android:id="@+id/spinnerFilterAuthor"
-                android:layout_width="170dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:minHeight="48dp" />
-
-            <Spinner
-                android:id="@+id/spinnerFilterPeriod"
-                android:layout_width="170dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:minHeight="48dp" />
-
-            <Button
-                android:id="@+id/btnResetFilters"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:text="@string/travelshare_filter_reset_button" />
-        </LinearLayout>
-    </HorizontalScrollView>
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <Spinner
+                    android:id="@+id/spinnerFilterPlaceType"
+                    android:layout_width="156dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_search_bar"
+                    android:minHeight="48dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerFilterAuthor"
+                    android:layout_width="156dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/bg_search_bar"
+                    android:minHeight="48dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerFilterPeriod"
+                    android:layout_width="156dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/bg_search_bar"
+                    android:minHeight="48dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp" />
+
+                <Button
+                    android:id="@+id/btnResetFilters"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:backgroundTint="@color/app_surface_alt"
+                    android:text="@string/travelshare_filter_reset_button"
+                    android:textAllCaps="false"
+                    android:textColor="@color/app_text_primary" />
+            </LinearLayout>
+        </HorizontalScrollView>
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvPhotoMetadata"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="16dp"
         android:layout_weight="1"
         android:clipToPadding="false"
-        android:paddingBottom="12dp" />
+        android:paddingBottom="10dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_bottom_bar"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="8dp"
+        android:paddingTop="8dp"
+        android:paddingRight="8dp"
+        android:paddingBottom="8dp">
+
+        <Button
+            android:id="@+id/btnOpenGroups"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:drawableTop="@android:drawable/ic_menu_share"
+            android:drawablePadding="6dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:text="@string/travelshare_groups_button_short"
+            android:textAllCaps="false"
+            android:textColor="@color/app_text_secondary"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/btnCreatePhotoMetadata"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/bg_primary_fab"
+            android:elevation="3dp"
+            android:text="+"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnOpenNotifications"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:drawableTop="@android:drawable/ic_dialog_email"
+            android:drawablePadding="6dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:text="@string/travelshare_notifications_button_short"
+            android:textAllCaps="false"
+            android:textColor="@color/app_text_secondary"
+            android:textSize="12sp"
+            android:visibility="gone" />
+    </LinearLayout>
 
 </LinearLayout>
