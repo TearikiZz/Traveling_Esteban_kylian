@@ -17,8 +17,6 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentViewHolder> {
 
     private final TravelShareRepository repository;
@@ -28,7 +26,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     public CommentAdapter(TravelShareRepository repository) {
         this.repository = repository;
         this.commentList = new ArrayList<>();
-        this.dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.FRANCE);
+        this.dateFormat = DateFormat.getDateTimeInstance(
+                DateFormat.SHORT,
+                DateFormat.SHORT,
+                repository.getCurrentLocale()
+        );
     }
 
     @NonNull

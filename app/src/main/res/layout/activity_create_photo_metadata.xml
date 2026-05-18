@@ -1,127 +1,534 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F6F8">
+    android:background="@color/app_bg"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="18dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/travelshare_create_screen_title"
-            android:textColor="#0F172A"
+            android:textColor="@color/app_text_primary"
             android:textSize="28sp"
             android:textStyle="bold" />
 
-        <ImageView
-            android:id="@+id/ivSelectedPhotoPreview"
-            android:layout_width="match_parent"
-            android:layout_height="220dp"
-            android:layout_marginTop="20dp"
-            android:adjustViewBounds="true"
-            android:background="@drawable/bg_photo_post_card"
-            android:contentDescription="@string/travelshare_selected_photo_preview"
-            android:padding="6dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_launcher_background" />
-
-        <Button
-            android:id="@+id/btnSelectPhoto"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/travelshare_select_photo_button" />
-
-        <EditText
-            android:id="@+id/etCreateTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/bg_search_bar"
-            android:hint="@string/travelshare_create_title_hint"
-            android:padding="12dp" />
-
-        <EditText
-            android:id="@+id/etCreateDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_search_bar"
-            android:gravity="top|start"
-            android:hint="@string/travelshare_create_description_hint"
-            android:inputType="textMultiLine"
-            android:minHeight="110dp"
-            android:padding="12dp" />
-
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/travelshare_place_section"
-            android:textColor="#0F172A"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvSelectedPlaceValue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:background="@drawable/bg_search_bar"
-            android:padding="12dp"
-            android:text="@string/travelshare_place_not_selected"
-            android:textStyle="bold"
-            android:textColor="#475569" />
+            android:text="@string/travelshare_create_screen_subtitle"
+            android:textColor="@color/app_text_secondary"
+            android:textSize="14sp" />
 
-        <TextView
-            android:id="@+id/tvSelectedPlaceDetails"
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/bg_photo_post_card"
-            android:padding="12dp"
-            android:text="@string/travelshare_place_details_empty"
-            android:textColor="#64748B" />
+            android:layout_marginTop="18dp"
+            app:cardBackgroundColor="@color/app_surface"
+            app:cardCornerRadius="26dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/app_stroke"
+            app:strokeWidth="1dp">
 
-        <AutoCompleteTextView
-            android:id="@+id/actvCreatePlaceSearch"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/travelshare_select_photo_button"
+                    android:textColor="@color/app_text_primary"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="190dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_muted_panel">
+
+                    <ImageView
+                        android:id="@+id/ivSelectedPhotoPreview"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:adjustViewBounds="true"
+                        android:contentDescription="@string/travelshare_selected_photo_preview"
+                        android:scaleType="centerCrop" />
+
+                    <LinearLayout
+                        android:id="@+id/layoutPhotoPlaceholder"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="34dp"
+                            android:layout_height="34dp"
+                            android:src="@android:drawable/ic_menu_camera"
+                            android:tint="@color/app_text_secondary" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="@string/travelshare_photo_placeholder"
+                            android:textColor="@color/app_text_secondary"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                </FrameLayout>
+
+                <Button
+                    android:id="@+id/btnSelectPhoto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="12dp"
+                    android:backgroundTint="@color/app_blue"
+                    android:text="@string/travelshare_select_photo_button"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_search_bar"
-            android:completionThreshold="2"
-            android:hint="@string/travelshare_place_search_hint"
-            android:imeOptions="actionDone"
-            android:inputType="text"
-            android:padding="12dp" />
+            android:layout_marginTop="14dp"
+            app:cardBackgroundColor="@color/app_surface"
+            app:cardCornerRadius="26dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/app_stroke"
+            app:strokeWidth="1dp">
 
-        <EditText
-            android:id="@+id/etCreateTags"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <EditText
+                    android:id="@+id/etCreateTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_search_bar"
+                    android:hint="@string/travelshare_create_title_hint"
+                    android:padding="14dp"
+                    android:textColor="@color/app_text_primary"
+                    android:textColorHint="@color/app_text_secondary" />
+
+                <EditText
+                    android:id="@+id/etCreateDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_search_bar"
+                    android:gravity="top|start"
+                    android:hint="@string/travelshare_create_description_hint"
+                    android:inputType="textMultiLine"
+                    android:minHeight="120dp"
+                    android:padding="14dp"
+                    android:textColor="@color/app_text_primary"
+                    android:textColorHint="@color/app_text_secondary" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_search_bar"
-            android:hint="@string/travelshare_create_tags_hint"
-            android:padding="12dp" />
+            android:layout_marginTop="14dp"
+            app:cardBackgroundColor="@color/app_surface"
+            app:cardCornerRadius="26dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/app_stroke"
+            app:strokeWidth="1dp">
 
-        <Spinner
-            android:id="@+id/spinnerCreatePlaceType"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/travelshare_voice_note_section"
+                    android:textColor="@color/app_text_primary"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvVoiceNoteStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_muted_panel"
+                    android:padding="14dp"
+                    android:text="@string/travelshare_voice_note_empty"
+                    android:textColor="@color/app_text_secondary" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btnRecordVoiceNote"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:backgroundTint="@color/app_blue"
+                        android:text="@string/travelshare_voice_note_record_button"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white" />
+
+                    <Button
+                        android:id="@+id/btnPlayVoiceNote"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="@color/app_surface_alt"
+                        android:text="@string/travelshare_voice_note_play_button"
+                        android:textAllCaps="false"
+                        android:textColor="@color/app_text_primary" />
+
+                    <Button
+                        android:id="@+id/btnDeleteVoiceNote"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:backgroundTint="@color/app_gold_soft"
+                        android:text="@string/travelshare_voice_note_delete_short"
+                        android:textAllCaps="false"
+                        android:textColor="@color/app_text_primary" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_search_bar"
-            android:padding="8dp" />
+            android:layout_marginTop="14dp"
+            app:cardBackgroundColor="@color/app_surface"
+            app:cardCornerRadius="26dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/app_stroke"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/travelshare_group_picker_label"
+                    android:textColor="@color/app_text_primary"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+                <Spinner
+                    android:id="@+id/spinnerCreateGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_search_bar"
+                    android:padding="10dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerCreatePlaceType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_search_bar"
+                    android:padding="10dp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            app:cardBackgroundColor="@color/app_surface"
+            app:cardCornerRadius="26dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/app_stroke"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/travelshare_place_section"
+                    android:textColor="@color/app_text_primary"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvSelectedPlaceValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_search_bar"
+                    android:padding="14dp"
+                    android:text="@string/travelshare_place_not_selected"
+                    android:textColor="@color/app_text_primary"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvSelectedPlaceDetails"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_muted_panel"
+                    android:padding="14dp"
+                    android:text="@string/travelshare_place_details_empty"
+                    android:textColor="@color/app_text_secondary" />
+
+                <AutoCompleteTextView
+                    android:id="@+id/actvCreatePlaceSearch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_search_bar"
+                    android:completionThreshold="2"
+                    android:hint="@string/travelshare_place_search_hint"
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
+                    android:padding="14dp"
+                    android:textColor="@color/app_text_primary"
+                    android:textColorHint="@color/app_text_secondary" />
+
+                <TextView
+                    android:id="@+id/tvManualPlaceFallback"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_muted_panel"
+                    android:padding="14dp"
+                    android:textColor="@color/app_text_secondary"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/btnShowManualPlaceForm"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:backgroundTint="@color/app_surface_alt"
+                    android:text="@string/travelshare_place_manual_button"
+                    android:textAllCaps="false"
+                    android:textColor="@color/app_text_primary"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/layoutManualPlaceContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <EditText
+                        android:id="@+id/etManualPlaceName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_search_bar"
+                        android:hint="@string/travelshare_create_place_name_hint"
+                        android:padding="14dp" />
+
+                    <EditText
+                        android:id="@+id/etManualPlaceAddress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_search_bar"
+                        android:hint="@string/travelshare_create_address_hint"
+                        android:padding="14dp" />
+
+                    <EditText
+                        android:id="@+id/etManualPlaceCity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_search_bar"
+                        android:hint="@string/travelshare_create_city_hint"
+                        android:padding="14dp" />
+
+                    <EditText
+                        android:id="@+id/etManualPlaceCountry"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_search_bar"
+                        android:hint="@string/travelshare_create_country_hint"
+                        android:padding="14dp" />
+
+                    <EditText
+                        android:id="@+id/etManualPlaceLatitude"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_search_bar"
+                        android:hint="@string/travelshare_create_latitude_hint"
+                        android:inputType="numberDecimal|numberSigned"
+                        android:padding="14dp" />
+
+                    <EditText
+                        android:id="@+id/etManualPlaceLongitude"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_search_bar"
+                        android:hint="@string/travelshare_create_longitude_hint"
+                        android:inputType="numberDecimal|numberSigned"
+                        android:padding="14dp" />
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/etCreateTags"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_search_bar"
+                    android:hint="@string/travelshare_create_tags_hint"
+                    android:padding="14dp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardAnnotationAssistant"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            app:cardBackgroundColor="@color/app_surface"
+            app:cardCornerRadius="26dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/app_stroke"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/travelshare_annotation_section"
+                        android:textColor="@color/app_text_primary"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnApplyAnnotation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/app_teal_soft"
+                        android:text="@string/travelshare_annotation_apply_button"
+                        android:textAllCaps="false"
+                        android:textColor="@color/app_teal" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvAnnotationStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/travelshare_annotation_subtitle"
+                    android:textColor="@color/app_text_secondary"
+                    android:textSize="13sp" />
+
+                <ProgressBar
+                    android:id="@+id/progressAnnotation"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tvAnnotationSummaryLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/travelshare_annotation_summary_label"
+                    android:textColor="@color/app_text_primary"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvAnnotationSummary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_muted_panel"
+                    android:padding="14dp"
+                    android:text="@string/travelshare_annotation_empty_state"
+                    android:textColor="@color/app_text_secondary" />
+
+                <TextView
+                    android:id="@+id/tvAnnotationTagsLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/travelshare_annotation_tags_label"
+                    android:textColor="@color/app_text_primary"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvAnnotationTags"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_muted_panel"
+                    android:padding="14dp"
+                    android:text="@string/travelshare_annotation_empty_state"
+                    android:textColor="@color/app_text_secondary" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <Button
             android:id="@+id/btnPublishPhotoMetadata"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/travelshare_create_publish_button" />
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="@color/app_blue"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp"
+            android:text="@string/travelshare_create_publish_button"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
 
     </LinearLayout>
 

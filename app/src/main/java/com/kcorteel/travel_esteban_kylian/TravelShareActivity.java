@@ -1,22 +1,35 @@
 package com.kcorteel.travel_esteban_kylian;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kcorteel.travel_esteban_kylian.travelshare.adapter.PhotoMetadataAdapter;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.PhotoMetadata;
+import com.kcorteel.travel_esteban_kylian.travelshare.model.PlaceType;
 import com.kcorteel.travel_esteban_kylian.travelshare.repository.TravelShareRepository;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 
 public class TravelShareActivity extends AppCompatActivity {
 
@@ -25,21 +38,49 @@ public class TravelShareActivity extends AppCompatActivity {
     private PhotoMetadataAdapter photoMetadataAdapter;
     private TravelShareRepository travelShareRepository;
     private TextView subtitleTextView;
-    private Button createPhotoMetadataButton;
+    private View createPhotoMetadataButton;
+    private View openGroupsButton;
+    private android.widget.Button toggleFeedLayoutButton;
+    private View voiceSearchButton;
+    private View resetFiltersButton;
+    private View openNotificationsButton;
+    private View toggleFiltersButton;
+    private View filtersContainer;
     private ImageView profileShortcutImageView;
+    private Spinner placeTypeSpinner;
+    private Spinner authorSpinner;
+    private Spinner periodSpinner;
+    private final List<String> authorOptions = new ArrayList<>();
+    private PlaceType selectedPlaceType;
+    private String selectedAuthor = "";
+    private PhotoMetadataAdapter.PeriodFilter selectedPeriod = PhotoMetadataAdapter.PeriodFilter.ALL;
+    private PhotoMetadataAdapter.DisplayMode currentDisplayMode = PhotoMetadataAdapter.DisplayMode.LIST;
+    private boolean filtersVisible;
+    private ActivityResultLauncher<Intent> voiceSearchLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         travelShareRepository = TravelShareRepository.getInstance(this);
-        travelShareRepository.applyCurrentUserThemePreference();
+        travelShareRepository.applyCurrentUserDisplayPreferences();
         setContentView(R.layout.activity_travel_share);
+        setupVoiceSearch();
 
         searchEditText = findViewById(R.id.etSearchPhotoMetadata);
         photoMetadataRecyclerView = findViewById(R.id.rvPhotoMetadata);
         subtitleTextView = findViewById(R.id.tvTravelShareSubtitle);
         createPhotoMetadataButton = findViewById(R.id.btnCreatePhotoMetadata);
+        openGroupsButton = findViewById(R.id.btnOpenGroups);
+        toggleFeedLayoutButton = findViewById(R.id.btnToggleFeedLayout);
+        voiceSearchButton = findViewById(R.id.btnVoiceSearch);
+        resetFiltersButton = findViewById(R.id.btnResetFilters);
+        openNotificationsButton = findViewById(R.id.btnOpenNotifications);
+        toggleFiltersButton = findViewById(R.id.btnToggleFilters);
+        filtersContainer = findViewById(R.id.layoutFiltersContainer);
         profileShortcutImageView = findViewById(R.id.ivProfileShortcut);
+        placeTypeSpinner = findViewById(R.id.spinnerFilterPlaceType);
+        authorSpinner = findViewById(R.id.spinnerFilterAuthor);
+        periodSpinner = findViewById(R.id.spinnerFilterPeriod);
 
         photoMetadataAdapter = new PhotoMetadataAdapter(
                 travelShareRepository,
@@ -50,6 +91,10 @@ public class TravelShareActivity extends AppCompatActivity {
         photoMetadataRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         photoMetadataRecyclerView.setHasFixedSize(true);
         photoMetadataRecyclerView.setAdapter(photoMetadataAdapter);
+        updateFeedDisplayMode();
+
+        setupFilterControls();
+        setFiltersVisible(false);
 
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -73,6 +118,26 @@ public class TravelShareActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        openGroupsButton.setOnClickListener(v ->
+                startActivity(new Intent(this, TravelShareGroupsActivity.class))
+        );
+
+        openNotificationsButton.setOnClickListener(v ->
+                startActivity(new Intent(this, NotificationsActivity.class))
+        );
+
+        toggleFeedLayoutButton.setOnClickListener(v -> {
+            currentDisplayMode = currentDisplayMode == PhotoMetadataAdapter.DisplayMode.LIST
+                    ? PhotoMetadataAdapter.DisplayMode.GRID
+                    : PhotoMetadataAdapter.DisplayMode.LIST;
+            updateFeedDisplayMode();
+        });
+
+        voiceSearchButton.setOnClickListener(v -> startVoiceSearch());
+        toggleFiltersButton.setOnClickListener(v -> setFiltersVisible(!filtersVisible));
+
+        resetFiltersButton.setOnClickListener(v -> resetAllFilters());
+
         profileShortcutImageView.setOnClickListener(v ->
                 startActivity(new Intent(this, ProfileActivity.class))
         );
@@ -84,6 +149,8 @@ public class TravelShareActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         photoMetadataAdapter.submitPhotoMetadataList(travelShareRepository.getPhotoMetadataList());
+        refreshAuthorOptions();
+        applySelectedFilters();
         updateSubtitle();
     }
 
@@ -91,6 +158,7 @@ public class TravelShareActivity extends AppCompatActivity {
         if (travelShareRepository.isCurrentUserAnonymous()) {
             subtitleTextView.setText(R.string.travelshare_screen_subtitle_anonymous);
             createPhotoMetadataButton.setVisibility(View.GONE);
+            openNotificationsButton.setVisibility(View.GONE);
             profileShortcutImageView.setVisibility(View.GONE);
             return;
         }
@@ -100,6 +168,7 @@ public class TravelShareActivity extends AppCompatActivity {
                 travelShareRepository.getCurrentUser().getUsername()
         ));
         createPhotoMetadataButton.setVisibility(View.VISIBLE);
+        openNotificationsButton.setVisibility(View.VISIBLE);
         profileShortcutImageView.setVisibility(View.VISIBLE);
         travelShareRepository.loadUserAvatarIntoImageView(
                 profileShortcutImageView,
@@ -111,5 +180,213 @@ public class TravelShareActivity extends AppCompatActivity {
         Intent intent = new Intent(this, TravelShareDetailActivity.class);
         intent.putExtra(TravelShareDetailActivity.EXTRA_PHOTO_ID, photoMetadata.getPhotoId());
         startActivity(intent);
+    }
+
+    private void setupFilterControls() {
+        setupPlaceTypeSpinner();
+        setupAuthorSpinner();
+        setupPeriodSpinner();
+        applySelectedFilters();
+    }
+
+    private void setupPlaceTypeSpinner() {
+        List<String> placeTypeOptions = new ArrayList<>();
+        placeTypeOptions.add(getString(R.string.travelshare_filter_all_types));
+        Collections.addAll(placeTypeOptions, getResources().getStringArray(R.array.travelshare_place_type_labels));
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                placeTypeOptions
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        placeTypeSpinner.setAdapter(adapter);
+        placeTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedPlaceType = position == 0 ? null : PlaceType.values()[position - 1];
+                applySelectedFilters();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // No-op
+            }
+        });
+    }
+
+    private void setupAuthorSpinner() {
+        refreshAuthorOptions();
+        authorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedAuthor = position == 0 ? "" : authorOptions.get(position);
+                applySelectedFilters();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // No-op
+            }
+        });
+    }
+
+    private void setupPeriodSpinner() {
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                this,
+                R.array.travelshare_period_filter_labels,
+                android.R.layout.simple_spinner_item
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        periodSpinner.setAdapter(adapter);
+        periodSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                switch (position) {
+                    case 1:
+                        selectedPeriod = PhotoMetadataAdapter.PeriodFilter.LAST_30_DAYS;
+                        break;
+                    case 2:
+                        selectedPeriod = PhotoMetadataAdapter.PeriodFilter.LAST_6_MONTHS;
+                        break;
+                    case 3:
+                        selectedPeriod = PhotoMetadataAdapter.PeriodFilter.OLDER;
+                        break;
+                    case 0:
+                    default:
+                        selectedPeriod = PhotoMetadataAdapter.PeriodFilter.ALL;
+                        break;
+                }
+                applySelectedFilters();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // No-op
+            }
+        });
+    }
+
+    private void refreshAuthorOptions() {
+        String currentSelection = selectedAuthor;
+        authorOptions.clear();
+        authorOptions.add(getString(R.string.travelshare_filter_all_authors));
+
+        List<String> authorNames = new ArrayList<>();
+        for (PhotoMetadata photoMetadata : travelShareRepository.getPhotoMetadataList()) {
+            String authorLabel = travelShareRepository.getAuthorLabel(photoMetadata);
+            if (authorLabel != null && !authorLabel.trim().isEmpty()
+                    && !containsIgnoreCase(authorNames, authorLabel)) {
+                authorNames.add(authorLabel.trim());
+            }
+        }
+
+        Collections.sort(authorNames, String.CASE_INSENSITIVE_ORDER);
+        authorOptions.addAll(authorNames);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                authorOptions
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        authorSpinner.setAdapter(adapter);
+
+        int selectedIndex = 0;
+        if (!currentSelection.isEmpty()) {
+            for (int i = 1; i < authorOptions.size(); i++) {
+                if (authorOptions.get(i).equalsIgnoreCase(currentSelection)) {
+                    selectedIndex = i;
+                    break;
+                }
+            }
+        }
+        authorSpinner.setSelection(selectedIndex, false);
+        selectedAuthor = selectedIndex == 0 ? "" : authorOptions.get(selectedIndex);
+    }
+
+    private void applySelectedFilters() {
+        photoMetadataAdapter.setSelectedPlaceType(selectedPlaceType);
+        photoMetadataAdapter.setSelectedAuthor(selectedAuthor);
+        photoMetadataAdapter.setSelectedPeriod(selectedPeriod);
+        photoMetadataAdapter.filter(searchEditText.getText().toString());
+    }
+
+    private void resetAllFilters() {
+        selectedPlaceType = null;
+        selectedAuthor = "";
+        selectedPeriod = PhotoMetadataAdapter.PeriodFilter.ALL;
+
+        searchEditText.setText("");
+        placeTypeSpinner.setSelection(0, false);
+        authorSpinner.setSelection(0, false);
+        periodSpinner.setSelection(0, false);
+
+        photoMetadataAdapter.resetFilters();
+        setFiltersVisible(false);
+    }
+
+    private void updateFeedDisplayMode() {
+        photoMetadataAdapter.setDisplayMode(currentDisplayMode);
+        if (currentDisplayMode == PhotoMetadataAdapter.DisplayMode.GRID) {
+            photoMetadataRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+            toggleFeedLayoutButton.setText(R.string.travelshare_feed_list_compact);
+        } else {
+            photoMetadataRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            toggleFeedLayoutButton.setText(R.string.travelshare_feed_grid_compact);
+        }
+    }
+
+    private void setFiltersVisible(boolean visible) {
+        filtersVisible = visible;
+        filtersContainer.setVisibility(visible ? View.VISIBLE : View.GONE);
+        toggleFiltersButton.setSelected(visible);
+    }
+
+    private void setupVoiceSearch() {
+        voiceSearchLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() != RESULT_OK || result.getData() == null) {
+                        return;
+                    }
+
+                    ArrayList<String> matches = result.getData()
+                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    if (matches == null || matches.isEmpty()) {
+                        return;
+                    }
+
+                    searchEditText.setText(matches.get(0));
+                    searchEditText.setSelection(searchEditText.getText().length());
+                }
+        );
+    }
+
+    private void startVoiceSearch() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, travelShareRepository.getCurrentLanguageTag());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.travelshare_search_hint));
+
+        try {
+            voiceSearchLauncher.launch(intent);
+        } catch (ActivityNotFoundException exception) {
+            android.widget.Toast.makeText(
+                    this,
+                    R.string.travelshare_voice_search_unavailable,
+                    android.widget.Toast.LENGTH_SHORT
+            ).show();
+        }
+    }
+
+    private boolean containsIgnoreCase(List<String> values, String candidate) {
+        String normalizedCandidate = candidate.toLowerCase(Locale.getDefault());
+        for (String value : values) {
+            if (value.toLowerCase(Locale.getDefault()).equals(normalizedCandidate)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

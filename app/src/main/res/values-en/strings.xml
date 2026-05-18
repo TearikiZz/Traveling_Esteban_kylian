@@ -1,0 +1,253 @@
+<resources>
+    <string name="app_name">Travel_Esteban_kylian</string>
+    <string name="app_home_title">Traveling</string>
+    <string name="app_home_subtitle">Choose your experience, sign in, or stay anonymous.</string>
+    <string name="app_home_account_section">Account</string>
+    <string name="app_home_explore_section">Explore the app</string>
+    <string name="app_open_travelshare_button">Open TravelShare</string>
+    <string name="app_open_travelpath_button">Open TravelPath</string>
+    <string name="auth_login_button">Sign in</string>
+    <string name="auth_register_button">Sign up</string>
+    <string name="auth_continue_anonymous_button">Continue anonymously</string>
+    <string name="auth_logout_button">Sign out</string>
+    <string name="auth_login_screen_title">Sign in</string>
+    <string name="auth_register_screen_title">Sign up</string>
+    <string name="auth_identifier_hint">Username or email</string>
+    <string name="auth_username_hint">Username</string>
+    <string name="auth_email_hint">Email</string>
+    <string name="auth_password_hint">Password</string>
+    <string name="auth_confirm_password_hint">Confirm password</string>
+    <string name="auth_status_anonymous">Current session: anonymous mode</string>
+    <string name="auth_status_connected_format">Current session: signed in as %1$s</string>
+    <string name="auth_login_success">Signed in successfully</string>
+    <string name="auth_register_success">Account created successfully</string>
+    <string name="auth_login_missing_fields_error">Please enter your username or email and your password.</string>
+    <string name="auth_invalid_credentials_error">Invalid credentials.</string>
+    <string name="auth_register_missing_fields_error">All fields are required.</string>
+    <string name="auth_register_password_mismatch_error">Passwords do not match.</string>
+    <string name="auth_username_exists_error">This username already exists.</string>
+    <string name="auth_email_exists_error">This email is already in use.</string>
+    <string name="auth_comment_requires_login">Sign in to post a comment</string>
+    <string name="travelshare_screen_title">TravelShare</string>
+    <string name="travelshare_screen_subtitle">Public feed built from the report models: PhotoMetadata, Comment, SocialInteraction.</string>
+    <string name="travelshare_screen_subtitle_anonymous">Anonymous mode: browsing, likes, and reports are available.</string>
+    <string name="travelshare_screen_subtitle_connected">Signed-in mode: welcome %1$s, you can also comment.</string>
+    <string name="travelshare_create_post_button">Create a post</string>
+    <string name="travelshare_groups_button">View groups</string>
+    <string name="travelshare_groups_button_short">Groups</string>
+    <string name="travelshare_notifications_button_short">Alerts</string>
+    <string name="travelshare_feed_grid_button">Switch to grid</string>
+    <string name="travelshare_feed_list_button">Switch to list</string>
+    <string name="travelshare_feed_grid_compact">Grid</string>
+    <string name="travelshare_feed_list_compact">List</string>
+    <string name="travelshare_voice_search_button">Voice search</string>
+    <string name="travelshare_create_screen_title">New TravelShare post</string>
+    <string name="travelshare_create_screen_subtitle">Compose a clear post with a photo, a place, and a few useful details.</string>
+    <string name="travelshare_create_title_hint">Post title</string>
+    <string name="travelshare_create_description_hint">Description</string>
+    <string name="travelshare_create_place_name_hint">Place name or landmark</string>
+    <string name="travelshare_create_address_hint">Address or landmark</string>
+    <string name="travelshare_create_city_hint">City</string>
+    <string name="travelshare_create_country_hint">Country</string>
+    <string name="travelshare_create_latitude_hint">Latitude</string>
+    <string name="travelshare_create_longitude_hint">Longitude</string>
+    <string name="travelshare_place_section">Place</string>
+    <string name="travelshare_place_not_selected">No place selected</string>
+    <string name="travelshare_place_details_empty">Select a place from the list to fill in useful details automatically.</string>
+    <string name="travelshare_select_place_button">Choose a place</string>
+    <string name="travelshare_place_search_hint">Start typing a place</string>
+    <string name="travelshare_place_api_missing">Add a Places API key in local.properties to enable place search.</string>
+    <string name="travelshare_place_autocomplete_error">This place cannot be retrieved right now.</string>
+    <string name="travelshare_place_required">Please choose a place from the suggested list.</string>
+    <string name="travelshare_place_manual_button">Enter the place manually</string>
+    <string name="travelshare_place_manual_unavailable">Autocomplete is not available right now. You can enter the place manually.</string>
+    <string name="travelshare_place_manual_required">Enter at least the place name, city, and country.</string>
+    <string name="travelshare_place_fetch_incomplete">The selected place does not contain enough information to be saved.</string>
+    <string name="travelshare_create_tags_hint">Comma-separated tags</string>
+    <string name="travelshare_group_picker_label">Post in a group</string>
+    <string name="travelshare_group_none_option">No group</string>
+    <string name="travelshare_groups_screen_title">TravelShare groups</string>
+    <string name="travelshare_groups_screen_subtitle">Create a group, join a community, and share targeted posts with its members.</string>
+    <string name="travelshare_groups_create_button">Create a group</string>
+    <string name="travelshare_groups_empty">No visible groups at the moment.</string>
+    <string name="travelshare_group_name_hint">Group name</string>
+    <string name="travelshare_group_private_label">Private group</string>
+    <string name="travelshare_group_created">Group created successfully.</string>
+    <string name="travelshare_group_joined">You joined the group.</string>
+    <string name="travelshare_group_left">You left the group.</string>
+    <string name="travelshare_group_action_failed">Action unavailable for this group.</string>
+    <string name="travelshare_group_missing">Group not found or inaccessible.</string>
+    <string name="travelshare_group_members_format">%1$d member(s)</string>
+    <string name="travelshare_group_creator_format">Created by %1$s</string>
+    <string name="travelshare_group_visibility_public">Public</string>
+    <string name="travelshare_group_visibility_private">Private</string>
+    <string name="travelshare_group_open_button">Open</string>
+    <string name="travelshare_group_join_button">Join</string>
+    <string name="travelshare_group_leave_button">Leave</string>
+    <string name="travelshare_group_owned_button">Created by you</string>
+    <string name="travelshare_group_login_required">Sign in to manage groups.</string>
+    <string name="travelshare_group_detail_posts_section">Group posts</string>
+    <string name="travelshare_group_detail_empty_posts">No posts in this group yet.</string>
+    <string name="travelshare_group_post_button">Post in this group</string>
+    <string name="travelshare_group_open_from_post">Open group</string>
+    <string name="travelshare_post_group_format">Group: %1$s</string>
+    <string name="travelshare_voice_note_section">Voice note</string>
+    <string name="travelshare_voice_note_empty">No voice note recorded.</string>
+    <string name="travelshare_voice_note_record_button">Record</string>
+    <string name="travelshare_voice_note_stop_button">Stop</string>
+    <string name="travelshare_voice_note_play_button">Play</string>
+    <string name="travelshare_voice_note_stop_playback_button">Stop playback</string>
+    <string name="travelshare_voice_note_delete_button">Delete voice note</string>
+    <string name="travelshare_voice_note_delete_short">Delete</string>
+    <string name="travelshare_voice_note_ready">Voice note ready.</string>
+    <string name="travelshare_voice_note_recording">Recording in progress…</string>
+    <string name="travelshare_voice_note_saved">Voice note saved.</string>
+    <string name="travelshare_voice_note_deleted">Voice note deleted.</string>
+    <string name="travelshare_voice_note_permission_required">Allow microphone access to record a voice note.</string>
+    <string name="travelshare_voice_note_error">The voice note cannot be handled right now.</string>
+    <string name="travelshare_voice_search_unavailable">Voice search is not available on this device.</string>
+    <string name="travelshare_annotation_section">Assisted annotation</string>
+    <string name="travelshare_annotation_subtitle">Suggestions generated automatically from the photo, text, and place.</string>
+    <string name="travelshare_annotation_apply_button">Apply</string>
+    <string name="travelshare_annotation_summary_label">Suggested summary</string>
+    <string name="travelshare_annotation_tags_label">Suggested tags</string>
+    <string name="travelshare_annotation_empty_state">Add a title, a description, or a place to get assisted annotation.</string>
+    <string name="travelshare_annotation_loading">AI analysis in progress…</string>
+    <string name="travelshare_annotation_missing_key">Add GEMINI_API_KEY in local.properties to enable AI annotation.</string>
+    <string name="travelshare_annotation_error">An AI annotation cannot be generated right now.</string>
+    <string name="travelshare_annotation_error_with_reason">An AI annotation cannot be generated: %1$s</string>
+    <string name="travelshare_annotation_applied">Suggestions applied to the post</string>
+    <string name="travelshare_create_publish_button">Publish</string>
+    <string name="travelshare_select_photo_button">Choose a photo</string>
+    <string name="travelshare_change_photo_button">Change photo</string>
+    <string name="travelshare_photo_placeholder">Add a photo to start the post</string>
+    <string name="travelshare_selected_photo_preview">Selected photo preview</string>
+    <string name="travelshare_create_missing_fields">All main fields must be filled in.</string>
+    <string name="travelshare_create_missing_photo">Please choose a photo.</string>
+    <string name="travelshare_create_invalid_coordinates">Coordinates must be valid.</string>
+    <string name="travelshare_create_success">Post created successfully.</string>
+    <string name="travelshare_create_requires_login">Sign in to create a post.</string>
+    <string name="travelshare_search_hint">Search for a post, a place, or a tip</string>
+    <string name="travelshare_filters_section">Feed filters</string>
+    <string name="travelshare_filter_all_types">All types</string>
+    <string name="travelshare_filter_all_authors">All authors</string>
+    <string name="travelshare_filter_all_periods">All time ranges</string>
+    <string name="travelshare_filter_period_30_days">Last 30 days</string>
+    <string name="travelshare_filter_period_6_months">Last 6 months</string>
+    <string name="travelshare_filter_period_older">Older</string>
+    <string name="travelshare_filter_reset_button">Reset filters</string>
+    <string name="travelshare_post_image_content_description">Travel post illustration</string>
+    <string name="travelshare_description_section">Description</string>
+    <string name="travelshare_tags_section">Tags</string>
+    <string name="travelshare_route_section">How to get there</string>
+    <string name="travelshare_route_advice_missing_coordinates">This place was entered manually without precise coordinates. Add a latitude and longitude to enable directions.</string>
+    <string name="travelshare_route_advice_format">Reach %1$s, %2$s. Open directions for detailed navigation to the photo spot.</string>
+    <string name="travelshare_comments_section">Comments</string>
+    <string name="travelshare_directions_button">Open directions</string>
+    <string name="travelshare_directions_missing_coordinates">Directions unavailable: this place was entered without coordinates.</string>
+    <string name="travelshare_like_button">Like</string>
+    <string name="travelshare_unlike_button">Remove like</string>
+    <string name="travelshare_report_button">Report</string>
+    <string name="travelshare_reported_button">Reported</string>
+    <string name="travelshare_delete_button">Delete post</string>
+    <string name="travelshare_delete_confirm_title">Delete post</string>
+    <string name="travelshare_delete_confirm_message">Do you really want to delete this post? This action cannot be undone.</string>
+    <string name="travelshare_delete_success">Post deleted.</string>
+    <string name="travelshare_delete_error">This post cannot be deleted.</string>
+    <string name="travelshare_location_format">Place: %1$s</string>
+    <string name="travelshare_date_format">Date: %1$s</string>
+    <string name="travelshare_author_format">Author: %1$s</string>
+    <string name="travelshare_tags_format">Tags: %1$s</string>
+    <string name="travelshare_feed_info_format">Type: %1$s  •  Likes: %2$d</string>
+    <string name="travelshare_comments_count_format">%1$d comment(s)</string>
+    <string name="travelshare_add_comment_button">Post comment</string>
+    <string name="travelshare_comment_hint">Add a comment</string>
+    <string name="travelshare_liked_message">You now like %1$s</string>
+    <string name="travelshare_unliked_message">You no longer like %1$s</string>
+    <string name="travelshare_comment_added">Comment added</string>
+    <string name="travelshare_comment_empty_error">The comment cannot be empty</string>
+    <string name="travelshare_report_success">The content has been reported</string>
+    <string name="travelshare_report_already_done">You already reported this content</string>
+    <string name="travelshare_post_missing">Post not found</string>
+    <string name="travelshare_no_map_app">No mapping app available</string>
+    <string name="travelshare_unknown_user">Unknown user</string>
+    <string name="travelshare_place_type_nature">Nature</string>
+    <string name="travelshare_place_type_museum">Museum</string>
+    <string name="travelshare_place_type_street">Street</string>
+    <string name="travelshare_place_type_shop">Shop</string>
+    <string name="travelshare_place_type_restaurant">Restaurant</string>
+    <string name="travelshare_place_type_other">Other</string>
+    <string name="profile_open_button">Open profile</string>
+    <string name="profile_screen_title">My profile</string>
+    <string name="profile_screen_subtitle">Manage your photo, information, and TravelShare preferences.</string>
+    <string name="profile_change_photo_button">Change photo</string>
+    <string name="profile_info_section">Account information</string>
+    <string name="profile_username_label">Username</string>
+    <string name="profile_email_label">Email</string>
+    <string name="profile_mode_label">Mode</string>
+    <string name="profile_mode_format">Mode: %1$s</string>
+    <string name="profile_mode_connected">Signed-in account</string>
+    <string name="profile_user_id_format">User ID: #%1$d</string>
+    <string name="profile_stats_section">Statistics</string>
+    <string name="profile_stat_publications">Posts</string>
+    <string name="profile_stat_comments">Comments</string>
+    <string name="profile_stat_likes">Likes received</string>
+    <string name="profile_preferences_section">Preferences</string>
+    <string name="profile_theme_label">Theme</string>
+    <string name="profile_language_label">Preferred language</string>
+    <string name="profile_notifications_label">Notifications enabled</string>
+    <string name="profile_notifications_button">View my notifications</string>
+    <string name="profile_notifications_unread_format">%1$d unread notification(s)</string>
+    <string name="profile_notifications_none">No pending notifications</string>
+    <string name="profile_save_button">Save profile</string>
+    <string name="profile_logout_button">Sign out</string>
+    <string name="profile_saved_message">Profile updated</string>
+    <string name="profile_photo_preview">Profile photo</string>
+    <string name="profile_update_requires_login">Sign in to edit your profile.</string>
+    <string name="profile_update_missing_identity_error">Username and email are required.</string>
+    <string name="notifications_screen_title">TravelShare notifications</string>
+    <string name="notifications_screen_subtitle">See the latest activity related to your posts and the TravelShare feed.</string>
+    <string name="notifications_empty_state">No notifications at the moment.</string>
+    <string name="notifications_channel_name">TravelShare activity</string>
+    <string name="notifications_channel_description">Alerts related to TravelShare posts, likes, and comments.</string>
+    <string name="notifications_type_new_post">New post</string>
+    <string name="notifications_type_group_post">Group post</string>
+    <string name="notifications_type_like">Like received</string>
+    <string name="notifications_type_comment">Comment received</string>
+    <string name="notifications_message_new_post_by_user">%1$s posted "%2$s".</string>
+    <string name="notifications_message_new_post_in_group">%1$s posted in the group "%2$s".</string>
+    <string name="notifications_message_comment_on_photo">%1$s commented on your post: "%2$s".</string>
+    <string name="notifications_message_like_on_photo">%1$s likes your post "%2$s".</string>
+    <string name="notifications_open_post">Open post</string>
+    <string name="notifications_marked_read">Notifications marked as read</string>
+    <string name="travelshare_group_name_required">Group name is required.</string>
+    <string name="travelshare_group_exists_error">A group with this name already exists.</string>
+
+    <string-array name="profile_theme_labels">
+        <item>Follow system</item>
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
+
+    <string-array name="profile_language_labels">
+        <item>Français</item>
+        <item>English</item>
+    </string-array>
+
+    <string-array name="travelshare_place_type_labels">
+        <item>Nature</item>
+        <item>Museum</item>
+        <item>Street</item>
+        <item>Shop</item>
+        <item>Restaurant</item>
+        <item>Other</item>
+    </string-array>
+
+    <string-array name="travelshare_period_filter_labels">
+        <item>All time ranges</item>
+        <item>Last 30 days</item>
+        <item>Last 6 months</item>
+        <item>Older</item>
+    </string-array>
+
+</resources>

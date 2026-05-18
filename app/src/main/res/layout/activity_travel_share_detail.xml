@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F6F8">
+    android:background="@color/app_bg">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:textColor="#0F172A"
+            android:textColor="@color/app_text_primary"
             android:textSize="28sp"
             android:textStyle="bold" />
 
@@ -34,15 +34,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:textColor="#475569"
+            android:textColor="@color/app_text_secondary"
             android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/btnOpenPhotoGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/travelshare_group_open_from_post"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tvDetailPhotoMetadataLocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:textColor="#2563EB"
+            android:textColor="@color/app_blue"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -51,7 +59,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:textColor="#64748B"
+            android:textColor="@color/app_text_secondary"
             android:textSize="14sp" />
 
         <TextView
@@ -59,7 +67,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="@string/travelshare_description_section"
-            android:textColor="#0F172A"
+            android:textColor="@color/app_text_primary"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -71,15 +79,34 @@
             android:background="@drawable/bg_photo_post_card"
             android:lineSpacingExtra="3dp"
             android:padding="16dp"
-            android:textColor="#334155"
+            android:textColor="@color/app_text_secondary"
             android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/tvVoiceNoteLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/travelshare_voice_note_section"
+            android:textColor="@color/app_text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnPlayVoiceNote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/travelshare_voice_note_play_button"
+            android:visibility="gone" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="@string/travelshare_tags_section"
-            android:textColor="#0F172A"
+            android:textColor="@color/app_text_primary"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -91,7 +118,7 @@
             android:background="@drawable/bg_photo_post_card"
             android:lineSpacingExtra="3dp"
             android:padding="16dp"
-            android:textColor="#334155"
+            android:textColor="@color/app_text_secondary"
             android:textSize="15sp" />
 
         <TextView
@@ -99,7 +126,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="@string/travelshare_route_section"
-            android:textColor="#0F172A"
+            android:textColor="@color/app_text_primary"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -111,7 +138,7 @@
             android:background="@drawable/bg_photo_post_card"
             android:lineSpacingExtra="3dp"
             android:padding="16dp"
-            android:textColor="#334155"
+            android:textColor="@color/app_text_secondary"
             android:textSize="15sp" />
 
         <Button
@@ -119,33 +146,43 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:backgroundTint="#0F766E"
-            android:textColor="#FFFFFF" />
+            android:backgroundTint="@color/app_teal"
+            android:textColor="@android:color/white" />
 
         <Button
             android:id="@+id/btnReportPhotoMetadata"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:backgroundTint="#B91C1C"
+            android:backgroundTint="@color/app_red"
             android:text="@string/travelshare_report_button"
-            android:textColor="#FFFFFF" />
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/btnDeletePhotoMetadata"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="@color/app_red"
+            android:text="@string/travelshare_delete_button"
+            android:textColor="@android:color/white"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/btnOpenDirections"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:backgroundTint="#2563EB"
+            android:backgroundTint="@color/app_blue"
             android:text="@string/travelshare_directions_button"
-            android:textColor="#FFFFFF" />
+            android:textColor="@android:color/white" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="@string/travelshare_comments_section"
-            android:textColor="#0F172A"
+            android:textColor="@color/app_text_primary"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -154,7 +191,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:textColor="#64748B"
+            android:textColor="@color/app_text_secondary"
             android:textSize="13sp" />
 
         <EditText
@@ -174,9 +211,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:backgroundTint="#1D4ED8"
+            android:backgroundTint="@color/app_blue"
             android:text="@string/travelshare_add_comment_button"
-            android:textColor="#FFFFFF" />
+            android:textColor="@android:color/white" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvComments"

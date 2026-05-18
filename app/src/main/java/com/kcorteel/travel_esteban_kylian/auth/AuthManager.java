@@ -2,6 +2,7 @@ package com.kcorteel.travel_esteban_kylian.auth;
 
 import android.content.Context;
 
+import com.kcorteel.travel_esteban_kylian.R;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.TravelShareDatabase;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.UserDao;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.User;
@@ -10,9 +11,10 @@ public class AuthManager {
 
     private final UserDao userDao;
     private final AppSessionManager appSessionManager;
+    private final Context appContext;
 
     public AuthManager(Context context) {
-        Context appContext = context.getApplicationContext();
+        appContext = context.getApplicationContext();
         userDao = TravelShareDatabase.getInstance(appContext).userDao();
         appSessionManager = new AppSessionManager(appContext);
     }
@@ -22,16 +24,16 @@ public class AuthManager {
         String normalizedPassword = password == null ? "" : password.trim();
 
         if (normalizedIdentifier.isEmpty() || normalizedPassword.isEmpty()) {
-            return "Veuillez renseigner votre identifiant et votre mot de passe.";
+            return appContext.getString(R.string.auth_login_missing_fields_error);
         }
 
         User user = userDao.getByUsernameOrEmail(normalizedIdentifier);
         if (user == null || user.isAnonymous()) {
-            return "Identifiants invalides.";
+            return appContext.getString(R.string.auth_invalid_credentials_error);
         }
 
         if (!user.getPasswordHash().equals(PasswordUtils.hash(normalizedPassword))) {
-            return "Identifiants invalides.";
+            return appContext.getString(R.string.auth_invalid_credentials_error);
         }
 
         appSessionManager.setCurrentUserId(user.getUserId());
@@ -46,19 +48,19 @@ public class AuthManager {
 
         if (normalizedUsername.isEmpty() || normalizedEmail.isEmpty()
                 || normalizedPassword.isEmpty() || normalizedConfirmPassword.isEmpty()) {
-            return "Tous les champs sont obligatoires.";
+            return appContext.getString(R.string.auth_register_missing_fields_error);
         }
 
         if (!normalizedPassword.equals(normalizedConfirmPassword)) {
-            return "Les mots de passe ne correspondent pas.";
+            return appContext.getString(R.string.auth_register_password_mismatch_error);
         }
 
         if (userDao.getByUsername(normalizedUsername) != null) {
-            return "Ce nom d'utilisateur existe déjà.";
+            return appContext.getString(R.string.auth_username_exists_error);
         }
 
         if (userDao.getByEmail(normalizedEmail) != null) {
-            return "Cet email est déjà utilisé.";
+            return appContext.getString(R.string.auth_email_exists_error);
         }
 
         User user = new User(

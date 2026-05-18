@@ -6,37 +6,48 @@ import android.text.TextUtils;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.content.ContextCompat;
 
 import com.kcorteel.travel_esteban_kylian.R;
 import com.kcorteel.travel_esteban_kylian.auth.AppSessionManager;
 import com.kcorteel.travel_esteban_kylian.auth.PasswordUtils;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.AppPreferencesDao;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.CommentDao;
+import com.kcorteel.travel_esteban_kylian.travelshare.database.GroupMembershipDao;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.LocationDao;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.MediaDao;
+import com.kcorteel.travel_esteban_kylian.travelshare.database.NotificationDao;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.PhotoMetadataDao;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.SocialInteractionDao;
+import com.kcorteel.travel_esteban_kylian.travelshare.database.TravelGroupDao;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.TravelShareDatabase;
 import com.kcorteel.travel_esteban_kylian.travelshare.database.UserDao;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.AppPreferences;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.AppTheme;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.ActivityType;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.Comment;
+import com.kcorteel.travel_esteban_kylian.travelshare.model.GroupMembership;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.Location;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.Media;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.MediaType;
+import com.kcorteel.travel_esteban_kylian.travelshare.model.Notification;
+import com.kcorteel.travel_esteban_kylian.travelshare.model.NotificationTriggerType;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.PhotoMetadata;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.PlaceType;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.SocialInteraction;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.SocialInteractionType;
+import com.kcorteel.travel_esteban_kylian.travelshare.model.TravelGroup;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.User;
+import com.kcorteel.travel_esteban_kylian.travelshare.notifications.TravelShareSystemNotifier;
+import com.kcorteel.travel_esteban_kylian.travelshare.util.TravelShareLocaleManager;
 
+import java.io.File;
+import java.text.Normalizer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.ArrayList;
-import java.text.Normalizer;
 
 public class TravelShareRepository {
 
@@ -49,10 +60,15 @@ public class TravelShareRepository {
     private final CommentDao commentDao;
     private final SocialInteractionDao socialInteractionDao;
     private final AppPreferencesDao appPreferencesDao;
+    private final NotificationDao notificationDao;
+    private final TravelGroupDao travelGroupDao;
+    private final GroupMembershipDao groupMembershipDao;
 
     private final AppSessionManager appSessionManager;
+    private final Context appContext;
 
     private TravelShareRepository(Context context) {
+        appContext = context.getApplicationContext();
         TravelShareDatabase database = TravelShareDatabase.getInstance(context);
         userDao = database.userDao();
         locationDao = database.locationDao();
@@ -61,6 +77,9 @@ public class TravelShareRepository {
         commentDao = database.commentDao();
         socialInteractionDao = database.socialInteractionDao();
         appPreferencesDao = database.appPreferencesDao();
+        notificationDao = database.notificationDao();
+        travelGroupDao = database.travelGroupDao();
+        groupMembershipDao = database.groupMembershipDao();
         appSessionManager = new AppSessionManager(context);
 
         seedDatabaseIfNeeded();
@@ -74,11 +93,18 @@ public class TravelShareRepository {
     }
 
     public List<PhotoMetadata> getPhotoMetadataList() {
-        return photoMetadataDao.getAll();
+        List<PhotoMetadata> result = new ArrayList<>();
+        for (PhotoMetadata photoMetadata : photoMetadataDao.getAll()) {
+            if (canAccessPhotoMetadata(photoMetadata)) {
+                result.add(photoMetadata);
+            }
+        }
+        return result;
     }
 
     public PhotoMetadata getPhotoMetadataById(long photoId) {
-        return photoMetadataDao.getById(photoId);
+        PhotoMetadata photoMetadata = photoMetadataDao.getById(photoId);
+        return canAccessPhotoMetadata(photoMetadata) ? photoMetadata : null;
     }
 
     public Location getLocationById(long locationId) {
@@ -113,7 +139,7 @@ public class TravelShareRepository {
     public String updateCurrentUserProfile(String username, String email, String avatarUri) {
         User currentUser = getCurrentUser();
         if (currentUser == null || currentUser.isAnonymous()) {
-            return "Connectez-vous pour modifier votre profil.";
+            return getStringResource(R.string.profile_update_requires_login);
         }
 
         String normalizedUsername = username == null ? "" : username.trim();
@@ -123,17 +149,17 @@ public class TravelShareRepository {
                 : avatarUri.trim();
 
         if (normalizedUsername.isEmpty() || normalizedEmail.isEmpty()) {
-            return "Le nom d'utilisateur et l'email sont obligatoires.";
+            return getStringResource(R.string.profile_update_missing_identity_error);
         }
 
         User existingByUsername = userDao.getByUsername(normalizedUsername);
         if (existingByUsername != null && existingByUsername.getUserId() != currentUser.getUserId()) {
-            return "Ce nom d'utilisateur existe déjà.";
+            return getStringResource(R.string.auth_username_exists_error);
         }
 
         User existingByEmail = userDao.getByEmail(normalizedEmail);
         if (existingByEmail != null && existingByEmail.getUserId() != currentUser.getUserId()) {
-            return "Cet email est déjà utilisé.";
+            return getStringResource(R.string.auth_email_exists_error);
         }
 
         userDao.upsert(new User(
@@ -181,6 +207,23 @@ public class TravelShareRepository {
         AppCompatDelegate.setDefaultNightMode(nightMode);
     }
 
+    public void applyCurrentUserLanguagePreference() {
+        TravelShareLocaleManager.applyLanguage(getCurrentUserPreferences().getLanguage());
+    }
+
+    public void applyCurrentUserDisplayPreferences() {
+        applyCurrentUserLanguagePreference();
+        applyCurrentUserThemePreference();
+    }
+
+    public Locale getCurrentLocale() {
+        return TravelShareLocaleManager.resolveLocale(appContext);
+    }
+
+    public String getCurrentLanguageTag() {
+        return getCurrentLocale().toLanguageTag();
+    }
+
     public ProfileStats getCurrentUserProfileStats() {
         User currentUser = getCurrentUser();
         if (currentUser == null || currentUser.isAnonymous()) {
@@ -205,9 +248,15 @@ public class TravelShareRepository {
             double longitude,
             List<String> tags,
             PlaceType placeType,
+            Long groupId,
+            String audioNoteUrl,
             String imageDrawableName
     ) {
         if (isCurrentUserAnonymous()) {
+            return null;
+        }
+
+        if (groupId != null && !isCurrentUserMemberOfGroup(groupId)) {
             return null;
         }
 
@@ -229,6 +278,8 @@ public class TravelShareRepository {
                 "09:00",
                 "18:00",
                 mapPlaceTypeToActivityType(placeType),
+                groupId,
+                audioNoteUrl,
                 tags == null ? Collections.emptyList() : tags,
                 placeType
         );
@@ -236,8 +287,140 @@ public class TravelShareRepository {
         locationDao.insert(location);
         mediaDao.insert(media);
         photoMetadataDao.insert(photoMetadata);
+        if (groupId == null) {
+            notifyUsersAboutNewPost(photoMetadata);
+        } else {
+            notifyGroupMembersAboutNewPost(photoMetadata);
+        }
 
         return photoMetadata;
+    }
+
+    public List<TravelGroup> getVisibleGroups() {
+        List<TravelGroup> result = new ArrayList<>();
+        for (TravelGroup group : travelGroupDao.getAll()) {
+            if (canAccessGroup(group)) {
+                result.add(group);
+            }
+        }
+        return result;
+    }
+
+    public TravelGroup getGroupById(long groupId) {
+        TravelGroup group = travelGroupDao.getById(groupId);
+        return canAccessGroup(group) ? group : null;
+    }
+
+    public List<TravelGroup> getGroupsForCurrentUser() {
+        if (isCurrentUserAnonymous()) {
+            return Collections.emptyList();
+        }
+
+        List<TravelGroup> groups = new ArrayList<>();
+        for (GroupMembership membership : groupMembershipDao.getByUserId(appSessionManager.getCurrentUserId())) {
+            TravelGroup group = travelGroupDao.getById(membership.getGroupId());
+            if (group != null) {
+                groups.add(group);
+            }
+        }
+        groups.sort((left, right) -> left.getGroupName().compareToIgnoreCase(right.getGroupName()));
+        return groups;
+    }
+
+    public String createGroup(String groupName, boolean isPrivate) {
+        if (isCurrentUserAnonymous()) {
+            return getStringResource(R.string.travelshare_group_login_required);
+        }
+
+        String normalizedName = groupName == null ? "" : groupName.trim();
+        if (normalizedName.isEmpty()) {
+            return getStringResource(R.string.travelshare_group_name_required);
+        }
+
+        for (TravelGroup existingGroup : travelGroupDao.getAll()) {
+            if (existingGroup.getGroupName().equalsIgnoreCase(normalizedName)) {
+                return getStringResource(R.string.travelshare_group_exists_error);
+            }
+        }
+
+        long groupId = travelGroupDao.getMaxGroupId() + 1L;
+        long currentUserId = appSessionManager.getCurrentUserId();
+        travelGroupDao.insert(new TravelGroup(groupId, normalizedName, currentUserId, isPrivate));
+        groupMembershipDao.insert(new GroupMembership(groupId, currentUserId));
+        return null;
+    }
+
+    public boolean joinGroup(long groupId) {
+        if (isCurrentUserAnonymous()) {
+            return false;
+        }
+
+        TravelGroup group = travelGroupDao.getById(groupId);
+        if (!canAccessGroup(group)) {
+            return false;
+        }
+        if (isCurrentUserMemberOfGroup(groupId)) {
+            return true;
+        }
+
+        groupMembershipDao.insert(new GroupMembership(groupId, appSessionManager.getCurrentUserId()));
+        return true;
+    }
+
+    public boolean leaveGroup(long groupId) {
+        if (isCurrentUserAnonymous()) {
+            return false;
+        }
+
+        TravelGroup group = travelGroupDao.getById(groupId);
+        if (group == null || group.getCreatorId() == appSessionManager.getCurrentUserId()) {
+            return false;
+        }
+
+        GroupMembership membership = groupMembershipDao.getByGroupIdAndUserId(
+                groupId,
+                appSessionManager.getCurrentUserId()
+        );
+        if (membership == null) {
+            return false;
+        }
+
+        groupMembershipDao.delete(membership);
+        return true;
+    }
+
+    public boolean isCurrentUserMemberOfGroup(long groupId) {
+        if (isCurrentUserAnonymous()) {
+            return false;
+        }
+        return groupMembershipDao.getByGroupIdAndUserId(groupId, appSessionManager.getCurrentUserId()) != null;
+    }
+
+    public int getGroupMemberCount(long groupId) {
+        return groupMembershipDao.countByGroupId(groupId);
+    }
+
+    public String getGroupCreatorLabel(TravelGroup group) {
+        if (group == null) {
+            return "";
+        }
+        User creator = getUserById(group.getCreatorId());
+        return creator == null ? getStringResource(R.string.travelshare_unknown_user) : creator.getUsername();
+    }
+
+    public List<PhotoMetadata> getPhotoMetadataForGroup(long groupId) {
+        TravelGroup group = getGroupById(groupId);
+        if (group == null) {
+            return Collections.emptyList();
+        }
+
+        List<PhotoMetadata> result = new ArrayList<>();
+        for (PhotoMetadata photoMetadata : getPhotoMetadataList()) {
+            if (photoMetadata.getGroupId() != null && photoMetadata.getGroupId() == groupId) {
+                result.add(photoMetadata);
+            }
+        }
+        return result;
     }
 
     public List<Comment> getCommentsForPhoto(long photoId) {
@@ -260,6 +443,7 @@ public class TravelShareRepository {
                 System.currentTimeMillis()
         );
         commentDao.insert(comment);
+        notifyPhotoAuthorAboutComment(photoId, normalizedText);
         return comment;
     }
 
@@ -281,6 +465,7 @@ public class TravelShareRepository {
                 photoId,
                 SocialInteractionType.LIKE
         ));
+        notifyPhotoAuthorAboutLike(photoId);
         return true;
     }
 
@@ -324,6 +509,62 @@ public class TravelShareRepository {
         ) != null;
     }
 
+    public boolean isCurrentUserAuthorOfPhoto(long photoId) {
+        PhotoMetadata photoMetadata = getPhotoMetadataById(photoId);
+        return photoMetadata != null
+                && !isCurrentUserAnonymous()
+                && photoMetadata.getAuthorId() == appSessionManager.getCurrentUserId();
+    }
+
+    public boolean deletePhotoMetadata(long photoId) {
+        PhotoMetadata photoMetadata = photoMetadataDao.getById(photoId);
+        if (photoMetadata == null || !isCurrentUserAuthorOfPhoto(photoId)) {
+            return false;
+        }
+
+        deleteLocalVoiceNoteIfPossible(photoMetadata.getAudioNoteUrl());
+        commentDao.deleteByPhotoId(photoId);
+        socialInteractionDao.deleteByPhotoId(photoId);
+        notificationDao.deleteByRelatedPhotoId(photoId);
+        photoMetadataDao.deleteById(photoId);
+        mediaDao.deleteById(photoMetadata.getMediaId());
+        locationDao.deleteById(photoMetadata.getLocationId());
+        return true;
+    }
+
+    public List<Notification> getNotificationsForCurrentUser() {
+        return notificationDao.getByTargetUserId(appSessionManager.getCurrentUserId());
+    }
+
+    public int getUnreadNotificationsCountForCurrentUser() {
+        return notificationDao.countUnreadByTargetUserId(appSessionManager.getCurrentUserId());
+    }
+
+    public void markCurrentUserNotificationsAsRead() {
+        notificationDao.markAllAsRead(appSessionManager.getCurrentUserId());
+    }
+
+    public void dispatchPendingSystemNotifications() {
+        if (isCurrentUserAnonymous()) {
+            return;
+        }
+
+        for (Notification notification : notificationDao.getUndeliveredByTargetUserId(appSessionManager.getCurrentUserId())) {
+            if (!getCurrentUserPreferences().isNotificationsEnabled()) {
+                return;
+            }
+
+            boolean shown = TravelShareSystemNotifier.showNotification(
+                    appContext,
+                    notification,
+                    getNotificationTypeLabel(notification)
+            );
+            if (shown) {
+                notificationDao.markAsDelivered(notification.getNotifId());
+            }
+        }
+    }
+
     public int resolveMediaResourceId(Context context, PhotoMetadata photoMetadata) {
         Media media = getMediaById(photoMetadata.getMediaId());
         if (media == null) {
@@ -360,7 +601,9 @@ public class TravelShareRepository {
     public void loadUserAvatarIntoImageView(ImageView imageView, User user) {
         if (user == null || user.getAvatarUri() == null || user.getAvatarUri().trim().isEmpty()) {
             imageView.setImageResource(android.R.drawable.ic_menu_myplaces);
-            imageView.setImageTintList(android.content.res.ColorStateList.valueOf(0xFF0F172A));
+            imageView.setImageTintList(android.content.res.ColorStateList.valueOf(
+                    ContextCompat.getColor(appContext, R.color.app_text_primary)
+            ));
             return;
         }
 
@@ -372,7 +615,9 @@ public class TravelShareRepository {
         }
 
         imageView.setImageResource(android.R.drawable.ic_menu_myplaces);
-        imageView.setImageTintList(android.content.res.ColorStateList.valueOf(0xFF0F172A));
+        imageView.setImageTintList(android.content.res.ColorStateList.valueOf(
+                ContextCompat.getColor(appContext, R.color.app_text_primary)
+        ));
     }
 
     public String getLocationLabel(PhotoMetadata photoMetadata) {
@@ -394,14 +639,21 @@ public class TravelShareRepository {
             return "";
         }
 
-        return "Rejoindre " + location.getAddress()
-                + ", " + location.getCity()
-                + ". Ouvrez l'itinéraire pour un guidage détaillé jusqu'au point photo.";
+        if (Double.isNaN(location.getLatitude()) || Double.isNaN(location.getLongitude())) {
+            return getStringResource(R.string.travelshare_route_advice_missing_coordinates);
+        }
+
+        return appContext.getString(
+                R.string.travelshare_route_advice_format,
+                location.getAddress(),
+                location.getCity()
+        );
     }
 
     public String getSearchableText(PhotoMetadata photoMetadata) {
         Location location = getLocationById(photoMetadata.getLocationId());
         User author = getUserById(photoMetadata.getAuthorId());
+        TravelGroup group = photoMetadata.getGroupId() == null ? null : travelGroupDao.getById(photoMetadata.getGroupId());
         StringBuilder builder = new StringBuilder();
         builder.append(photoMetadata.getTitle()).append(' ')
                 .append(photoMetadata.getDescription()).append(' ')
@@ -415,6 +667,10 @@ public class TravelShareRepository {
             builder.append(location.getAddress()).append(' ')
                     .append(location.getCity()).append(' ')
                     .append(location.getCountry()).append(' ');
+        }
+
+        if (group != null) {
+            builder.append(group.getGroupName()).append(' ');
         }
 
         for (String tag : photoMetadata.getTags()) {
@@ -718,6 +974,205 @@ public class TravelShareRepository {
         return 1;
     }
 
+    public String getNotificationTypeLabel(Notification notification) {
+        if (notification == null) {
+            return "";
+        }
+
+        switch (notification.getTriggerType()) {
+            case NEW_POST_IN_GROUP:
+                return getStringResource(R.string.notifications_type_group_post);
+            case LIKE_ON_PHOTO:
+                return getStringResource(R.string.notifications_type_like);
+            case COMMENT_ON_PHOTO:
+                return getStringResource(R.string.notifications_type_comment);
+            case NEW_POST_BY_USER:
+            case NEW_POST_IN_LOCATION:
+            case NEW_TAG_MATCH:
+            default:
+                return getStringResource(R.string.notifications_type_new_post);
+        }
+    }
+
+    public String getPlaceTypeLabel(PlaceType placeType) {
+        if (placeType == null) {
+            return getStringResource(R.string.travelshare_place_type_other);
+        }
+
+        switch (placeType) {
+            case NATURE:
+                return getStringResource(R.string.travelshare_place_type_nature);
+            case MUSEUM:
+                return getStringResource(R.string.travelshare_place_type_museum);
+            case STREET:
+                return getStringResource(R.string.travelshare_place_type_street);
+            case SHOP:
+                return getStringResource(R.string.travelshare_place_type_shop);
+            case RESTAURANT:
+                return getStringResource(R.string.travelshare_place_type_restaurant);
+            case OTHER:
+            default:
+                return getStringResource(R.string.travelshare_place_type_other);
+        }
+    }
+
+    public String getGroupLabel(PhotoMetadata photoMetadata) {
+        if (photoMetadata == null || photoMetadata.getGroupId() == null) {
+            return "";
+        }
+
+        TravelGroup group = travelGroupDao.getById(photoMetadata.getGroupId());
+        return group == null ? "" : group.getGroupName();
+    }
+
+    private void notifyUsersAboutNewPost(PhotoMetadata photoMetadata) {
+        User author = getUserById(photoMetadata.getAuthorId());
+        if (author == null) {
+            return;
+        }
+
+        for (User user : userDao.getAllRegisteredUsers()) {
+            if (user.getUserId() == photoMetadata.getAuthorId()) {
+                continue;
+            }
+            if (!getOrCreatePreferencesForUser(user.getUserId()).isNotificationsEnabled()) {
+                continue;
+            }
+
+            createNotification(
+                    user.getUserId(),
+                    photoMetadata.getPhotoId(),
+                    appContext.getString(
+                            R.string.notifications_message_new_post_by_user,
+                            author.getUsername(),
+                            photoMetadata.getTitle()
+                    ),
+                    NotificationTriggerType.NEW_POST_BY_USER
+            );
+        }
+    }
+
+    private void notifyGroupMembersAboutNewPost(PhotoMetadata photoMetadata) {
+        if (photoMetadata == null || photoMetadata.getGroupId() == null) {
+            return;
+        }
+
+        TravelGroup group = travelGroupDao.getById(photoMetadata.getGroupId());
+        User author = getUserById(photoMetadata.getAuthorId());
+        if (group == null || author == null) {
+            return;
+        }
+
+        for (GroupMembership membership : groupMembershipDao.getByGroupId(group.getGroupId())) {
+            if (membership.getUserId() == photoMetadata.getAuthorId()) {
+                continue;
+            }
+            if (!getOrCreatePreferencesForUser(membership.getUserId()).isNotificationsEnabled()) {
+                continue;
+            }
+
+            createNotification(
+                    membership.getUserId(),
+                    photoMetadata.getPhotoId(),
+                    appContext.getString(
+                            R.string.notifications_message_new_post_in_group,
+                            author.getUsername(),
+                            group.getGroupName()
+                    ),
+                    NotificationTriggerType.NEW_POST_IN_GROUP
+            );
+        }
+    }
+
+    private void notifyPhotoAuthorAboutComment(long photoId, String commentText) {
+        PhotoMetadata photoMetadata = getPhotoMetadataById(photoId);
+        User actor = getCurrentUser();
+        if (photoMetadata == null || actor == null || actor.isAnonymous()) {
+            return;
+        }
+        if (photoMetadata.getAuthorId() == actor.getUserId()) {
+            return;
+        }
+        if (!getOrCreatePreferencesForUser(photoMetadata.getAuthorId()).isNotificationsEnabled()) {
+            return;
+        }
+
+        createNotification(
+                photoMetadata.getAuthorId(),
+                photoId,
+                appContext.getString(
+                        R.string.notifications_message_comment_on_photo,
+                        actor.getUsername(),
+                        commentText
+                ),
+                NotificationTriggerType.COMMENT_ON_PHOTO
+        );
+    }
+
+    private void notifyPhotoAuthorAboutLike(long photoId) {
+        PhotoMetadata photoMetadata = getPhotoMetadataById(photoId);
+        User actor = getCurrentUser();
+        if (photoMetadata == null || actor == null || actor.isAnonymous()) {
+            return;
+        }
+        if (photoMetadata.getAuthorId() == actor.getUserId()) {
+            return;
+        }
+        if (!getOrCreatePreferencesForUser(photoMetadata.getAuthorId()).isNotificationsEnabled()) {
+            return;
+        }
+
+        createNotification(
+                photoMetadata.getAuthorId(),
+                photoId,
+                appContext.getString(
+                        R.string.notifications_message_like_on_photo,
+                        actor.getUsername(),
+                        photoMetadata.getTitle()
+                ),
+                NotificationTriggerType.LIKE_ON_PHOTO
+        );
+    }
+
+    private void createNotification(
+            long targetUserId,
+            long relatedPhotoId,
+            String message,
+            NotificationTriggerType triggerType
+    ) {
+        notificationDao.insert(new Notification(
+                notificationDao.getMaxNotificationId() + 1L,
+                targetUserId,
+                relatedPhotoId,
+                message,
+                triggerType,
+                false,
+                false,
+                System.currentTimeMillis()
+        ));
+
+        if (targetUserId == appSessionManager.getCurrentUserId()) {
+            dispatchPendingSystemNotifications();
+        }
+    }
+
+    private void deleteLocalVoiceNoteIfPossible(String voiceNotePath) {
+        if (TextUtils.isEmpty(voiceNotePath)) {
+            return;
+        }
+
+        String normalizedPath = voiceNotePath.trim();
+        if (normalizedPath.startsWith("content://") || normalizedPath.startsWith("file://")) {
+            return;
+        }
+
+        try {
+            new File(normalizedPath).delete();
+        } catch (Exception ignored) {
+            // Best effort only.
+        }
+    }
+
     private void seedDatabaseIfNeeded() {
         if (photoMetadataDao.countAll() > 0) {
             return;
@@ -733,6 +1188,21 @@ public class TravelShareRepository {
         appPreferencesDao.insert(new AppPreferences(1L, 1L, AppTheme.SYSTEM, "fr", true));
         appPreferencesDao.insert(new AppPreferences(2L, 2L, AppTheme.SYSTEM, "fr", true));
         appPreferencesDao.insert(new AppPreferences(3L, 3L, AppTheme.SYSTEM, "fr", true));
+
+        travelGroupDao.insertAll(Arrays.asList(
+                new TravelGroup(401L, "Escapades urbaines", 1L, false),
+                new TravelGroup(402L, "Paris culture privée", 2L, true),
+                new TravelGroup(403L, "Food trips Europe", 3L, false)
+        ));
+
+        groupMembershipDao.insertAll(Arrays.asList(
+                new GroupMembership(401L, 1L),
+                new GroupMembership(401L, 2L),
+                new GroupMembership(402L, 2L),
+                new GroupMembership(402L, 3L),
+                new GroupMembership(403L, 3L),
+                new GroupMembership(403L, 1L)
+        ));
 
         locationDao.insertAll(Arrays.asList(
                 new Location(101L, 48.85837, 2.294481, "Champ de Mars", "Paris", "France"),
@@ -759,42 +1229,159 @@ public class TravelShareRepository {
         ));
 
         photoMetadataDao.insertAll(Arrays.asList(
-                new PhotoMetadata(301L, 2L, "Balade au lever du soleil",
+                new PhotoMetadata(
+                        301L,
+                        2L,
+                        "Balade au lever du soleil",
                         "Une promenade matinale le long de la Seine avec une vue magnifique sur la Tour Eiffel.",
-                        1775944800000L, 101L, 201L, 0d, "06:00", "22:00", ActivityType.LEISURE,
-                        Arrays.asList("sunrise", "eiffel", "seine"), PlaceType.STREET),
-                new PhotoMetadata(302L, 3L, "Musée du Louvre",
+                        1775944800000L,
+                        101L,
+                        201L,
+                        0d,
+                        "06:00",
+                        "22:00",
+                        ActivityType.LEISURE,
+                        401L,
+                        null,
+                        Arrays.asList("sunrise", "eiffel", "seine"),
+                        PlaceType.STREET
+                ),
+                new PhotoMetadata(
+                        302L,
+                        3L,
+                        "Musée du Louvre",
                         "Une visite culturelle autour des galeries du Louvre et des façades historiques du centre de Paris.",
-                        1772586000000L, 102L, 202L, 35d, "09:00", "18:00", ActivityType.CULTURAL,
-                        Arrays.asList("louvre", "museum", "paris"), PlaceType.MUSEUM),
-                new PhotoMetadata(303L, 2L, "Balade sur l'île de la Cité",
+                        1772586000000L,
+                        102L,
+                        202L,
+                        35d,
+                        "09:00",
+                        "18:00",
+                        ActivityType.CULTURAL,
+                        402L,
+                        null,
+                        Arrays.asList("louvre", "museum", "paris"),
+                        PlaceType.MUSEUM
+                ),
+                new PhotoMetadata(
+                        303L,
+                        2L,
+                        "Balade sur l'île de la Cité",
                         "Découverte du coeur historique de Paris, entre ponts, quais et architecture emblématique.",
-                        1771138800000L, 103L, 203L, 20d, "08:30", "19:00", ActivityType.CULTURAL,
-                        Arrays.asList("cite", "history", "paris"), PlaceType.MUSEUM),
-                new PhotoMetadata(304L, 1L, "Saveurs de Montmartre",
+                        1771138800000L,
+                        103L,
+                        203L,
+                        20d,
+                        "08:30",
+                        "19:00",
+                        ActivityType.CULTURAL,
+                        402L,
+                        null,
+                        Arrays.asList("cite", "history", "paris"),
+                        PlaceType.MUSEUM
+                ),
+                new PhotoMetadata(
+                        304L,
+                        1L,
+                        "Saveurs de Montmartre",
                         "Un parcours gourmand avec haltes dans des adresses parisiennes conviviales du quartier Montmartre.",
-                        1769500800000L, 104L, 204L, 65d, "11:30", "23:00", ActivityType.FOOD,
-                        Arrays.asList("montmartre", "food", "paris"), PlaceType.RESTAURANT),
-                new PhotoMetadata(305L, 1L, "Pause café à Montmartre",
+                        1769500800000L,
+                        104L,
+                        204L,
+                        65d,
+                        "11:30",
+                        "23:00",
+                        ActivityType.FOOD,
+                        403L,
+                        null,
+                        Arrays.asList("montmartre", "food", "paris"),
+                        PlaceType.RESTAURANT
+                ),
+                new PhotoMetadata(
+                        305L,
+                        1L,
+                        "Pause café à Montmartre",
                         "Une matinée tranquille entre ruelles pavées, terrasses discrètes et vue dégagée sur les toits de Paris.",
-                        1776719400000L, 105L, 205L, 12d, "07:00", "20:00", ActivityType.FOOD,
-                        Arrays.asList("paris", "montmartre", "coffee"), PlaceType.STREET),
-                new PhotoMetadata(306L, 2L, "Pause verte au Luxembourg",
+                        1776719400000L,
+                        105L,
+                        205L,
+                        12d,
+                        "07:00",
+                        "20:00",
+                        ActivityType.FOOD,
+                        401L,
+                        null,
+                        Arrays.asList("paris", "montmartre", "coffee"),
+                        PlaceType.STREET
+                ),
+                new PhotoMetadata(
+                        306L,
+                        2L,
+                        "Pause verte au Luxembourg",
                         "Un itinéraire détente entre allées arborées et fontaines du Jardin du Luxembourg.",
-                        1773282600000L, 106L, 206L, 0d, "08:00", "21:00", ActivityType.LEISURE,
-                        Arrays.asList("luxembourg", "garden", "paris"), PlaceType.NATURE),
-                new PhotoMetadata(307L, 3L, "Soirée sur les Champs-Élysées",
+                        1773282600000L,
+                        106L,
+                        206L,
+                        0d,
+                        "08:00",
+                        "21:00",
+                        ActivityType.LEISURE,
+                        null,
+                        null,
+                        Arrays.asList("luxembourg", "garden", "paris"),
+                        PlaceType.NATURE
+                ),
+                new PhotoMetadata(
+                        307L,
+                        3L,
+                        "Soirée sur les Champs-Élysées",
                         "Un parcours urbain vivant en fin de journée, entre vitrines, places et ambiance parisienne.",
-                        1771738200000L, 107L, 207L, 0d, "10:00", "22:00", ActivityType.LEISURE,
-                        Arrays.asList("champs", "street", "paris"), PlaceType.STREET),
-                new PhotoMetadata(308L, 1L, "Dîner près de la Concorde",
+                        1771738200000L,
+                        107L,
+                        207L,
+                        0d,
+                        "10:00",
+                        "22:00",
+                        ActivityType.LEISURE,
+                        null,
+                        null,
+                        Arrays.asList("champs", "street", "paris"),
+                        PlaceType.STREET
+                ),
+                new PhotoMetadata(
+                        308L,
+                        1L,
+                        "Dîner près de la Concorde",
                         "Une fin de parcours confortable avec une table parisienne proche de la place de la Concorde.",
-                        1770170400000L, 108L, 208L, 85d, "12:00", "23:30", ActivityType.FOOD,
-                        Arrays.asList("concorde", "restaurant", "paris"), PlaceType.RESTAURANT),
-                new PhotoMetadata(309L, 2L, "Dîner gastronomique Tour Eiffel",
+                        1770170400000L,
+                        108L,
+                        208L,
+                        85d,
+                        "12:00",
+                        "23:30",
+                        ActivityType.FOOD,
+                        403L,
+                        null,
+                        Arrays.asList("concorde", "restaurant", "paris"),
+                        PlaceType.RESTAURANT
+                ),
+                new PhotoMetadata(
+                        309L,
+                        2L,
+                        "Dîner gastronomique Tour Eiffel",
                         "Expérience gastronomique premium avec vue panoramique sur Paris depuis la Tour Eiffel.",
-                        1777903200000L, 109L, 209L, 320d, "12:00", "23:00", ActivityType.FOOD,
-                        Arrays.asList("jules-verne", "fine-dining", "eiffel"), PlaceType.RESTAURANT)
+                        1777903200000L,
+                        109L,
+                        209L,
+                        320d,
+                        "12:00",
+                        "23:00",
+                        ActivityType.FOOD,
+                        null,
+                        null,
+                        Arrays.asList("jules-verne", "fine-dining", "eiffel"),
+                        PlaceType.RESTAURANT
+                )
         ));
 
         commentDao.insertAll(Arrays.asList(
@@ -838,6 +1425,32 @@ public class TravelShareRepository {
         AppPreferences defaultPreferences = new AppPreferences(userId, userId, AppTheme.SYSTEM, "fr", true);
         appPreferencesDao.insert(defaultPreferences);
         return defaultPreferences;
+    }
+
+    private boolean canAccessPhotoMetadata(PhotoMetadata photoMetadata) {
+        if (photoMetadata == null) {
+            return false;
+        }
+        if (photoMetadata.getGroupId() == null) {
+            return true;
+        }
+
+        TravelGroup group = travelGroupDao.getById(photoMetadata.getGroupId());
+        return canAccessGroup(group);
+    }
+
+    private boolean canAccessGroup(TravelGroup group) {
+        if (group == null) {
+            return false;
+        }
+        if (!group.isPrivate()) {
+            return true;
+        }
+        return isCurrentUserMemberOfGroup(group.getGroupId());
+    }
+
+    private String getStringResource(int resId) {
+        return appContext.getString(resId);
     }
 
     public static class ProfileStats {

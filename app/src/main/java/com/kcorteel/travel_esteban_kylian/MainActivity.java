@@ -9,6 +9,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.kcorteel.travel_esteban_kylian.auth.AuthManager;
 import com.kcorteel.travel_esteban_kylian.travelshare.repository.TravelShareRepository;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.User;
+import com.kcorteel.travel_esteban_kylian.travelshare.notifications.TravelShareSystemNotifier;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,14 +30,30 @@ public class MainActivity extends AppCompatActivity {
     private Button btnLogout;
     private TextView tvSessionStatus;
     private AuthManager authManager;
+    private TravelShareRepository travelShareRepository;
+    private ActivityResultLauncher<String> notificationsPermissionLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        TravelShareRepository.getInstance(this).applyCurrentUserThemePreference();
+        travelShareRepository = TravelShareRepository.getInstance(this);
+        travelShareRepository.applyCurrentUserDisplayPreferences();
         setContentView(R.layout.activity_main);
 
         authManager = new AuthManager(this);
+        notificationsPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        travelShareRepository.dispatchPendingSystemNotifications();
+                    }
+                }
+        );
+        TravelShareSystemNotifier.ensureChannel(this);
+        TravelShareSystemNotifier.requestPermissionIfNeeded(
+                this,
+                notificationsPermissionLauncher
+        );
 
         Button btnTravelShare = findViewById(R.id.btnTravelShare);
         Button btnTravelPath = findViewById(R.id.btnTravelPath);
@@ -71,7 +90,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        travelShareRepository.applyCurrentUserDisplayPreferences();
         updateSessionUi();
+        travelShareRepository.dispatchPendingSystemNotifications();
     }
 
     private void updateSessionUi() {
@@ -84,10 +105,10 @@ public class MainActivity extends AppCompatActivity {
             tvSessionStatus.setText(getString(R.string.auth_status_connected_format, currentUser.getUsername()));
         }
 
-        btnLogin.setEnabled(anonymous);
-        btnRegister.setEnabled(anonymous);
-        btnAnonymous.setEnabled(!anonymous);
-        btnLogout.setEnabled(!anonymous);
+        btnLogin.setVisibility(anonymous ? android.view.View.VISIBLE : android.view.View.GONE);
+        btnRegister.setVisibility(anonymous ? android.view.View.VISIBLE : android.view.View.GONE);
+        btnAnonymous.setVisibility(android.view.View.GONE);
+        btnLogout.setVisibility(anonymous ? android.view.View.GONE : android.view.View.VISIBLE);
     }
 
     private void ensureLocationPermission() {

@@ -1,13 +1,20 @@
 package com.kcorteel.travel_esteban_kylian.travelshare.model;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "notifications")
 public class Notification {
 
+    @PrimaryKey
     private final long notifId;
     private final long targetUserId;
     private final long relatedPhotoId;
     private final String message;
     private final NotificationTriggerType triggerType;
     private final boolean isRead;
+    private final boolean isDelivered;
+    private final long createdAt;
 
     public Notification(
             long notifId,
@@ -15,7 +22,9 @@ public class Notification {
             long relatedPhotoId,
             String message,
             NotificationTriggerType triggerType,
-            boolean isRead
+            boolean isRead,
+            boolean isDelivered,
+            long createdAt
     ) {
         this.notifId = notifId;
         this.targetUserId = targetUserId;
@@ -23,6 +32,8 @@ public class Notification {
         this.message = message;
         this.triggerType = triggerType;
         this.isRead = isRead;
+        this.isDelivered = isDelivered;
+        this.createdAt = createdAt;
     }
 
     public long getNotifId() {
@@ -47,5 +58,13 @@ public class Notification {
 
     public boolean isRead() {
         return isRead;
+    }
+
+    public boolean isDelivered() {
+        return isDelivered;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
     }
 }

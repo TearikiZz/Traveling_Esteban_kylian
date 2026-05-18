@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <queries>
         <package android:name="com.google.android.apps.maps" />
@@ -42,6 +44,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Travel_Esteban_kylian"
         tools:targetApi="31">
+        <activity android:name=".TravelShareGroupDetailActivity" />
+        <activity android:name=".TravelShareGroupsActivity" />
+        <activity android:name=".NotificationsActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".CreatePhotoMetadataActivity" />
         <activity android:name=".RegisterActivity" />

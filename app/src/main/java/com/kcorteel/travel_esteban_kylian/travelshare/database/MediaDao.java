@@ -23,4 +23,7 @@ public interface MediaDao {
 
     @Query("SELECT COALESCE(MAX(mediaId), 0) FROM media")
     long getMaxMediaId();
+
+    @Query("DELETE FROM media WHERE mediaId = :mediaId")
+    void deleteById(long mediaId);
 }

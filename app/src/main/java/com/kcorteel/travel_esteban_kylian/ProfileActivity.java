@@ -35,6 +35,7 @@ public class ProfileActivity extends AppCompatActivity {
     private Spinner themeSpinner;
     private Spinner languageSpinner;
     private SwitchCompat notificationsSwitch;
+    private TextView notificationsSummaryTextView;
 
     private TravelShareRepository travelShareRepository;
     private AuthManager authManager;
@@ -45,7 +46,7 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         travelShareRepository = TravelShareRepository.getInstance(this);
-        travelShareRepository.applyCurrentUserThemePreference();
+        travelShareRepository.applyCurrentUserDisplayPreferences();
         setContentView(R.layout.activity_profile);
 
         authManager = new AuthManager(this);
@@ -62,6 +63,12 @@ public class ProfileActivity extends AppCompatActivity {
         bindProfile();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        bindProfile();
+    }
+
     private void bindViews() {
         avatarImageView = findViewById(R.id.ivProfileAvatar);
         usernameEditText = findViewById(R.id.etProfileUsername);
@@ -74,6 +81,7 @@ public class ProfileActivity extends AppCompatActivity {
         themeSpinner = findViewById(R.id.spinnerProfileTheme);
         languageSpinner = findViewById(R.id.spinnerProfileLanguage);
         notificationsSwitch = findViewById(R.id.switchProfileNotifications);
+        notificationsSummaryTextView = findViewById(R.id.tvProfileNotificationsSummary);
     }
 
     private void setupSpinners() {
@@ -117,10 +125,14 @@ public class ProfileActivity extends AppCompatActivity {
         Button changeAvatarButton = findViewById(R.id.btnChangeAvatar);
         Button saveProfileButton = findViewById(R.id.btnSaveProfile);
         Button logoutButton = findViewById(R.id.btnProfileLogout);
+        Button openNotificationsButton = findViewById(R.id.btnOpenNotifications);
 
         changeAvatarButton.setOnClickListener(v -> openDocumentLauncher.launch(new String[]{"image/*"}));
         saveProfileButton.setOnClickListener(v -> saveProfile());
         logoutButton.setOnClickListener(v -> logout());
+        openNotificationsButton.setOnClickListener(v ->
+                startActivity(new Intent(this, NotificationsActivity.class))
+        );
     }
 
     private void bindProfile() {
@@ -150,6 +162,10 @@ public class ProfileActivity extends AppCompatActivity {
         themeSpinner.setSelection(mapThemeToSelection(preferences.getTheme()));
         languageSpinner.setSelection(mapLanguageToSelection(preferences.getLanguage()));
         notificationsSwitch.setChecked(preferences.isNotificationsEnabled());
+        int unreadNotificationsCount = travelShareRepository.getUnreadNotificationsCountForCurrentUser();
+        notificationsSummaryTextView.setText(unreadNotificationsCount == 0
+                ? getString(R.string.profile_notifications_none)
+                : getString(R.string.profile_notifications_unread_format, unreadNotificationsCount));
     }
 
     private void saveProfile() {
@@ -169,7 +185,7 @@ public class ProfileActivity extends AppCompatActivity {
                 mapSelectionToLanguage(languageSpinner.getSelectedItemPosition()),
                 notificationsSwitch.isChecked()
         );
-        travelShareRepository.applyCurrentUserThemePreference();
+        travelShareRepository.applyCurrentUserDisplayPreferences();
         bindProfile();
         Toast.makeText(this, R.string.profile_saved_message, Toast.LENGTH_SHORT).show();
     }
@@ -210,9 +226,6 @@ public class ProfileActivity extends AppCompatActivity {
         if ("en".equalsIgnoreCase(language)) {
             return 1;
         }
-        if ("es".equalsIgnoreCase(language)) {
-            return 2;
-        }
         return 0;
     }
 
@@ -220,8 +233,6 @@ public class ProfileActivity extends AppCompatActivity {
         switch (position) {
             case 1:
                 return "en";
-            case 2:
-                return "es";
             case 0:
             default:
                 return "fr";

@@ -2,6 +2,7 @@ package com.kcorteel.travel_esteban_kylian;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -11,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,11 +36,15 @@ public class TravelShareDetailActivity extends AppCompatActivity {
     private TextView locationTextView;
     private TextView dateTextView;
     private TextView descriptionTextView;
+    private TextView voiceNoteLabelTextView;
     private TextView tagsTextView;
     private TextView routeAdviceTextView;
     private TextView commentsCountTextView;
+    private Button openGroupButton;
+    private Button playVoiceNoteButton;
     private Button likeButton;
     private Button reportButton;
+    private Button deleteButton;
     private Button directionsButton;
     private Button addCommentButton;
     private EditText commentEditText;
@@ -48,13 +54,14 @@ public class TravelShareDetailActivity extends AppCompatActivity {
     private CommentAdapter commentAdapter;
     private PhotoMetadata photoMetadata;
     private long photoId;
+    private MediaPlayer voiceNotePlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_travel_share_detail);
-
         travelShareRepository = TravelShareRepository.getInstance(this);
+        travelShareRepository.applyCurrentUserDisplayPreferences();
+        setContentView(R.layout.activity_travel_share_detail);
         photoId = getIntent().getLongExtra(EXTRA_PHOTO_ID, -1L);
         photoMetadata = travelShareRepository.getPhotoMetadataById(photoId);
 
@@ -86,11 +93,15 @@ public class TravelShareDetailActivity extends AppCompatActivity {
         locationTextView = findViewById(R.id.tvDetailPhotoMetadataLocation);
         dateTextView = findViewById(R.id.tvDetailPhotoMetadataDate);
         descriptionTextView = findViewById(R.id.tvDetailPhotoMetadataDescription);
+        voiceNoteLabelTextView = findViewById(R.id.tvVoiceNoteLabel);
+        playVoiceNoteButton = findViewById(R.id.btnPlayVoiceNote);
         tagsTextView = findViewById(R.id.tvDetailPhotoMetadataTags);
         routeAdviceTextView = findViewById(R.id.tvDetailPhotoMetadataRouteAdvice);
         commentsCountTextView = findViewById(R.id.tvCommentsCount);
+        openGroupButton = findViewById(R.id.btnOpenPhotoGroup);
         likeButton = findViewById(R.id.btnLikePhotoMetadata);
         reportButton = findViewById(R.id.btnReportPhotoMetadata);
+        deleteButton = findViewById(R.id.btnDeletePhotoMetadata);
         directionsButton = findViewById(R.id.btnOpenDirections);
         addCommentButton = findViewById(R.id.btnAddComment);
         commentEditText = findViewById(R.id.etAddComment);
@@ -115,16 +126,24 @@ public class TravelShareDetailActivity extends AppCompatActivity {
                 R.string.travelshare_author_format,
                 travelShareRepository.getAuthorLabel(photoMetadata)
         ));
+        String groupLabel = travelShareRepository.getGroupLabel(photoMetadata);
+        if (groupLabel.isEmpty()) {
+            openGroupButton.setVisibility(android.view.View.GONE);
+        } else {
+            openGroupButton.setVisibility(android.view.View.VISIBLE);
+            openGroupButton.setText(getString(R.string.travelshare_post_group_format, groupLabel));
+        }
         locationTextView.setText(getString(
                 R.string.travelshare_location_format,
                 travelShareRepository.getLocationLabel(photoMetadata)
         ));
         dateTextView.setText(getString(
                 R.string.travelshare_date_format,
-                DateFormat.getDateInstance(DateFormat.LONG, Locale.FRANCE)
+                DateFormat.getDateInstance(DateFormat.LONG, travelShareRepository.getCurrentLocale())
                         .format(new Date(photoMetadata.getTimestamp()))
         ));
         descriptionTextView.setText(photoMetadata.getDescription());
+        bindVoiceNote();
         tagsTextView.setText(getString(
                 R.string.travelshare_tags_format,
                 TextUtils.join(", ", photoMetadata.getTags())
@@ -137,6 +156,7 @@ public class TravelShareDetailActivity extends AppCompatActivity {
 
         updateLikeButton();
         updateReportButton();
+        updateDeleteButton();
         updateCommentInputState();
     }
 
@@ -167,9 +187,13 @@ public class TravelShareDetailActivity extends AppCompatActivity {
             Toast.makeText(this, messageRes, Toast.LENGTH_SHORT).show();
         });
 
+        openGroupButton.setOnClickListener(v -> openPhotoGroup());
+        playVoiceNoteButton.setOnClickListener(v -> toggleVoiceNotePlayback());
+
         directionsButton.setOnClickListener(v -> openDirections());
 
         addCommentButton.setOnClickListener(v -> addComment());
+        deleteButton.setOnClickListener(v -> confirmDeletePhotoMetadata());
     }
 
     private void updateLikeButton() {
@@ -187,6 +211,14 @@ public class TravelShareDetailActivity extends AppCompatActivity {
         reportButton.setText(reported
                 ? R.string.travelshare_reported_button
                 : R.string.travelshare_report_button);
+    }
+
+    private void updateDeleteButton() {
+        deleteButton.setVisibility(
+                travelShareRepository.isCurrentUserAuthorOfPhoto(photoId)
+                        ? android.view.View.VISIBLE
+                        : android.view.View.GONE
+        );
     }
 
     private void addComment() {
@@ -220,6 +252,11 @@ public class TravelShareDetailActivity extends AppCompatActivity {
         Location location = travelShareRepository.getLocationById(photoMetadata.getLocationId());
         if (location == null) {
             Toast.makeText(this, R.string.travelshare_no_map_app, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (Double.isNaN(location.getLatitude()) || Double.isNaN(location.getLongitude())) {
+            Toast.makeText(this, R.string.travelshare_directions_missing_coordinates, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -266,5 +303,90 @@ public class TravelShareDetailActivity extends AppCompatActivity {
         } catch (ActivityNotFoundException exception) {
             return false;
         }
+    }
+
+    private void confirmDeletePhotoMetadata() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.travelshare_delete_confirm_title)
+                .setMessage(R.string.travelshare_delete_confirm_message)
+                .setPositiveButton(R.string.travelshare_delete_button, (dialog, which) -> deletePhotoMetadata())
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void deletePhotoMetadata() {
+        boolean deleted = travelShareRepository.deletePhotoMetadata(photoId);
+        if (!deleted) {
+            Toast.makeText(this, R.string.travelshare_delete_error, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Toast.makeText(this, R.string.travelshare_delete_success, Toast.LENGTH_SHORT).show();
+        finish();
+    }
+
+    private void bindVoiceNote() {
+        String voiceNotePath = photoMetadata == null ? null : photoMetadata.getAudioNoteUrl();
+        boolean hasVoiceNote = voiceNotePath != null && !voiceNotePath.trim().isEmpty();
+        voiceNoteLabelTextView.setVisibility(hasVoiceNote ? android.view.View.VISIBLE : android.view.View.GONE);
+        playVoiceNoteButton.setVisibility(hasVoiceNote ? android.view.View.VISIBLE : android.view.View.GONE);
+        playVoiceNoteButton.setText(R.string.travelshare_voice_note_play_button);
+    }
+
+    private void toggleVoiceNotePlayback() {
+        if (photoMetadata == null || TextUtils.isEmpty(photoMetadata.getAudioNoteUrl())) {
+            return;
+        }
+
+        if (voiceNotePlayer != null && voiceNotePlayer.isPlaying()) {
+            stopVoiceNotePlayback();
+            playVoiceNoteButton.setText(R.string.travelshare_voice_note_play_button);
+            return;
+        }
+
+        try {
+            voiceNotePlayer = new MediaPlayer();
+            voiceNotePlayer.setDataSource(photoMetadata.getAudioNoteUrl());
+            voiceNotePlayer.setOnCompletionListener(mp -> {
+                stopVoiceNotePlayback();
+                playVoiceNoteButton.setText(R.string.travelshare_voice_note_play_button);
+            });
+            voiceNotePlayer.prepare();
+            voiceNotePlayer.start();
+            playVoiceNoteButton.setText(R.string.travelshare_voice_note_stop_playback_button);
+        } catch (Exception exception) {
+            stopVoiceNotePlayback();
+            Toast.makeText(this, R.string.travelshare_voice_note_error, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void stopVoiceNotePlayback() {
+        if (voiceNotePlayer != null) {
+            try {
+                if (voiceNotePlayer.isPlaying()) {
+                    voiceNotePlayer.stop();
+                }
+            } catch (Exception ignored) {
+                // No-op
+            }
+            voiceNotePlayer.release();
+            voiceNotePlayer = null;
+        }
+    }
+
+    private void openPhotoGroup() {
+        if (photoMetadata == null || photoMetadata.getGroupId() == null) {
+            return;
+        }
+
+        Intent intent = new Intent(this, TravelShareGroupDetailActivity.class);
+        intent.putExtra(TravelShareGroupDetailActivity.EXTRA_GROUP_ID, photoMetadata.getGroupId());
+        startActivity(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopVoiceNotePlayback();
+        super.onDestroy();
     }
 }

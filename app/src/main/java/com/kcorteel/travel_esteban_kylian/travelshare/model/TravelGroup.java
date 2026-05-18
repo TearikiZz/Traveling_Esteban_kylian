@@ -1,7 +1,12 @@
 package com.kcorteel.travel_esteban_kylian.travelshare.model;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "travel_groups")
 public class TravelGroup {
 
+    @PrimaryKey
     private final long groupId;
     private final String groupName;
     private final long creatorId;

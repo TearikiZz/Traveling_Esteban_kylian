@@ -23,4 +23,7 @@ public interface LocationDao {
 
     @Query("SELECT COALESCE(MAX(locationId), 0) FROM locations")
     long getMaxLocationId();
+
+    @Query("DELETE FROM locations WHERE locationId = :locationId")
+    void deleteById(long locationId);
 }

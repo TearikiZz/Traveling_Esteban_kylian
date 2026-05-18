@@ -5,6 +5,7 @@ import androidx.room.TypeConverter;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.AppTheme;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.ActivityType;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.MediaType;
+import com.kcorteel.travel_esteban_kylian.travelshare.model.NotificationTriggerType;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.PlaceType;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.SocialInteractionType;
 
@@ -76,7 +77,17 @@ public class TravelShareConverters {
     }
 
     @TypeConverter
+    public static String fromNotificationTriggerType(NotificationTriggerType type) {
+        return type == null ? null : type.name();
+    }
+
+    @TypeConverter
     public static ActivityType toActivityType(String value) {
         return value == null ? ActivityType.LEISURE : ActivityType.valueOf(value);
+    }
+
+    @TypeConverter
+    public static NotificationTriggerType toNotificationTriggerType(String value) {
+        return value == null ? NotificationTriggerType.NEW_POST_BY_USER : NotificationTriggerType.valueOf(value);
     }
 }

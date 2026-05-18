@@ -32,4 +32,7 @@ public interface PhotoMetadataDao {
 
     @Query("SELECT COALESCE(MAX(photoId), 0) FROM photo_metadata")
     long getMaxPhotoId();
+
+    @Query("DELETE FROM photo_metadata WHERE photoId = :photoId")
+    void deleteById(long photoId);
 }

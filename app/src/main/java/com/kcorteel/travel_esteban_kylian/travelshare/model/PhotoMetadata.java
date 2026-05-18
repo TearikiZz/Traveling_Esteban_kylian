@@ -22,6 +22,8 @@ public class PhotoMetadata {
     private String openingTime;
     private String closingTime;
     private ActivityType activityType;
+    private Long groupId;
+    private String audioNoteUrl;
     private List<String> tags;
     private PlaceType placeType;
 
@@ -37,6 +39,8 @@ public class PhotoMetadata {
             String openingTime,
             String closingTime,
             ActivityType activityType,
+            Long groupId,
+            String audioNoteUrl,
             List<String> tags,
             PlaceType placeType
     ) {
@@ -51,6 +55,8 @@ public class PhotoMetadata {
         this.openingTime = openingTime;
         this.closingTime = closingTime;
         this.activityType = activityType;
+        this.groupId = groupId;
+        this.audioNoteUrl = audioNoteUrl;
         this.tags = new ArrayList<>(tags);
         this.placeType = placeType;
     }
@@ -97,6 +103,14 @@ public class PhotoMetadata {
 
     public ActivityType getActivityType() {
         return activityType;
+    }
+
+    public Long getGroupId() {
+        return groupId;
+    }
+
+    public String getAudioNoteUrl() {
+        return audioNoteUrl;
     }
 
     public List<String> getTags() {
