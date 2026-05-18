@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:maxLines="2"
-        android:textColor="#0F172A"
+        android:textColor="@color/app_text_primary"
         android:textSize="16sp"
         android:textStyle="bold" />
 
@@ -40,7 +40,7 @@
         android:paddingTop="5dp"
         android:paddingRight="8dp"
         android:paddingBottom="5dp"
-        android:textColor="#0F766E"
+        android:textColor="@color/app_teal"
         android:textSize="12sp"
         android:textStyle="bold"
         android:visibility="gone" />
@@ -51,7 +51,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:maxLines="2"
-        android:textColor="#2563EB"
+        android:textColor="@color/app_blue"
         android:textSize="13sp"
         android:textStyle="bold" />
 
@@ -60,7 +60,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:textColor="#64748B"
+        android:textColor="@color/app_text_secondary"
         android:textSize="12sp" />
 
     <TextView
@@ -70,7 +70,7 @@
         android:layout_marginTop="8dp"
         android:lineSpacingExtra="1dp"
         android:maxLines="4"
-        android:textColor="#334155"
+        android:textColor="@color/app_text_secondary"
         android:textSize="13sp" />
 
     <TextView
@@ -78,7 +78,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:textColor="#475569"
+        android:textColor="@color/app_text_secondary"
         android:textSize="12sp"
         android:textStyle="bold" />
 

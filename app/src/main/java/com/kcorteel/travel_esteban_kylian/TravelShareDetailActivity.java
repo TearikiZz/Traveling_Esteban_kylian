@@ -57,9 +57,9 @@ public class TravelShareDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_travel_share_detail);
-
         travelShareRepository = TravelShareRepository.getInstance(this);
+        travelShareRepository.applyCurrentUserThemePreference();
+        setContentView(R.layout.activity_travel_share_detail);
         photoId = getIntent().getLongExtra(EXTRA_PHOTO_ID, -1L);
         photoMetadata = travelShareRepository.getPhotoMetadataById(photoId);
 

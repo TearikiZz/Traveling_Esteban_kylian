@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="app_bg">#0F1720</color>
+    <color name="app_surface">#16212D</color>
+    <color name="app_surface_alt">#1C2A38</color>
+    <color name="app_text_primary">#EFF6FC</color>
+    <color name="app_text_secondary">#A5B4C5</color>
+    <color name="app_stroke">#2B3C4D</color>
+    <color name="app_blue">#6EA0FF</color>
+    <color name="app_teal">#54C8BE</color>
+    <color name="app_teal_soft">#183B38</color>
+    <color name="app_gold_soft">#463A1F</color>
+    <color name="app_red">#F87171</color>
+    <color name="app_red_soft">#402125</color>
+    <color name="app_avatar_fill">#233344</color>
+    <color name="app_avatar_stroke">#3A4F63</color>
+    <color name="app_hero_start">#1A2330</color>
+    <color name="app_hero_end">#203142</color>
+    <color name="app_fab_start">#4E7BFF</color>
+    <color name="app_fab_end">#1DAF9E</color>
+</resources>

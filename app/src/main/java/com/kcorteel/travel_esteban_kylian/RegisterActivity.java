@@ -8,6 +8,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.kcorteel.travel_esteban_kylian.auth.AuthManager;
+import com.kcorteel.travel_esteban_kylian.travelshare.repository.TravelShareRepository;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -20,6 +21,7 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TravelShareRepository.getInstance(this).applyCurrentUserThemePreference();
         setContentView(R.layout.activity_register);
 
         authManager = new AuthManager(this);

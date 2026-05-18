@@ -134,9 +134,9 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_photo_metadata);
-
         travelShareRepository = TravelShareRepository.getInstance(this);
+        travelShareRepository.applyCurrentUserThemePreference();
+        setContentView(R.layout.activity_create_photo_metadata);
         annotationProvider = new GeminiTravelShareAnnotationProvider(this);
 
         if (travelShareRepository.isCurrentUserAnonymous()) {

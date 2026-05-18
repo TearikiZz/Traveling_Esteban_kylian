@@ -11,7 +11,7 @@
         android:id="@+id/tvGroupName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#0F172A"
+        android:textColor="@color/app_text_primary"
         android:textSize="18sp"
         android:textStyle="bold" />
 
@@ -20,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:textColor="#0F766E"
+        android:textColor="@color/app_teal"
         android:textSize="13sp"
         android:textStyle="bold" />
 
@@ -29,7 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
-        android:textColor="#475569"
+        android:textColor="@color/app_text_secondary"
         android:textSize="14sp" />
 
     <TextView
@@ -37,7 +37,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:textColor="#64748B"
+        android:textColor="@color/app_text_secondary"
         android:textSize="13sp" />
 
     <LinearLayout

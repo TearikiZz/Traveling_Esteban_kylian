@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.content.ContextCompat;
 
 import com.kcorteel.travel_esteban_kylian.R;
 import com.kcorteel.travel_esteban_kylian.auth.AppSessionManager;
@@ -552,7 +553,9 @@ public class TravelShareRepository {
     public void loadUserAvatarIntoImageView(ImageView imageView, User user) {
         if (user == null || user.getAvatarUri() == null || user.getAvatarUri().trim().isEmpty()) {
             imageView.setImageResource(android.R.drawable.ic_menu_myplaces);
-            imageView.setImageTintList(android.content.res.ColorStateList.valueOf(0xFF0F172A));
+            imageView.setImageTintList(android.content.res.ColorStateList.valueOf(
+                    ContextCompat.getColor(appContext, R.color.app_text_primary)
+            ));
             return;
         }
 
@@ -564,7 +567,9 @@ public class TravelShareRepository {
         }
 
         imageView.setImageResource(android.R.drawable.ic_menu_myplaces);
-        imageView.setImageTintList(android.content.res.ColorStateList.valueOf(0xFF0F172A));
+        imageView.setImageTintList(android.content.res.ColorStateList.valueOf(
+                ContextCompat.getColor(appContext, R.color.app_text_primary)
+        ));
     }
 
     public String getLocationLabel(PhotoMetadata photoMetadata) {
