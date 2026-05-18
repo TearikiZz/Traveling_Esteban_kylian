@@ -4,7 +4,6 @@ Application Android autour du voyage, divisée en deux volets principaux :
 - `TravelShare` : partage et découverte de photos de voyage.
 - `TravelPath` : autre partie du projet.
 
-Le travail documenté ici concerne principalement `TravelShare`.
 
 ## Ouvrir et lancer l'application
 
@@ -13,15 +12,6 @@ Le travail documenté ici concerne principalement `TravelShare`.
 - SDK Android disponible
 - Un émulateur Android ou un téléphone Android branché
 
-### Lancement rapide
-1. Cloner le dépôt :
-```bash
-git clone https://github.com/TearikiZz/Traveling_Esteban_kylian.git
-```
-2. Ouvrir le dossier du projet dans Android Studio.
-3. Laisser Android Studio faire le `Gradle Sync`.
-4. Sélectionner un émulateur ou un appareil.
-5. Lancer l'application avec `Run`.
 
 ### Configuration technique
 - `minSdk` : 24
@@ -85,17 +75,6 @@ GEMINI_API_KEY=VOTRE_CLE_GEMINI
 GEMINI_MODEL=gemini-2.5-flash
 ```
 
-Étapes rapides :
-1. Ouvrir [Google AI Studio](https://aistudio.google.com/apikey).
-2. Se connecter avec un compte Google.
-3. Ouvrir la page `API Keys`.
-4. Créer une clé Gemini ou utiliser la clé du projet par défaut si elle est proposée.
-5. Copier la clé dans `local.properties`.
-
-Attention :
-- ne committez jamais `local.properties`
-- pour une vraie application de production, il ne faut pas exposer la clé directement dans l'application mobile
-
 ## Fonctionnalités TravelShare disponibles
 
 - authentification : connexion, inscription, déconnexion et mode anonyme
@@ -126,7 +105,6 @@ Attention :
 ## Limites connues
 
 - pas de vue carte embarquée avec pins dans cette version
-- pas de traduction espagnole complète dans cette version
 - sans `PLACES_API_KEY`, l'autocomplétion Google est désactivée mais la saisie manuelle du lieu reste disponible
 - sans `GEMINI_API_KEY`, l'annotation IA est désactivée mais la création de publication reste disponible
 
