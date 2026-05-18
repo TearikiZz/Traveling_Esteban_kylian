@@ -79,6 +79,7 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
     private Spinner groupSpinner;
     private Spinner placeTypeSpinner;
     private ImageView selectedImagePreview;
+    private View photoPlaceholderView;
     private TextView selectedPlaceLabelTextView;
     private TextView selectedPlaceDetailsTextView;
     private TextView manualPlaceFallbackTextView;
@@ -89,6 +90,7 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
     private ProgressBar annotationProgressBar;
     private Button applyAnnotationButton;
     private Button showManualPlaceFormButton;
+    private Button selectPhotoButton;
     private Button recordVoiceNoteButton;
     private Button playVoiceNoteButton;
     private Button deleteVoiceNoteButton;
@@ -152,8 +154,7 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         setupPlaceSearchField();
         setupAnnotationAssistant();
 
-        Button selectImageButton = findViewById(R.id.btnSelectPhoto);
-        selectImageButton.setOnClickListener(v -> openDocumentLauncher.launch(new String[]{"image/*"}));
+        selectPhotoButton.setOnClickListener(v -> openDocumentLauncher.launch(new String[]{"image/*"}));
 
         Button publishButton = findViewById(R.id.btnPublishPhotoMetadata);
         publishButton.setOnClickListener(v -> publishPhotoMetadata());
@@ -173,6 +174,7 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
                     if (selectedImagePreview != null) {
                         selectedImagePreview.setImageURI(uri);
                     }
+                    updatePhotoPreviewState();
                     scheduleAnnotationSuggestion();
                 }
         );
@@ -211,6 +213,7 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         groupSpinner = findViewById(R.id.spinnerCreateGroup);
         placeTypeSpinner = findViewById(R.id.spinnerCreatePlaceType);
         selectedImagePreview = findViewById(R.id.ivSelectedPhotoPreview);
+        photoPlaceholderView = findViewById(R.id.layoutPhotoPlaceholder);
         selectedPlaceLabelTextView = findViewById(R.id.tvSelectedPlaceValue);
         selectedPlaceDetailsTextView = findViewById(R.id.tvSelectedPlaceDetails);
         manualPlaceFallbackTextView = findViewById(R.id.tvManualPlaceFallback);
@@ -221,6 +224,7 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         annotationProgressBar = findViewById(R.id.progressAnnotation);
         applyAnnotationButton = findViewById(R.id.btnApplyAnnotation);
         showManualPlaceFormButton = findViewById(R.id.btnShowManualPlaceForm);
+        selectPhotoButton = findViewById(R.id.btnSelectPhoto);
         recordVoiceNoteButton = findViewById(R.id.btnRecordVoiceNote);
         playVoiceNoteButton = findViewById(R.id.btnPlayVoiceNote);
         deleteVoiceNoteButton = findViewById(R.id.btnDeleteVoiceNote);
@@ -236,7 +240,16 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
         renderManualPlaceFallbackState();
 
         renderAnnotationSuggestion(null);
+        updatePhotoPreviewState();
         updateVoiceNoteUi();
+    }
+
+    private void updatePhotoPreviewState() {
+        boolean hasPhoto = selectedImageUri != null;
+        photoPlaceholderView.setVisibility(hasPhoto ? View.GONE : View.VISIBLE);
+        selectPhotoButton.setText(hasPhoto
+                ? R.string.travelshare_change_photo_button
+                : R.string.travelshare_select_photo_button);
     }
 
     private void bindManualPlaceWatchers() {
@@ -1153,6 +1166,8 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
             recordVoiceNoteButton.setText(R.string.travelshare_voice_note_record_button);
         }
 
+        playVoiceNoteButton.setVisibility(hasVoiceNote ? View.VISIBLE : View.GONE);
+        deleteVoiceNoteButton.setVisibility(hasVoiceNote || isRecordingVoiceNote ? View.VISIBLE : View.GONE);
         playVoiceNoteButton.setEnabled(hasVoiceNote && !isRecordingVoiceNote);
         playVoiceNoteButton.setText(isPlaying
                 ? R.string.travelshare_voice_note_stop_playback_button

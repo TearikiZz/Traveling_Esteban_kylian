@@ -36,6 +36,7 @@
     <string name="travelshare_feed_list_compact">Liste</string>
     <string name="travelshare_voice_search_button">Recherche vocale</string>
     <string name="travelshare_create_screen_title">Nouvelle publication TravelShare</string>
+    <string name="travelshare_create_screen_subtitle">Composez une publication claire avec photo, lieu et quelques details utiles.</string>
     <string name="travelshare_create_title_hint">Titre de la publication</string>
     <string name="travelshare_create_description_hint">Description</string>
     <string name="travelshare_create_place_name_hint">Nom du lieu ou repère</string>
@@ -91,6 +92,7 @@
     <string name="travelshare_voice_note_play_button">Lire</string>
     <string name="travelshare_voice_note_stop_playback_button">Stopper la lecture</string>
     <string name="travelshare_voice_note_delete_button">Supprimer le message vocal</string>
+    <string name="travelshare_voice_note_delete_short">Suppr.</string>
     <string name="travelshare_voice_note_ready">Message vocal prêt.</string>
     <string name="travelshare_voice_note_recording">Enregistrement en cours…</string>
     <string name="travelshare_voice_note_saved">Message vocal enregistré.</string>
@@ -111,6 +113,8 @@
     <string name="travelshare_annotation_applied">Suggestions appliquées à la publication</string>
     <string name="travelshare_create_publish_button">Publier</string>
     <string name="travelshare_select_photo_button">Choisir une photo</string>
+    <string name="travelshare_change_photo_button">Changer la photo</string>
+    <string name="travelshare_photo_placeholder">Ajoutez une photo pour lancer la publication</string>
     <string name="travelshare_selected_photo_preview">Aperçu de la photo sélectionnée</string>
     <string name="travelshare_create_missing_fields">Tous les champs principaux doivent être remplis.</string>
     <string name="travelshare_create_missing_photo">Veuillez sélectionner une photo.</string>
