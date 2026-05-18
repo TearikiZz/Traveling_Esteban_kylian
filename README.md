@@ -122,6 +122,9 @@ Il est aussi possible d'utiliser le mode anonyme depuis l'écran principal ou de
 
 - Rapport dépot 1 : [Google Docs](https://docs.google.com/document/d/1o7mm7aCbfqujxYhBLlrR-QNlFFKafq1opXZrzC9ERCA/edit?usp=sharing)
 - Rapport dépot 2 : [Google Docs](https://docs.google.com/document/d/1setkHzDUsPspcDI7uroq2E83XlOIPxHL6HPTQDQ_DJs/edit?tab=t.0)
+- Rapport dépot 3 : [Google Docs](https://docs.google.com/document/d/1mdmNE6qZx6h8rNT2zCKwq_3mfNmJyhQiQjEaFpzBKis/edit?tab=t.0) 
+
+- Vidéo de Démo : https://www.youtube.com/watch?v=ng81VWirw_A
 
 ## Remarques
 
