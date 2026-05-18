@@ -16,8 +16,6 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder> {
 
     public interface OnNotificationClickListener {
@@ -36,7 +34,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         this.repository = repository;
         this.onNotificationClickListener = onNotificationClickListener;
         this.notifications = new ArrayList<>();
-        this.dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.FRANCE);
+        this.dateFormat = DateFormat.getDateTimeInstance(
+                DateFormat.SHORT,
+                DateFormat.SHORT,
+                repository.getCurrentLocale()
+        );
     }
 
     @NonNull

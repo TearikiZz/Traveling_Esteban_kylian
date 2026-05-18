@@ -135,7 +135,7 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         travelShareRepository = TravelShareRepository.getInstance(this);
-        travelShareRepository.applyCurrentUserThemePreference();
+        travelShareRepository.applyCurrentUserDisplayPreferences();
         setContentView(R.layout.activity_create_photo_metadata);
         annotationProvider = new GeminiTravelShareAnnotationProvider(this);
 
@@ -1006,7 +1006,7 @@ public class CreatePhotoMetadataActivity extends AppCompatActivity {
     private void startDescriptionSpeechInput() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.FRANCE.toLanguageTag());
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, travelShareRepository.getCurrentLanguageTag());
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.travelshare_create_description_hint));
 
         try {

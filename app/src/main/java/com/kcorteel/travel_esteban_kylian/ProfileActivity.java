@@ -46,7 +46,7 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         travelShareRepository = TravelShareRepository.getInstance(this);
-        travelShareRepository.applyCurrentUserThemePreference();
+        travelShareRepository.applyCurrentUserDisplayPreferences();
         setContentView(R.layout.activity_profile);
 
         authManager = new AuthManager(this);
@@ -185,7 +185,7 @@ public class ProfileActivity extends AppCompatActivity {
                 mapSelectionToLanguage(languageSpinner.getSelectedItemPosition()),
                 notificationsSwitch.isChecked()
         );
-        travelShareRepository.applyCurrentUserThemePreference();
+        travelShareRepository.applyCurrentUserDisplayPreferences();
         bindProfile();
         Toast.makeText(this, R.string.profile_saved_message, Toast.LENGTH_SHORT).show();
     }
@@ -226,9 +226,6 @@ public class ProfileActivity extends AppCompatActivity {
         if ("en".equalsIgnoreCase(language)) {
             return 1;
         }
-        if ("es".equalsIgnoreCase(language)) {
-            return 2;
-        }
         return 0;
     }
 
@@ -236,8 +233,6 @@ public class ProfileActivity extends AppCompatActivity {
         switch (position) {
             case 1:
                 return "en";
-            case 2:
-                return "es";
             case 0:
             default:
                 return "fr";

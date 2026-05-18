@@ -21,7 +21,7 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        TravelShareRepository.getInstance(this).applyCurrentUserThemePreference();
+        TravelShareRepository.getInstance(this).applyCurrentUserDisplayPreferences();
         setContentView(R.layout.activity_register);
 
         authManager = new AuthManager(this);

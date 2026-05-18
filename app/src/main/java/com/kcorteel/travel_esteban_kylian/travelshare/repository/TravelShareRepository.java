@@ -38,6 +38,7 @@ import com.kcorteel.travel_esteban_kylian.travelshare.model.SocialInteractionTyp
 import com.kcorteel.travel_esteban_kylian.travelshare.model.TravelGroup;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.User;
 import com.kcorteel.travel_esteban_kylian.travelshare.notifications.TravelShareSystemNotifier;
+import com.kcorteel.travel_esteban_kylian.travelshare.util.TravelShareLocaleManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -135,7 +136,7 @@ public class TravelShareRepository {
     public String updateCurrentUserProfile(String username, String email, String avatarUri) {
         User currentUser = getCurrentUser();
         if (currentUser == null || currentUser.isAnonymous()) {
-            return "Connectez-vous pour modifier votre profil.";
+            return getStringResource(R.string.profile_update_requires_login);
         }
 
         String normalizedUsername = username == null ? "" : username.trim();
@@ -145,17 +146,17 @@ public class TravelShareRepository {
                 : avatarUri.trim();
 
         if (normalizedUsername.isEmpty() || normalizedEmail.isEmpty()) {
-            return "Le nom d'utilisateur et l'email sont obligatoires.";
+            return getStringResource(R.string.profile_update_missing_identity_error);
         }
 
         User existingByUsername = userDao.getByUsername(normalizedUsername);
         if (existingByUsername != null && existingByUsername.getUserId() != currentUser.getUserId()) {
-            return "Ce nom d'utilisateur existe déjà.";
+            return getStringResource(R.string.auth_username_exists_error);
         }
 
         User existingByEmail = userDao.getByEmail(normalizedEmail);
         if (existingByEmail != null && existingByEmail.getUserId() != currentUser.getUserId()) {
-            return "Cet email est déjà utilisé.";
+            return getStringResource(R.string.auth_email_exists_error);
         }
 
         userDao.upsert(new User(
@@ -201,6 +202,23 @@ public class TravelShareRepository {
                 break;
         }
         AppCompatDelegate.setDefaultNightMode(nightMode);
+    }
+
+    public void applyCurrentUserLanguagePreference() {
+        TravelShareLocaleManager.applyLanguage(getCurrentUserPreferences().getLanguage());
+    }
+
+    public void applyCurrentUserDisplayPreferences() {
+        applyCurrentUserLanguagePreference();
+        applyCurrentUserThemePreference();
+    }
+
+    public Locale getCurrentLocale() {
+        return TravelShareLocaleManager.resolveLocale(appContext);
+    }
+
+    public String getCurrentLanguageTag() {
+        return getCurrentLocale().toLanguageTag();
     }
 
     public ProfileStats getCurrentUserProfileStats() {
@@ -304,17 +322,17 @@ public class TravelShareRepository {
 
     public String createGroup(String groupName, boolean isPrivate) {
         if (isCurrentUserAnonymous()) {
-            return "Connectez-vous pour créer un groupe.";
+            return getStringResource(R.string.travelshare_group_login_required);
         }
 
         String normalizedName = groupName == null ? "" : groupName.trim();
         if (normalizedName.isEmpty()) {
-            return "Le nom du groupe est obligatoire.";
+            return getStringResource(R.string.travelshare_group_name_required);
         }
 
         for (TravelGroup existingGroup : travelGroupDao.getAll()) {
             if (existingGroup.getGroupName().equalsIgnoreCase(normalizedName)) {
-                return "Un groupe avec ce nom existe déjà.";
+                return getStringResource(R.string.travelshare_group_exists_error);
             }
         }
 
@@ -592,12 +610,14 @@ public class TravelShareRepository {
         }
 
         if (Double.isNaN(location.getLatitude()) || Double.isNaN(location.getLongitude())) {
-            return "Lieu saisi manuellement sans coordonnees precises. Ajoutez une latitude et une longitude pour activer l'itineraire.";
+            return getStringResource(R.string.travelshare_route_advice_missing_coordinates);
         }
 
-        return "Rejoindre " + location.getAddress()
-                + ", " + location.getCity()
-                + ". Ouvrez l'itinéraire pour un guidage détaillé jusqu'au point photo.";
+        return appContext.getString(
+                R.string.travelshare_route_advice_format,
+                location.getAddress(),
+                location.getCity()
+        );
     }
 
     public String getSearchableText(PhotoMetadata photoMetadata) {
@@ -637,16 +657,38 @@ public class TravelShareRepository {
 
         switch (notification.getTriggerType()) {
             case NEW_POST_IN_GROUP:
-                return "Publication de groupe";
+                return getStringResource(R.string.notifications_type_group_post);
             case LIKE_ON_PHOTO:
-                return "Like reçu";
+                return getStringResource(R.string.notifications_type_like);
             case COMMENT_ON_PHOTO:
-                return "Commentaire reçu";
+                return getStringResource(R.string.notifications_type_comment);
             case NEW_POST_BY_USER:
             case NEW_POST_IN_LOCATION:
             case NEW_TAG_MATCH:
             default:
-                return "Nouvelle publication";
+                return getStringResource(R.string.notifications_type_new_post);
+        }
+    }
+
+    public String getPlaceTypeLabel(PlaceType placeType) {
+        if (placeType == null) {
+            return getStringResource(R.string.travelshare_place_type_other);
+        }
+
+        switch (placeType) {
+            case NATURE:
+                return getStringResource(R.string.travelshare_place_type_nature);
+            case MUSEUM:
+                return getStringResource(R.string.travelshare_place_type_museum);
+            case STREET:
+                return getStringResource(R.string.travelshare_place_type_street);
+            case SHOP:
+                return getStringResource(R.string.travelshare_place_type_shop);
+            case RESTAURANT:
+                return getStringResource(R.string.travelshare_place_type_restaurant);
+            case OTHER:
+            default:
+                return getStringResource(R.string.travelshare_place_type_other);
         }
     }
 
@@ -676,7 +718,11 @@ public class TravelShareRepository {
             createNotification(
                     user.getUserId(),
                     photoMetadata.getPhotoId(),
-                    author.getUsername() + " a publié \"" + photoMetadata.getTitle() + "\".",
+                    appContext.getString(
+                            R.string.notifications_message_new_post_by_user,
+                            author.getUsername(),
+                            photoMetadata.getTitle()
+                    ),
                     NotificationTriggerType.NEW_POST_BY_USER
             );
         }
@@ -704,7 +750,11 @@ public class TravelShareRepository {
             createNotification(
                     membership.getUserId(),
                     photoMetadata.getPhotoId(),
-                    author.getUsername() + " a publié dans le groupe \"" + group.getGroupName() + "\".",
+                    appContext.getString(
+                            R.string.notifications_message_new_post_in_group,
+                            author.getUsername(),
+                            group.getGroupName()
+                    ),
                     NotificationTriggerType.NEW_POST_IN_GROUP
             );
         }
@@ -726,7 +776,11 @@ public class TravelShareRepository {
         createNotification(
                 photoMetadata.getAuthorId(),
                 photoId,
-                actor.getUsername() + " a commenté votre publication : \"" + commentText + "\".",
+                appContext.getString(
+                        R.string.notifications_message_comment_on_photo,
+                        actor.getUsername(),
+                        commentText
+                ),
                 NotificationTriggerType.COMMENT_ON_PHOTO
         );
     }
@@ -747,7 +801,11 @@ public class TravelShareRepository {
         createNotification(
                 photoMetadata.getAuthorId(),
                 photoId,
-                actor.getUsername() + " aime votre publication \"" + photoMetadata.getTitle() + "\".",
+                appContext.getString(
+                        R.string.notifications_message_like_on_photo,
+                        actor.getUsername(),
+                        photoMetadata.getTitle()
+                ),
                 NotificationTriggerType.LIKE_ON_PHOTO
         );
     }

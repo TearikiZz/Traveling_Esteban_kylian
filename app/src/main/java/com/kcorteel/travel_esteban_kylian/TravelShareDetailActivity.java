@@ -58,7 +58,7 @@ public class TravelShareDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         travelShareRepository = TravelShareRepository.getInstance(this);
-        travelShareRepository.applyCurrentUserThemePreference();
+        travelShareRepository.applyCurrentUserDisplayPreferences();
         setContentView(R.layout.activity_travel_share_detail);
         photoId = getIntent().getLongExtra(EXTRA_PHOTO_ID, -1L);
         photoMetadata = travelShareRepository.getPhotoMetadataById(photoId);
@@ -136,7 +136,7 @@ public class TravelShareDetailActivity extends AppCompatActivity {
         ));
         dateTextView.setText(getString(
                 R.string.travelshare_date_format,
-                DateFormat.getDateInstance(DateFormat.LONG, Locale.FRANCE)
+                DateFormat.getDateInstance(DateFormat.LONG, travelShareRepository.getCurrentLocale())
                         .format(new Date(photoMetadata.getTimestamp()))
         ));
         descriptionTextView.setText(photoMetadata.getDescription());

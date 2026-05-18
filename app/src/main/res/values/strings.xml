@@ -21,6 +21,12 @@
     <string name="auth_status_connected_format">Session actuelle : connecté en tant que %1$s</string>
     <string name="auth_login_success">Connexion réussie</string>
     <string name="auth_register_success">Compte créé avec succès</string>
+    <string name="auth_login_missing_fields_error">Veuillez renseigner votre identifiant et votre mot de passe.</string>
+    <string name="auth_invalid_credentials_error">Identifiants invalides.</string>
+    <string name="auth_register_missing_fields_error">Tous les champs sont obligatoires.</string>
+    <string name="auth_register_password_mismatch_error">Les mots de passe ne correspondent pas.</string>
+    <string name="auth_username_exists_error">Ce nom d\'utilisateur existe déjà.</string>
+    <string name="auth_email_exists_error">Cet email est déjà utilisé.</string>
     <string name="auth_comment_requires_login">Connectez-vous pour publier un commentaire</string>
     <string name="travelshare_screen_title">TravelShare</string>
     <string name="travelshare_screen_subtitle">Flux public basé sur les modèles du rapport : PhotoMetadata, Comment, SocialInteraction.</string>
@@ -134,6 +140,8 @@
     <string name="travelshare_description_section">Description</string>
     <string name="travelshare_tags_section">Tags</string>
     <string name="travelshare_route_section">Comment y aller</string>
+    <string name="travelshare_route_advice_missing_coordinates">Lieu saisi manuellement sans coordonnées précises. Ajoutez une latitude et une longitude pour activer l\'itinéraire.</string>
+    <string name="travelshare_route_advice_format">Rejoindre %1$s, %2$s. Ouvrez l\'itinéraire pour un guidage détaillé jusqu\'au point photo.</string>
     <string name="travelshare_comments_section">Commentaires</string>
     <string name="travelshare_directions_button">Ouvrir l\'itinéraire</string>
     <string name="travelshare_directions_missing_coordinates">Itinéraire indisponible : ce lieu a été saisi sans coordonnées.</string>
@@ -158,6 +166,12 @@
     <string name="travelshare_post_missing">Publication introuvable</string>
     <string name="travelshare_no_map_app">Aucune application de cartographie disponible</string>
     <string name="travelshare_unknown_user">Utilisateur inconnu</string>
+    <string name="travelshare_place_type_nature">Nature</string>
+    <string name="travelshare_place_type_museum">Musée</string>
+    <string name="travelshare_place_type_street">Rue</string>
+    <string name="travelshare_place_type_shop">Boutique</string>
+    <string name="travelshare_place_type_restaurant">Restaurant</string>
+    <string name="travelshare_place_type_other">Autre</string>
     <string name="profile_open_button">Ouvrir le profil</string>
     <string name="profile_screen_title">Mon profil</string>
     <string name="profile_screen_subtitle">Gérez votre photo, vos informations et vos préférences TravelShare.</string>
@@ -184,16 +198,25 @@
     <string name="profile_logout_button">Se déconnecter</string>
     <string name="profile_saved_message">Profil mis à jour</string>
     <string name="profile_photo_preview">Photo de profil</string>
+    <string name="profile_update_requires_login">Connectez-vous pour modifier votre profil.</string>
+    <string name="profile_update_missing_identity_error">Le nom d\'utilisateur et l\'email sont obligatoires.</string>
     <string name="notifications_screen_title">Notifications TravelShare</string>
     <string name="notifications_screen_subtitle">Retrouvez les dernières activités liées à vos publications et au flux TravelShare.</string>
     <string name="notifications_empty_state">Aucune notification pour le moment.</string>
     <string name="notifications_channel_name">Activité TravelShare</string>
     <string name="notifications_channel_description">Alertes liées aux publications, likes et commentaires TravelShare.</string>
     <string name="notifications_type_new_post">Nouvelle publication</string>
+    <string name="notifications_type_group_post">Publication de groupe</string>
     <string name="notifications_type_like">Like reçu</string>
     <string name="notifications_type_comment">Commentaire reçu</string>
+    <string name="notifications_message_new_post_by_user">%1$s a publié "%2$s".</string>
+    <string name="notifications_message_new_post_in_group">%1$s a publié dans le groupe "%2$s".</string>
+    <string name="notifications_message_comment_on_photo">%1$s a commenté votre publication : "%2$s".</string>
+    <string name="notifications_message_like_on_photo">%1$s aime votre publication "%2$s".</string>
     <string name="notifications_open_post">Ouvrir la publication</string>
     <string name="notifications_marked_read">Notifications marquées comme lues</string>
+    <string name="travelshare_group_name_required">Le nom du groupe est obligatoire.</string>
+    <string name="travelshare_group_exists_error">Un groupe avec ce nom existe déjà.</string>
 
     <string-array name="profile_theme_labels">
         <item>Suivre le système</item>
@@ -204,7 +227,6 @@
     <string-array name="profile_language_labels">
         <item>Français</item>
         <item>English</item>
-        <item>Español</item>
     </string-array>
 
     <string-array name="travelshare_place_type_labels">

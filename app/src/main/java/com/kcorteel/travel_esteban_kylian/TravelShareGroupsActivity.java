@@ -33,7 +33,7 @@ public class TravelShareGroupsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         repository = TravelShareRepository.getInstance(this);
-        repository.applyCurrentUserThemePreference();
+        repository.applyCurrentUserDisplayPreferences();
         setContentView(R.layout.activity_travel_share_groups);
 
         groupsRecyclerView = findViewById(R.id.rvTravelGroups);

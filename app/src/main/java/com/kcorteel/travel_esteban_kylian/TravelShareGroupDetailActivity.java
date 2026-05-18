@@ -37,7 +37,7 @@ public class TravelShareGroupDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         repository = TravelShareRepository.getInstance(this);
-        repository.applyCurrentUserThemePreference();
+        repository.applyCurrentUserDisplayPreferences();
         setContentView(R.layout.activity_travel_share_group_detail);
 
         groupId = getIntent().getLongExtra(EXTRA_GROUP_ID, -1L);

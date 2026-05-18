@@ -10,6 +10,7 @@ import android.util.Base64;
 
 import com.kcorteel.travel_esteban_kylian.BuildConfig;
 import com.kcorteel.travel_esteban_kylian.travelshare.model.PlaceType;
+import com.kcorteel.travel_esteban_kylian.travelshare.util.TravelShareLocaleManager;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -23,6 +24,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class GeminiTravelShareAnnotationProvider implements TravelShareAnnotationProvider {
 
@@ -158,22 +160,42 @@ public class GeminiTravelShareAnnotationProvider implements TravelShareAnnotatio
             String country,
             PlaceType placeType
     ) {
+        Locale locale = TravelShareLocaleManager.resolveLocale(appContext);
+        boolean english = locale.getLanguage().toLowerCase(Locale.ROOT).startsWith("en");
         StringBuilder builder = new StringBuilder();
-        builder.append("Tu es un assistant éditorial pour une application Android de voyage. ");
-        builder.append("Analyse l'image si elle est fournie, ainsi que les informations textuelles. ");
-        builder.append("Retourne uniquement un objet JSON valide sans markdown ni texte additionnel. ");
-        builder.append("Le JSON doit avoir exactement deux clés: summary et tags. ");
-        builder.append("summary doit contenir un résumé naturel, inspirant, concis, en français, sans hashtags, en deux phrases maximum et moins de 180 caractères. ");
-        builder.append("tags doit contenir entre 3 et 6 tags utiles pour la découverte d'une photo de voyage. ");
-        builder.append("Les tags doivent être de simples mots ou courtes expressions, sans #.\n\n");
-        builder.append("Titre: ").append(safeValue(title)).append('\n');
-        builder.append("Description: ").append(safeValue(description)).append('\n');
-        builder.append("Lieu: ").append(safeValue(placeName)).append('\n');
-        builder.append("Ville: ").append(safeValue(city)).append('\n');
-        builder.append("Pays: ").append(safeValue(country)).append('\n');
-        builder.append("Type de lieu: ").append(placeType == null ? "OTHER" : placeType.name()).append('\n');
-        builder.append("\nExemple de format attendu:\n");
-        builder.append("{\"summary\":\"Balade lumineuse entre ruelles et façades colorées.\",\"tags\":[\"ville\",\"architecture\",\"week-end\"]}");
+        if (english) {
+            builder.append("You are an editorial assistant for an Android travel app. ");
+            builder.append("Analyze the image if provided, along with the text information. ");
+            builder.append("Return only a valid JSON object without markdown or extra text. ");
+            builder.append("The JSON must contain exactly two keys: summary and tags. ");
+            builder.append("summary must be a natural, inspiring, concise English summary, without hashtags, in at most two sentences and under 180 characters. ");
+            builder.append("tags must contain between 3 and 6 useful tags for discovering a travel photo. ");
+            builder.append("Tags must be simple words or short phrases, without #.\n\n");
+            builder.append("Title: ").append(safeValue(title)).append('\n');
+            builder.append("Description: ").append(safeValue(description)).append('\n');
+            builder.append("Place: ").append(safeValue(placeName)).append('\n');
+            builder.append("City: ").append(safeValue(city)).append('\n');
+            builder.append("Country: ").append(safeValue(country)).append('\n');
+            builder.append("Place type: ").append(placeType == null ? "OTHER" : placeType.name()).append('\n');
+            builder.append("\nExpected format example:\n");
+            builder.append("{\"summary\":\"A bright stroll through colorful streets and calm city corners.\",\"tags\":[\"city\",\"architecture\",\"weekend\"]}");
+        } else {
+            builder.append("Tu es un assistant éditorial pour une application Android de voyage. ");
+            builder.append("Analyse l'image si elle est fournie, ainsi que les informations textuelles. ");
+            builder.append("Retourne uniquement un objet JSON valide sans markdown ni texte additionnel. ");
+            builder.append("Le JSON doit avoir exactement deux clés: summary et tags. ");
+            builder.append("summary doit contenir un résumé naturel, inspirant, concis, en français, sans hashtags, en deux phrases maximum et moins de 180 caractères. ");
+            builder.append("tags doit contenir entre 3 et 6 tags utiles pour la découverte d'une photo de voyage. ");
+            builder.append("Les tags doivent être de simples mots ou courtes expressions, sans #.\n\n");
+            builder.append("Titre: ").append(safeValue(title)).append('\n');
+            builder.append("Description: ").append(safeValue(description)).append('\n');
+            builder.append("Lieu: ").append(safeValue(placeName)).append('\n');
+            builder.append("Ville: ").append(safeValue(city)).append('\n');
+            builder.append("Pays: ").append(safeValue(country)).append('\n');
+            builder.append("Type de lieu: ").append(placeType == null ? "OTHER" : placeType.name()).append('\n');
+            builder.append("\nExemple de format attendu:\n");
+            builder.append("{\"summary\":\"Balade lumineuse entre ruelles et façades colorées.\",\"tags\":[\"ville\",\"architecture\",\"week-end\"]}");
+        }
         return builder.toString();
     }
 
@@ -181,7 +203,10 @@ public class GeminiTravelShareAnnotationProvider implements TravelShareAnnotatio
         JSONObject root = new JSONObject(responseBody);
         JSONArray candidates = root.optJSONArray("candidates");
         if (candidates == null || candidates.length() == 0) {
-            throw new IllegalStateException("Réponse Gemini inattendue.");
+            throw new IllegalStateException(buildLocalizedProviderMessage(
+                    "Unexpected Gemini response.",
+                    "Réponse Gemini inattendue."
+            ));
         }
 
         String jsonText = "";
@@ -211,7 +236,10 @@ public class GeminiTravelShareAnnotationProvider implements TravelShareAnnotatio
         }
 
         if (jsonText.isEmpty()) {
-            throw new IllegalStateException("Aucune annotation générée par Gemini.");
+            throw new IllegalStateException(buildLocalizedProviderMessage(
+                    "No annotation generated by Gemini.",
+                    "Aucune annotation générée par Gemini."
+            ));
         }
 
         JSONObject suggestionJson = new JSONObject(stripMarkdownFences(jsonText));
@@ -299,5 +327,10 @@ public class GeminiTravelShareAnnotationProvider implements TravelShareAnnotatio
 
     private String safeValue(String value) {
         return value == null ? "" : value.trim();
+    }
+
+    private String buildLocalizedProviderMessage(String english, String french) {
+        Locale locale = TravelShareLocaleManager.resolveLocale(appContext);
+        return locale.getLanguage().toLowerCase(Locale.ROOT).startsWith("en") ? english : french;
     }
 }

@@ -26,7 +26,7 @@ public class NotificationsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         repository = TravelShareRepository.getInstance(this);
-        repository.applyCurrentUserThemePreference();
+        repository.applyCurrentUserDisplayPreferences();
         setContentView(R.layout.activity_notifications);
 
         notificationsRecyclerView = findViewById(R.id.rvNotifications);

@@ -59,7 +59,7 @@ public class PhotoMetadataAdapter extends RecyclerView.Adapter<PhotoMetadataAdap
         this.onItemClickListener = onItemClickListener;
         this.allPhotoMetadata = new ArrayList<>(photoMetadataList);
         this.visiblePhotoMetadata = new ArrayList<>(photoMetadataList);
-        this.dateFormat = DateFormat.getDateInstance(DateFormat.LONG, Locale.FRANCE);
+        this.dateFormat = DateFormat.getDateInstance(DateFormat.LONG, repository.getCurrentLocale());
     }
 
     @NonNull
@@ -232,7 +232,7 @@ public class PhotoMetadataAdapter extends RecyclerView.Adapter<PhotoMetadataAdap
             descriptionTextView.setText(photoMetadata.getDescription());
             infoTextView.setText(itemView.getContext().getString(
                     R.string.travelshare_feed_info_format,
-                    photoMetadata.getPlaceType().name(),
+                    repository.getPlaceTypeLabel(photoMetadata.getPlaceType()),
                     repository.getLikeCount(photoMetadata.getPhotoId())
             ));
 

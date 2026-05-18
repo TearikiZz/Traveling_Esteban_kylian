@@ -19,7 +19,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        TravelShareRepository.getInstance(this).applyCurrentUserThemePreference();
+        TravelShareRepository.getInstance(this).applyCurrentUserDisplayPreferences();
         setContentView(R.layout.activity_login);
 
         authManager = new AuthManager(this);
