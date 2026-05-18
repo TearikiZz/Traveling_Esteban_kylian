@@ -43,6 +43,7 @@ import com.kcorteel.travel_esteban_kylian.travelshare.util.TravelShareLocaleMana
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.io.File;
 import java.util.List;
 import java.util.Locale;
 
@@ -502,6 +503,29 @@ public class TravelShareRepository {
         ) != null;
     }
 
+    public boolean isCurrentUserAuthorOfPhoto(long photoId) {
+        PhotoMetadata photoMetadata = getPhotoMetadataById(photoId);
+        return photoMetadata != null
+                && !isCurrentUserAnonymous()
+                && photoMetadata.getAuthorId() == appSessionManager.getCurrentUserId();
+    }
+
+    public boolean deletePhotoMetadata(long photoId) {
+        PhotoMetadata photoMetadata = photoMetadataDao.getById(photoId);
+        if (photoMetadata == null || !isCurrentUserAuthorOfPhoto(photoId)) {
+            return false;
+        }
+
+        deleteLocalVoiceNoteIfPossible(photoMetadata.getAudioNoteUrl());
+        commentDao.deleteByPhotoId(photoId);
+        socialInteractionDao.deleteByPhotoId(photoId);
+        notificationDao.deleteByRelatedPhotoId(photoId);
+        photoMetadataDao.deleteById(photoId);
+        mediaDao.deleteById(photoMetadata.getMediaId());
+        locationDao.deleteById(photoMetadata.getLocationId());
+        return true;
+    }
+
     public List<Notification> getNotificationsForCurrentUser() {
         return notificationDao.getByTargetUserId(appSessionManager.getCurrentUserId());
     }
@@ -829,6 +853,23 @@ public class TravelShareRepository {
 
         if (targetUserId == appSessionManager.getCurrentUserId()) {
             dispatchPendingSystemNotifications();
+        }
+    }
+
+    private void deleteLocalVoiceNoteIfPossible(String voiceNotePath) {
+        if (TextUtils.isEmpty(voiceNotePath)) {
+            return;
+        }
+
+        String normalizedPath = voiceNotePath.trim();
+        if (normalizedPath.startsWith("content://") || normalizedPath.startsWith("file://")) {
+            return;
+        }
+
+        try {
+            new File(normalizedPath).delete();
+        } catch (Exception ignored) {
+            // Best effort only.
         }
     }
 

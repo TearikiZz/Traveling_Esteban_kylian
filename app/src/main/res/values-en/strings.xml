@@ -149,6 +149,11 @@
     <string name="travelshare_unlike_button">Remove like</string>
     <string name="travelshare_report_button">Report</string>
     <string name="travelshare_reported_button">Reported</string>
+    <string name="travelshare_delete_button">Delete post</string>
+    <string name="travelshare_delete_confirm_title">Delete post</string>
+    <string name="travelshare_delete_confirm_message">Do you really want to delete this post? This action cannot be undone.</string>
+    <string name="travelshare_delete_success">Post deleted.</string>
+    <string name="travelshare_delete_error">This post cannot be deleted.</string>
     <string name="travelshare_location_format">Place: %1$s</string>
     <string name="travelshare_date_format">Date: %1$s</string>
     <string name="travelshare_author_format">Author: %1$s</string>

@@ -149,6 +149,11 @@
     <string name="travelshare_unlike_button">Retirer le like</string>
     <string name="travelshare_report_button">Signaler</string>
     <string name="travelshare_reported_button">Signalé</string>
+    <string name="travelshare_delete_button">Supprimer la publication</string>
+    <string name="travelshare_delete_confirm_title">Supprimer la publication</string>
+    <string name="travelshare_delete_confirm_message">Voulez-vous vraiment supprimer cette publication ? Cette action est définitive.</string>
+    <string name="travelshare_delete_success">Publication supprimée.</string>
+    <string name="travelshare_delete_error">Impossible de supprimer cette publication.</string>
     <string name="travelshare_location_format">Lieu : %1$s</string>
     <string name="travelshare_date_format">Date : %1$s</string>
     <string name="travelshare_author_format">Auteur : %1$s</string>

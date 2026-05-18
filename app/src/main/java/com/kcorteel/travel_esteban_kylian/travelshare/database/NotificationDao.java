@@ -32,4 +32,7 @@ public interface NotificationDao {
 
     @Query("SELECT COALESCE(MAX(notifId), 0) FROM notifications")
     long getMaxNotificationId();
+
+    @Query("DELETE FROM notifications WHERE relatedPhotoId = :photoId")
+    void deleteByRelatedPhotoId(long photoId);
 }

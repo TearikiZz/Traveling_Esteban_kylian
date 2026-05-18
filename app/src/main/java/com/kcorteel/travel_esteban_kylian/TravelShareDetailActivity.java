@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -43,6 +44,7 @@ public class TravelShareDetailActivity extends AppCompatActivity {
     private Button playVoiceNoteButton;
     private Button likeButton;
     private Button reportButton;
+    private Button deleteButton;
     private Button directionsButton;
     private Button addCommentButton;
     private EditText commentEditText;
@@ -99,6 +101,7 @@ public class TravelShareDetailActivity extends AppCompatActivity {
         openGroupButton = findViewById(R.id.btnOpenPhotoGroup);
         likeButton = findViewById(R.id.btnLikePhotoMetadata);
         reportButton = findViewById(R.id.btnReportPhotoMetadata);
+        deleteButton = findViewById(R.id.btnDeletePhotoMetadata);
         directionsButton = findViewById(R.id.btnOpenDirections);
         addCommentButton = findViewById(R.id.btnAddComment);
         commentEditText = findViewById(R.id.etAddComment);
@@ -153,6 +156,7 @@ public class TravelShareDetailActivity extends AppCompatActivity {
 
         updateLikeButton();
         updateReportButton();
+        updateDeleteButton();
         updateCommentInputState();
     }
 
@@ -189,6 +193,7 @@ public class TravelShareDetailActivity extends AppCompatActivity {
         directionsButton.setOnClickListener(v -> openDirections());
 
         addCommentButton.setOnClickListener(v -> addComment());
+        deleteButton.setOnClickListener(v -> confirmDeletePhotoMetadata());
     }
 
     private void updateLikeButton() {
@@ -206,6 +211,14 @@ public class TravelShareDetailActivity extends AppCompatActivity {
         reportButton.setText(reported
                 ? R.string.travelshare_reported_button
                 : R.string.travelshare_report_button);
+    }
+
+    private void updateDeleteButton() {
+        deleteButton.setVisibility(
+                travelShareRepository.isCurrentUserAuthorOfPhoto(photoId)
+                        ? android.view.View.VISIBLE
+                        : android.view.View.GONE
+        );
     }
 
     private void addComment() {
@@ -290,6 +303,26 @@ public class TravelShareDetailActivity extends AppCompatActivity {
         } catch (ActivityNotFoundException exception) {
             return false;
         }
+    }
+
+    private void confirmDeletePhotoMetadata() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.travelshare_delete_confirm_title)
+                .setMessage(R.string.travelshare_delete_confirm_message)
+                .setPositiveButton(R.string.travelshare_delete_button, (dialog, which) -> deletePhotoMetadata())
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void deletePhotoMetadata() {
+        boolean deleted = travelShareRepository.deletePhotoMetadata(photoId);
+        if (!deleted) {
+            Toast.makeText(this, R.string.travelshare_delete_error, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Toast.makeText(this, R.string.travelshare_delete_success, Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     private void bindVoiceNote() {

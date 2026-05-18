@@ -34,4 +34,7 @@ public interface SocialInteractionDao {
 
     @Query("SELECT COALESCE(MAX(interactionId), 0) FROM social_interactions")
     long getMaxInteractionId();
+
+    @Query("DELETE FROM social_interactions WHERE targetId = :photoId")
+    void deleteByPhotoId(long photoId);
 }

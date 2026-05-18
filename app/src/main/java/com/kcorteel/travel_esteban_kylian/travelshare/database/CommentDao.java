@@ -29,4 +29,7 @@ public interface CommentDao {
 
     @Query("SELECT COALESCE(MAX(commentId), 0) FROM comments")
     long getMaxCommentId();
+
+    @Query("DELETE FROM comments WHERE photoId = :photoId")
+    void deleteByPhotoId(long photoId);
 }
